@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>My Messages</h1>
+
+{% if messages %}
+
+    {% for message in messages %}
+
+        <div>
+            <h3>From: {{ message["sender"] }}</h3>
+
+            <p>{{ message["message"] }}</p>
+
+            <small>{{ message["created_at"] }}</small>
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>You have no messages yet.</p>
+
+{% endif %}
+
+<br>
+
+<a href="{{ url_for('student_dashboard') }}">
+    Back to Student Dashboard
+</a>
+
+{% endblock %}

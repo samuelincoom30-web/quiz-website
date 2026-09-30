@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Student Communication</h1>
+
+<h2>Send Message</h2>
+
+<form method="POST">
+
+    <label>Select Student:</label>
+
+    <select name="receiver_id" required>
+        <option value="">-- Select Student --</option>
+
+        {% for student in students %}
+        <option value="{{ student['id'] }}">
+            {{ student['full_name'] }} ({{ student['username'] }})
+        </option>
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <label>Message:</label>
+
+    <br>
+
+    <textarea
+        name="message"
+        rows="6"
+        cols="60"
+        placeholder="Type your message here..."
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">Send Message</button>
+
+</form>
+
+<br>
+
+<a href="{{ url_for('teacher_dashboard') }}">
+    Back to Teacher Dashboard
+</a>
+
+{% endblock %}

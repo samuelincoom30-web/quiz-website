@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Student Results</h1>
+
+    {% if results %}
+
+    <table>
+
+        <tr>
+
+            <th>Student</th>
+
+            <th>Student ID</th>
+
+            <th>Quiz</th>
+
+            <th>Score</th>
+
+            <th>Percentage</th>
+
+        </tr>
+
+        {% for result in results %}
+
+        <tr>
+
+            <td>
+                {{ result["full_name"] }}
+            </td>
+
+            <td>
+                {{ result["username"] }}
+            </td>
+
+            <td>
+                {{ result["title"] }}
+            </td>
+
+            <td>
+                {{ result["score"] }}/{{ result["total"] }}
+            </td>
+
+            <td>
+                {{ "%.1f"|format(result["score"] / result["total"] * 100) }}%
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    {% else %}
+
+        <p>No student has taken a quiz yet.</p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

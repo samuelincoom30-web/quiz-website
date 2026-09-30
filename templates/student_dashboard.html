@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Student Dashboard</h1>
+
+<h2>Available Quizzes</h2>
+
+{% if quizzes %}
+
+<table border="1" cellpadding="10" cellspacing="0">
+
+    <tr>
+        <th>Quiz</th>
+        <th>Description</th>
+        <th>Teacher</th>
+        <th>Action</th>
+    </tr>
+
+    {% for quiz in quizzes %}
+
+    <tr>
+
+        <td>
+            {{ quiz["title"] }}
+        </td>
+
+        <td>
+            {{ quiz["description"] }}
+        </td>
+
+        <td>
+            {{ quiz["teacher"] }}
+        </td>
+
+        <td>
+            <a href="{{ url_for('take_quiz', quiz_id=quiz['id']) }}">
+                Take Quiz
+            </a>
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No quizzes are available at the moment.</p>
+
+{% endif %}
+
+
+<hr>
+
+
+<h2>My Results</h2>
+
+{% if results %}
+
+<table border="1" cellpadding="10" cellspacing="0">
+
+    <tr>
+        <th>Quiz</th>
+        <th>Score</th>
+        <th>Total</th>
+    </tr>
+
+    {% for result in results %}
+
+    <tr>
+
+        <td>
+            {{ result["title"] }}
+        </td>
+
+        <td>
+            {{ result["score"] }}
+        </td>
+
+        <td>
+            {{ result["total"] }}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+
+<p>You have not taken any quizzes yet.</p>
+
+{% endif %}
+
+
+<hr>
+
+
+<h2>Communication</h2>
+
+<p>
+    <a href="{{ url_for('student_messages') }}">
+        My Messages
+    </a>
+</p>
+
+
+{% endblock %}

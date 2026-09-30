@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h2>Create New Quiz</h2>
+
+    <form method="POST">
+
+        <label>Quiz Title</label>
+
+        <input type="text"
+               name="title"
+               placeholder="e.g. Basic Science Test 1"
+               required>
+
+        <label>Description</label>
+
+        <textarea name="description"
+                  placeholder="Enter quiz instructions"></textarea>
+
+        <button type="submit">
+            Create Quiz
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

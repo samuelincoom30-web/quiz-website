@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="hero">
+
+    <h1>Online Quiz System</h1>
+
+    <p>
+        A simple platform for teachers to create quizzes
+        and students to take them online.
+    </p>
+
+    <br>
+
+    <a class="btn"
+       href="{{ url_for('login') }}">
+        Login
+    </a>
+
+    <a class="btn success"
+       href="{{ url_for('register') }}">
+        Student Registration
+    </a>
+
+</div>
+
+{% endblock %}

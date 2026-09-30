@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ quiz["title"] }}</h1>
+
+<div class="card">
+
+    <h2>Add Question</h2>
+
+    <form method="POST">
+
+        <label>Question</label>
+
+        <textarea name="question"
+                  required></textarea>
+
+        <label>Option A</label>
+
+        <input type="text"
+               name="option_a"
+               required>
+
+        <label>Option B</label>
+
+        <input type="text"
+               name="option_b"
+               required>
+
+        <label>Option C</label>
+
+        <input type="text"
+               name="option_c"
+               required>
+
+        <label>Option D</label>
+
+        <input type="text"
+               name="option_d"
+               required>
+
+        <label>Correct Answer</label>
+
+        <select name="correct_answer" required>
+
+            <option value="">-- Select Answer --</option>
+
+            <option value="A">A</option>
+
+            <option value="B">B</option>
+
+            <option value="C">C</option>
+
+            <option value="D">D</option>
+
+        </select>
+
+        <button type="submit">
+            Add Question
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Questions Added</h2>
+
+    {% for question in questions %}
+
+        <div class="question">
+
+            <strong>
+                {{ loop.index }}. {{ question["question"] }}
+            </strong>
+
+            <p>
+                A. {{ question["option_a"] }}
+            </p>
+
+            <p>
+                B. {{ question["option_b"] }}
+            </p>
+
+            <p>
+                C. {{ question["option_c"] }}
+            </p>
+
+            <p>
+                D. {{ question["option_d"] }}
+            </p>
+
+            <p>
+                <strong>
+                    Correct Answer:
+                    {{ question["correct_answer"] }}
+                </strong>
+            </p>
+
+        </div>
+
+        <hr>
+
+    {% else %}
+
+        <p>No questions added yet.</p>
+
+    {% endfor %}
+
+</div>
+
+<a class="btn"
+   href="{{ url_for('teacher_dashboard') }}">
+    Done
+</a>
+
+{% endblock %}

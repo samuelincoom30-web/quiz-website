@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Teacher Dashboard</h1>
+
+<hr>
+
+<h2>{{ students }}</h2>
+<p>Registered Students</p>
+
+<h2>{{ quizzes|length }}</h2>
+<p>Quizzes</p>
+
+<hr>
+
+<h2>Teacher Tools</h2>
+
+<p>
+    <a href="{{ url_for('create_quiz') }}">
+        + Create New Quiz
+    </a>
+</p>
+
+<p>
+    <a href="{{ url_for('teacher_results') }}">
+        View Student Results
+    </a>
+</p>
+
+<p>
+    <a href="{{ url_for('teacher_messages') }}">
+        Student Communication
+    </a>
+</p>
+
+<hr>
+
+<h2>My Quizzes</h2>
+
+{% if quizzes %}
+
+<table border="1" cellpadding="10" cellspacing="0">
+
+    <tr>
+        <th>Quiz</th>
+        <th>Description</th>
+        <th>Questions</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for quiz in quizzes %}
+
+    <tr>
+
+        <td>
+            {{ quiz["title"] }}
+        </td>
+
+        <td>
+            {{ quiz["description"] }}
+        </td>
+
+        <td>
+            {{ quiz["question_count"] }}
+        </td>
+
+        <td>
+
+            <a href="{{ url_for('add_question', quiz_id=quiz['id']) }}">
+                Add Questions
+            </a>
+
+            <br><br>
+
+            <a href="{{ url_for('edit_quiz', quiz_id=quiz['id']) }}">
+                Edit Quiz
+            </a>
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+
+<p>No quizzes created yet.</p>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card"
+     style="text-align:center;">
+
+    <h1>Quiz Completed!</h1>
+
+    <h2>{{ quiz["title"] }}</h2>
+
+    <h1>
+        {{ score }}/{{ total }}
+    </h1>
+
+    <h2>
+        {{ "%.1f"|format(score / total * 100) }}%
+    </h2>
+
+    {% if score / total >= 0.5 %}
+
+        <p>
+            Well done!
+        </p>
+
+    {% else %}
+
+        <p>
+            Keep studying and try again.
+        </p>
+
+    {% endif %}
+
+    <br>
+
+    <a class="btn"
+       href="{{ url_for('student_dashboard') }}">
+
+        Back to Dashboard
+
+    </a>
+
+</div>
+
+{% endblock %}
