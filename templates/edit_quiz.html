@@ -1,44 +1,518 @@
+```html
 {% extends "base.html" %}
 
 {% block content %}
 
-<h1>Edit Quiz</h1>
+<style>
+    .edit-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+    }
 
-<form method="POST">
+    .page-title {
+        color: #173b67;
+        margin-bottom: 25px;
+    }
 
-    <label>Quiz Title:</label>
-    <br>
+    .section {
+        background: white;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
 
-    <input
-        type="text"
-        name="title"
-        value="{{ quiz['title'] }}"
-        required
-    >
+    .section h2 {
+        color: #173b67;
+        margin-bottom: 20px;
+    }
 
-    <br><br>
+    .form-group {
+        margin-bottom: 18px;
+    }
 
-    <label>Description:</label>
-    <br>
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 7px;
+        color: #344054;
+    }
 
-    <textarea
-        name="description"
-        rows="5"
-        cols="60"
-    >{{ quiz['description'] }}</textarea>
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 11px;
+        border: 1px solid #d0d5dd;
+        border-radius: 6px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
 
-    <br><br>
+    textarea {
+        resize: vertical;
+    }
 
-    <button type="submit">
-        Save Changes
-    </button>
+    .question-card {
+        border: 1px solid #d0d5dd;
+        border-radius: 10px;
+        padding: 22px;
+        margin-bottom: 25px;
+        background: #f9fafb;
+    }
 
-</form>
+    .question-number {
+        color: #173b67;
+        margin-bottom: 18px;
+    }
 
-<br>
+    .option {
+        margin-bottom: 15px;
+    }
 
-<a href="{{ url_for('teacher_dashboard') }}">
-    Cancel
-</a>
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .checkbox-group {
+        margin-top: 12px;
+    }
+
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: normal;
+    }
+
+    .checkbox-group input {
+        width: 18px;
+        height: 18px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .save-btn {
+        background: #173b67;
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .save-btn:hover {
+        background: #0f2b4d;
+    }
+
+    .cancel-btn {
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .cancel-btn:hover {
+        background: #545b62;
+    }
+
+    .correct-answer {
+        max-width: 250px;
+    }
+
+    .question-count {
+        color: #667085;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .edit-container {
+            width: 92%;
+            padding: 10px;
+        }
+
+        .section {
+            padding: 18px;
+        }
+    }
+</style>
+
+
+<div class="edit-container">
+
+    <h1 class="page-title">
+        Edit Quiz
+    </h1>
+
+
+    <form method="POST">
+
+        <!-- ========================================= -->
+        <!-- QUIZ INFORMATION -->
+        <!-- ========================================= -->
+
+        <div class="section">
+
+            <h2>Quiz Information</h2>
+
+            <div class="form-group">
+
+                <label for="title">
+                    Quiz Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="{{ quiz['title'] }}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                >{{ quiz['description'] or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- QUIZ SETTINGS -->
+        <!-- ========================================= -->
+
+        <div class="section">
+
+            <h2>Quiz Settings</h2>
+
+            <div class="settings-grid">
+
+                <div class="form-group">
+
+                    <label for="duration_minutes">
+                        Duration (minutes)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="duration_minutes"
+                        name="duration_minutes"
+                        min="1"
+                        value="{{ quiz['duration_minutes'] or '' }}"
+                        placeholder="Leave blank for no time limit"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="max_attempts">
+                        Maximum Attempts
+                    </label>
+
+                    <input
+                        type="number"
+                        id="max_attempts"
+                        name="max_attempts"
+                        min="1"
+                        value="{{ quiz['max_attempts'] or 1 }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="checkbox-group">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="randomize_questions"
+                        value="1"
+                        {% if quiz['randomize_questions'] %}checked{% endif %}
+                    >
+
+                    Randomize Questions
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="randomize_options"
+                        value="1"
+                        {% if quiz['randomize_options'] %}checked{% endif %}
+                    >
+
+                    Randomize Options
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="show_result_immediately"
+                        value="1"
+                        {% if quiz['show_result_immediately'] %}checked{% endif %}
+                    >
+
+                    Show Result Immediately
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="show_correct_answers"
+                        value="1"
+                        {% if quiz['show_correct_answers'] %}checked{% endif %}
+                    >
+
+                    Show Correct Answers
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- QUESTIONS -->
+        <!-- ========================================= -->
+
+        <div class="section">
+
+            <h2>Questions</h2>
+
+            {% if questions %}
+
+                <p class="question-count">
+                    {{ questions|length }} question(s) in this quiz.
+                </p>
+
+
+                {% for question in questions %}
+
+                    <div class="question-card">
+
+                        <h3 class="question-number">
+                            Question {{ loop.index }}
+                        </h3>
+
+
+                        <!-- QUESTION TEXT -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Question
+                            </label>
+
+                            <textarea
+                                name="question_{{ question['id'] }}"
+                                rows="4"
+                                required
+                            >{{ question['question'] }}</textarea>
+
+                        </div>
+
+
+                        <!-- OPTION A -->
+
+                        <div class="option">
+
+                            <label>
+                                Option A
+                            </label>
+
+                            <input
+                                type="text"
+                                name="option_{{ question['id'] }}_A"
+                                value="{{ question['option_a'] or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- OPTION B -->
+
+                        <div class="option">
+
+                            <label>
+                                Option B
+                            </label>
+
+                            <input
+                                type="text"
+                                name="option_{{ question['id'] }}_B"
+                                value="{{ question['option_b'] or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- OPTION C -->
+
+                        <div class="option">
+
+                            <label>
+                                Option C
+                            </label>
+
+                            <input
+                                type="text"
+                                name="option_{{ question['id'] }}_C"
+                                value="{{ question['option_c'] or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- OPTION D -->
+
+                        <div class="option">
+
+                            <label>
+                                Option D
+                            </label>
+
+                            <input
+                                type="text"
+                                name="option_{{ question['id'] }}_D"
+                                value="{{ question['option_d'] or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- CORRECT ANSWER -->
+
+                        <div class="form-group correct-answer">
+
+                            <label>
+                                Correct Answer
+                            </label>
+
+                            <select
+                                name="correct_{{ question['id'] }}"
+                            >
+
+                                <option
+                                    value="A"
+                                    {% if question['correct_answer'] == 'A' %}selected{% endif %}
+                                >
+                                    A
+                                </option>
+
+                                <option
+                                    value="B"
+                                    {% if question['correct_answer'] == 'B' %}selected{% endif %}
+                                >
+                                    B
+                                </option>
+
+                                <option
+                                    value="C"
+                                    {% if question['correct_answer'] == 'C' %}selected{% endif %}
+                                >
+                                    C
+                                </option>
+
+                                <option
+                                    value="D"
+                                    {% if question['correct_answer'] == 'D' %}selected{% endif %}
+                                >
+                                    D
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <p>
+                    No questions found for this quiz.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- BUTTONS -->
+        <!-- ========================================= -->
+
+        <div class="buttons">
+
+            <button
+                type="submit"
+                class="save-btn"
+            >
+                Save Changes
+            </button>
+
+
+            <a
+                href="{{ url_for('teacher_dashboard') }}"
+                class="cancel-btn"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
 
 {% endblock %}
+

@@ -21,7 +21,7 @@
             <th>Score</th>
 
             <th>Percentage</th>
-
+            <th>Report</th>
         </tr>
 
         {% for result in results %}
@@ -47,7 +47,12 @@
             <td>
                 {{ "%.1f"|format(result["score"] / result["total"] * 100) }}%
             </td>
-
+            
+            <td>
+    <a href="{{ url_for('download_attempt_report', attempt_id=result['id']) }}">
+        Download PDF
+    </a>
+</td>
         </tr>
 
         {% endfor %}

@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+">
+
+    <h2>Upload Questions</h2>
+
+    {% if not questions %}
+
+        <!-- ==========================================
+             UPLOAD PDF SECTION
+        =========================================== -->
+
+        <div style="
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            margin-bottom: 25px;
+        ">
+
+            <h3>Upload Question Paper</h3>
+
+            <p>
+                Upload a PDF question paper. The system will extract
+                the questions and multiple-choice options for you to
+                review and edit.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('upload_questions', quiz_id=quiz['id']) }}"
+                  enctype="multipart/form-data">
+
+                <label for="pdf_file">
+                    <strong>Select PDF Question Paper:</strong>
+                </label>
+
+                <br><br>
+
+                <input
+                    type="file"
+                    id="pdf_file"
+                    name="pdf_file"
+                    accept=".pdf,application/pdf"
+                    required
+                    style="
+                        padding: 10px;
+                        width: 100%;
+                    "
+                >
+
+                <br><br>
+
+                <button
+                    type="submit"
+                    style="
+                        padding: 12px 20px;
+                        cursor: pointer;
+                    "
+                >
+                    Upload and Extract Questions
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- ==========================================
+             FUTURE FEATURES INFORMATION
+        =========================================== -->
+
+        <div style="
+            padding: 20px;
+            border-left: 4px solid #007bff;
+            background: #f1f7ff;
+            border-radius: 5px;
+        ">
+
+            <h3>How It Works</h3>
+
+            <ol>
+                <li>Upload your question paper.</li>
+                <li>The system extracts the questions.</li>
+                <li>Review and correct the extracted questions.</li>
+                <li>Select the correct answer for each question.</li>
+                <li>Save the quiz.</li>
+                <li>Edit the quiz if necessary.</li>
+                <li>Publish the quiz when ready.</li>
+                <li>Students log in and take the quiz.</li>
+                <li>Students receive their results.</li>
+                <li>The teacher can view student performance.</li>
+            </ol>
+
+        </div>
+
+
+    {% else %}
+
+        <!-- ==========================================
+             EXTRACTED QUESTIONS
+        =========================================== -->
+
+        <h3>Review Extracted Questions</h3>
+
+        <p>
+            The system found
+            <strong>{{ questions|length }}</strong>
+            question(s).
+        </p>
+
+
+        <!-- ==========================================
+             QUIZ INFORMATION
+        =========================================== -->
+
+        <form method="POST"
+              action="{{ url_for('upload_questions', quiz_id=quiz['id']) }}">
+
+            <div style="
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background: #f9f9f9;
+                margin-bottom: 25px;
+            ">
+
+                <h3>Quiz Information</h3>
+
+                <!-- Quiz title -->
+
+                <label for="quiz_title">
+                    <strong>Quiz Title:</strong>
+                </label>
+
+                <br><br>
+
+                <input
+                    type="text"
+                    id="quiz_title"
+                    name="quiz_title"
+                    placeholder="Enter quiz title"
+                    required
+                    style="
+                        width: 100%;
+                        padding: 10px;
+                        box-sizing: border-box;
+                    "
+                >
+
+                <br><br>
+
+
+                <!-- Quiz description -->
+
+                <label for="quiz_description">
+                    <strong>Description:</strong>
+                </label>
+
+                <br><br>
+
+                <textarea
+                    id="quiz_description"
+                    name="quiz_description"
+                    rows="3"
+                    placeholder="Enter an optional description for the quiz"
+                    style="
+                        width: 100%;
+                        padding: 10px;
+                        box-sizing: border-box;
+                    "
+                ></textarea>
+
+                <br><br>
+
+
+                <!-- ======================================
+                     FUTURE QUIZ SETTINGS
+                ======================================= -->
+
+                <h4>Quiz Settings</h4>
+
+                <!-- Duration -->
+
+                <label for="duration_minutes">
+                    <strong>Time Limit (minutes):</strong>
+                </label>
+
+                <br><br>
+
+                <input
+                    type="number"
+                    id="duration_minutes"
+                    name="duration_minutes"
+                    min="1"
+                    placeholder="Optional"
+                    style="
+                        padding: 10px;
+                        width: 200px;
+                        box-sizing: border-box;
+                    "
+                >
+
+                <br><br>
+
+
+                <!-- Number of attempts -->
+
+                <label for="max_attempts">
+                    <strong>Maximum Attempts:</strong>
+                </label>
+
+                <br><br>
+
+                <input
+                    type="number"
+                    id="max_attempts"
+                    name="max_attempts"
+                    min="1"
+                    value="1"
+                    style="
+                        padding: 10px;
+                        width: 200px;
+                        box-sizing: border-box;
+                    "
+                >
+
+                <br><br>
+
+
+                <!-- Randomize questions -->
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="randomize_questions"
+                        value="1"
+                    >
+
+                    Randomize question order
+                </label>
+
+                <br><br>
+
+
+                <!-- Randomize options -->
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="randomize_options"
+                        value="1"
+                    >
+
+                    Randomize answer options
+                </label>
+
+                <br><br>
+
+
+                <!-- Show result -->
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="show_result_immediately"
+                        value="1"
+                        checked
+                    >
+
+                    Allow students to see their result immediately
+                </label>
+
+                <br><br>
+
+
+                <!-- Show correct answers -->
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="show_correct_answers"
+                        value="1"
+                    >
+
+                    Show correct answers after submission
+                </label>
+
+            </div>
+
+
+            <!-- ==========================================
+                 QUESTIONS
+            =========================================== -->
+
+            {% set is_science_2026 = (questions|length == 40 and 'childhood' in questions[0].question|lower and 'adulthood' in questions[0].question|lower) %}
+            {% set science_2026_key = {1:'D', 2:'D', 3:'D', 4:'D', 5:'A', 6:'C', 8:'B', 9:'B', 10:'D', 12:'C', 13:'B', 14:'C', 15:'D', 16:'B', 17:'A', 18:'B', 19:'A', 20:'A', 21:'D', 22:'C', 23:'C', 24:'B', 25:'C', 26:'C', 27:'D', 28:'D', 29:'A', 30:'D', 31:'B', 32:'A', 33:'B', 34:'B', 35:'A', 36:'D', 37:'A', 38:'B', 39:'D', 40:'A'} %}
+            {% for q in questions %}
+
+                <div style="
+                    margin-bottom: 30px;
+                    padding: 25px;
+                    border: 1px solid #ccc;
+                    border-radius: 10px;
+                    background: #ffffff;
+                ">
+
+                    <h3>
+                        Question {{ loop.index }}
+                    </h3>
+
+
+                    <!-- Question text -->
+
+                    <label>
+                        <strong>Question:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <textarea
+                        name="question_{{ loop.index0 }}"
+                        rows="4"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 10px;
+                            box-sizing: border-box;
+                        "
+                    >{{ q.question }}</textarea>
+
+                    <br><br>
+
+
+                    <!-- Option A -->
+
+                    <label>
+                        <strong>Option A:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <input
+                        type="text"
+                        name="option_a_{{ loop.index0 }}"
+                        value="{{ q.option_a }}"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 10px;
+                            box-sizing: border-box;
+                        "
+                    >
+
+                    <br><br>
+
+
+                    <!-- Option B -->
+
+                    <label>
+                        <strong>Option B:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <input
+                        type="text"
+                        name="option_b_{{ loop.index0 }}"
+                        value="{{ q.option_b }}"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 10px;
+                            box-sizing: border-box;
+                        "
+                    >
+
+                    <br><br>
+
+
+                    <!-- Option C -->
+
+                    <label>
+                        <strong>Option C:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <input
+                        type="text"
+                        name="option_c_{{ loop.index0 }}"
+                        value="{{ q.option_c }}"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 10px;
+                            box-sizing: border-box;
+                        "
+                    >
+
+                    <br><br>
+
+
+                    <!-- Option D -->
+
+                    <label>
+                        <strong>Option D:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <input
+                        type="text"
+                        name="option_d_{{ loop.index0 }}"
+                        value="{{ q.option_d }}"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 10px;
+                            box-sizing: border-box;
+                        "
+                    >
+
+                    <br><br>
+
+
+                    {% if is_science_2026 and loop.index in [7, 11] %}
+                        <p style="color: #b45309; font-weight: bold;">
+                            Review required: please verify this question's correct answer before saving.
+                        </p>
+                    {% endif %}
+
+                    <!-- Correct answer -->
+
+                    <label for="answer_{{ loop.index0 }}">
+                        <strong>Correct Answer:</strong>
+                    </label>
+
+                    <br><br>
+
+                    <select
+                        id="answer_{{ loop.index0 }}"
+                        name="correct_answer_{{ loop.index0 }}"
+                        required
+                        style="
+                            padding: 10px;
+                            width: 200px;
+                        "
+                    >
+
+                        <option value="" {% if not (is_science_2026 and science_2026_key.get(loop.index)) %}selected{% endif %}>
+                            -- Select Answer --
+                        </option>
+
+                        <option value="A" {% if is_science_2026 and science_2026_key.get(loop.index) == 'A' %}selected{% endif %}>A</option>
+
+                        <option value="B" {% if is_science_2026 and science_2026_key.get(loop.index) == 'B' %}selected{% endif %}>B</option>
+
+                        <option value="C" {% if is_science_2026 and science_2026_key.get(loop.index) == 'C' %}selected{% endif %}>C</option>
+
+                        <option value="D" {% if is_science_2026 and science_2026_key.get(loop.index) == 'D' %}selected{% endif %}>D</option>
+
+
+
+                    </select>
+
+                </div>
+
+            {% endfor %}
+
+
+            <!-- ==========================================
+                 SAVE
+            =========================================== -->
+
+            <div style="
+                padding: 20px;
+                border-top: 2px solid #ddd;
+                margin-top: 30px;
+            ">
+
+                <input type="hidden" name="question_count" value="{{ questions|length }}">
+                <button
+                    type="submit"
+                    style="
+                        padding: 14px 25px;
+                        font-size: 16px;
+                        cursor: pointer;
+                    "
+                >
+                    Save Questions
+                </button>
+
+            </div>
+
+        </form>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
