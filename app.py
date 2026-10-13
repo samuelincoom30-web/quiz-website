@@ -2023,14 +2023,121 @@ def download_attempt_report(attempt_id):
         bottomMargin=15 * mm
     )
 
+
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus import KeepTogether
+
     styles = getSampleStyleSheet()
     story = []
 
     from xml.sax.saxutils import escape
 
+    # --------------------------------------------------
+    # PROFESSIONAL PDF COLOURS
+    # --------------------------------------------------
+    navy = colors.HexColor("#163A5F")
+    blue = colors.HexColor("#245B85")
+    light_blue = colors.HexColor("#EAF2F8")
+    green = colors.HexColor("#18794E")
+    light_green = colors.HexColor("#E8F5E9")
+    red = colors.HexColor("#B42318")
+    light_red = colors.HexColor("#FDECEC")
+    grey = colors.HexColor("#64748B")
+    light_grey = colors.HexColor("#F1F5F9")
+    white = colors.white
+
+    # --------------------------------------------------
+    # PROFESSIONAL TEXT STYLES
+    # --------------------------------------------------
+    school_style = ParagraphStyle(
+        "SchoolName",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=19,
+        leading=23,
+        textColor=navy,
+        alignment=1,
+        spaceAfter=4
+    )
+
+    report_title_style = ParagraphStyle(
+        "ReportTitle",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=16,
+        textColor=blue,
+        alignment=1,
+        spaceAfter=8
+    )
+
+    section_style = ParagraphStyle(
+        "SectionHeading",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=11,
+        leading=14,
+        textColor=navy,
+        spaceBefore=4,
+        spaceAfter=6
+    )
+
+    question_style = ParagraphStyle(
+        "QuestionText",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=10,
+        leading=14,
+        textColor=navy,
+        spaceAfter=5
+    )
+
+    option_style = ParagraphStyle(
+        "OptionText",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=13,
+        leftIndent=8,
+        spaceAfter=3
+    )
+
+    correct_option_style = ParagraphStyle(
+        "CorrectOption",
+        parent=option_style,
+        fontName="Helvetica-Bold",
+        textColor=green
+    )
+
+    selected_option_style = ParagraphStyle(
+        "SelectedOption",
+        parent=option_style,
+        fontName="Helvetica-Bold",
+        textColor=red
+    )
+
+    detail_style = ParagraphStyle(
+        "DetailText",
+        parent=styles["BodyText"],
+        fontSize=9,
+        leading=13
+    )
+
+    small_style = ParagraphStyle(
+        "SmallText",
+        parent=styles["Normal"],
+        fontSize=8,
+        leading=11,
+        textColor=grey
+    )
+
+    # --------------------------------------------------
+    # SAFE TEXT AND ANSWER HELPERS
+    # --------------------------------------------------
     def safe_text(value):
         if value is None or value == "":
             return "Not answered"
+
         return escape(str(value))
 
     def answer_text(letter, answer):
@@ -2049,145 +2156,363 @@ def download_attempt_report(attempt_id):
         option = options.get(letter)
 
         if option is not None:
-            return f"{letter} - {safe_text(option)}"
+            return f"{letter}. {safe_text(option)}"
 
         return safe_text(letter)
 
+    # --------------------------------------------------
+    # SCHOOL HEADING
+    # --------------------------------------------------
+    story.append(Spacer(1, 3 * mm))
+
     story.append(Paragraph(
         "STOCKWELL MONTESSORI SCHOOL",
-        styles["Title"]
+        school_style
     ))
 
     story.append(Paragraph(
-        "Student Quiz Report",
-        styles["Heading1"]
+        "STUDENT QUIZ PERFORMANCE REPORT",
+        report_title_style
     ))
 
+    heading_line = Table(
+        [[""]],
+        colWidths=[180 * mm],
+        rowHeights=[1.5 * mm]
+    )
+
+    heading_line.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), navy),
+        ("LINEBELOW", (0, 0), (-1, -1), 0, navy),
+    ]))
+
+    story.append(heading_line)
     story.append(Spacer(1, 6 * mm))
 
-    story.append(Paragraph(
-        f"<b>Student:</b> {safe_text(attempt['full_name'])}",
-        styles["Normal"]
-    ))
-
-    story.append(Paragraph(
-        f"<b>Username:</b> {safe_text(attempt['username'])}",
-        styles["Normal"]
-    ))
-
-    story.append(Paragraph(
-        f"<b>Quiz:</b> {safe_text(attempt['quiz_title'])}",
-        styles["Normal"]
-    ))
-
-    story.append(Paragraph(
-        f"<b>Submission date:</b> "
-        f"{safe_text(attempt['submitted_at'])}",
-        styles["Normal"]
-    ))
-
+    # --------------------------------------------------
+    # STUDENT AND QUIZ INFORMATION
+    # --------------------------------------------------
     score = attempt["score"] or 0
     total = attempt["total"] or 0
 
     percentage = (score / total * 100) if total else 0
 
-    story.append(Spacer(1, 3 * mm))
+    student_name = (
+            attempt["full_name"]
+            or attempt["username"]
+            or "Student"
+    )
 
-    story.append(Paragraph(
-        f"<b>Score:</b> {score}/{total} "
-        f"({percentage:.1f}%)",
-        styles["Heading2"]
-    ))
+    submitted_at = attempt["submitted_at"]
 
+    if submitted_at:
+        submitted_at = str(submitted_at)
+    else:
+        submitted_at = "Not available"
+
+    information_data = [
+        [
+            Paragraph("<b>Student Name</b>", detail_style),
+            Paragraph(safe_text(student_name), detail_style),
+            Paragraph("<b>Username</b>", detail_style),
+            Paragraph(safe_text(attempt["username"]), detail_style)
+        ],
+        [
+            Paragraph("<b>Quiz Title</b>", detail_style),
+            Paragraph(safe_text(attempt["quiz_title"]), detail_style),
+            Paragraph("<b>Submitted</b>", detail_style),
+            Paragraph(safe_text(submitted_at), detail_style)
+        ]
+    ]
+
+    information_table = Table(
+        information_data,
+        colWidths=[27 * mm, 63 * mm, 25 * mm, 65 * mm]
+    )
+
+    information_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), light_blue),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#CBD5E1")),
+        ("INNERGRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#CBD5E1")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+    ]))
+
+    story.append(information_table)
     story.append(Spacer(1, 5 * mm))
 
-    table_data = [[
-        "Question",
-        "Student's Answer",
-        "Correct Answer",
-        "Result"
+    # --------------------------------------------------
+    # SCORE SUMMARY
+    # --------------------------------------------------
+    score_data = [[
+        Paragraph(
+            "<b>FINAL SCORE</b><br/>"
+            f"{score} / {total}",
+            ParagraphStyle(
+                "ScoreBox",
+                parent=detail_style,
+                fontName="Helvetica-Bold",
+                fontSize=13,
+                leading=19,
+                alignment=1,
+                textColor=navy
+            )
+        ),
+        Paragraph(
+            "<b>PERCENTAGE</b><br/>"
+            f"{percentage:.1f}%",
+            ParagraphStyle(
+                "PercentageBox",
+                parent=detail_style,
+                fontName="Helvetica-Bold",
+                fontSize=13,
+                leading=19,
+                alignment=1,
+                textColor=green if percentage >= 50 else red
+            )
+        ),
+        Paragraph(
+            "<b>QUESTIONS ANSWERED</b><br/>"
+            f"{sum(1 for a in answers if a['selected_answer'])} / {len(answers)}",
+            ParagraphStyle(
+                "AnsweredBox",
+                parent=detail_style,
+                fontName="Helvetica-Bold",
+                fontSize=12,
+                leading=19,
+                alignment=1,
+                textColor=navy
+            )
+        )
     ]]
 
-    for answer in answers:
+    score_table = Table(
+        score_data,
+        colWidths=[60 * mm, 60 * mm, 60 * mm]
+    )
 
-        selected = answer_text(
+    score_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, 0), light_blue),
+        ("BACKGROUND", (1, 0), (1, 0), light_green),
+        ("BACKGROUND", (2, 0), (2, 0), light_grey),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#CBD5E1")),
+        ("INNERGRID", (0, 0), (-1, -1), 0.6, white),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
+    story.append(score_table)
+    story.append(Spacer(1, 7 * mm))
+
+    story.append(Paragraph(
+        "QUESTIONS AND ANSWERS",
+        section_style
+    ))
+
+    # --------------------------------------------------
+    # DISPLAY EACH QUESTION AND ALL FOUR OPTIONS
+    # --------------------------------------------------
+    if not answers:
+        story.append(Paragraph(
+            "No saved answer details were found for this attempt.",
+            detail_style
+        ))
+
+    for index, answer in enumerate(answers, start=1):
+
+        question_text = safe_text(answer["question_text"])
+
+        selected_letter = (
+            str(answer["selected_answer"]).strip().upper()
+            if answer["selected_answer"]
+            else ""
+        )
+
+        correct_letter = (
+            str(answer["correct_answer"]).strip().upper()
+            if answer["correct_answer"]
+            else ""
+        )
+
+        is_correct = bool(answer["is_correct"])
+
+        question_heading = Table(
+            [[Paragraph(
+                f"QUESTION {index}",
+                ParagraphStyle(
+                    f"QuestionNumber{index}",
+                    parent=detail_style,
+                    fontName="Helvetica-Bold",
+                    fontSize=10,
+                    leading=13,
+                    textColor=white
+                )
+            )]],
+            colWidths=[180 * mm]
+        )
+
+        question_heading.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), navy),
+            ("LEFTPADDING", (0, 0), (-1, -1), 8),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ("TOPPADDING", (0, 0), (-1, -1), 7),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+        ]))
+
+        question_content = [
+            question_heading,
+            Spacer(1, 3 * mm),
+            Paragraph(question_text, question_style)
+        ]
+
+        option_values = {
+            "A": answer["option_a"],
+            "B": answer["option_b"],
+            "C": answer["option_c"],
+            "D": answer["option_d"]
+        }
+
+        for letter in ["A", "B", "C", "D"]:
+            option_value = option_values[letter]
+
+            if option_value is None or str(option_value).strip() == "":
+                continue
+
+            marker = ""
+
+            if letter == correct_letter:
+                marker = "  [CORRECT ANSWER]"
+                option_format = correct_option_style
+
+            elif letter == selected_letter and not is_correct:
+                marker = "  [STUDENT'S ANSWER]"
+                option_format = selected_option_style
+
+            else:
+                option_format = option_style
+
+            option_text = (
+                f"<b>{letter}.</b> "
+                f"{safe_text(option_value)}"
+                f"<b>{marker}</b>"
+            )
+
+            question_content.append(
+                Paragraph(option_text, option_format)
+            )
+
+        if not any(
+                option_values[letter] is not None
+                and str(option_values[letter]).strip() != ""
+                for letter in ["A", "B", "C", "D"]
+        ):
+            question_content.append(
+                Paragraph(
+                    "Options are not available for this question.",
+                    small_style
+                )
+            )
+
+        question_content.append(Spacer(1, 2 * mm))
+
+        result_text = (
+            "CORRECT"
+            if is_correct
+            else "INCORRECT"
+        )
+
+        result_colour = green if is_correct else red
+
+        result_background = light_green if is_correct else light_red
+
+        selected_text = answer_text(
             answer["selected_answer"],
             answer
         )
 
-        correct = answer_text(
+        correct_text = answer_text(
             answer["correct_answer"],
             answer
         )
 
-        status = (
-            "CORRECT"
-            if answer["is_correct"]
-            else "WRONG"
+        answer_summary = Table(
+            [[
+                Paragraph(
+                    f"<b>Student's Answer</b><br/>{selected_text}",
+                    detail_style
+                ),
+                Paragraph(
+                    f"<b>Correct Answer</b><br/>{correct_text}",
+                    detail_style
+                ),
+                Paragraph(
+                    f"<b>RESULT</b><br/><font color='{result_colour.hexval()}'>"
+                    f"<b>{result_text}</b></font>",
+                    detail_style
+                )
+            ]],
+            colWidths=[60 * mm, 70 * mm, 50 * mm]
         )
 
-        question = Paragraph(
-            safe_text(answer["question_text"]),
-            styles["BodyText"]
+        answer_summary.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), result_background),
+            ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#CBD5E1")),
+            ("INNERGRID", (0, 0), (-1, -1), 0.4, white),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 7),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+        ]))
+
+        question_content.append(answer_summary)
+        question_content.append(Spacer(1, 6 * mm))
+
+        story.append(KeepTogether(question_content))
+
+    # --------------------------------------------------
+    # PAGE NUMBER FOOTER
+    # --------------------------------------------------
+    def draw_page_number(canvas, doc):
+        canvas.saveState()
+
+        canvas.setStrokeColor(colors.HexColor("#CBD5E1"))
+        canvas.setLineWidth(0.5)
+
+        canvas.line(
+            15 * mm,
+            13 * mm,
+            A4[0] - 15 * mm,
+            13 * mm
         )
 
-        selected_paragraph = Paragraph(
-            selected,
-            styles["BodyText"]
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(grey)
+
+        canvas.drawString(
+            15 * mm,
+            8 * mm,
+            "STOCKWELL MONTESSORI SCHOOL | Student Quiz Report"
         )
 
-        correct_paragraph = Paragraph(
-            correct,
-            styles["BodyText"]
+        canvas.drawRightString(
+            A4[0] - 15 * mm,
+            8 * mm,
+            f"Page {doc.page}"
         )
 
-        status_paragraph = Paragraph(
-            status,
-            styles["BodyText"]
-        )
+        canvas.restoreState()
 
-        table_data.append([
-            question,
-            selected_paragraph,
-            correct_paragraph,
-            status_paragraph
-        ])
-
-    if len(table_data) == 1:
-        table_data.append([
-            "No saved answer details were found.",
-            "",
-            "",
-            ""
-        ])
-
-    report_table = Table(
-        table_data,
-        colWidths=[
-            65 * mm,
-            40 * mm,
-            40 * mm,
-            25 * mm
-        ],
-        repeatRows=1
+    document.build(
+        story,
+        onFirstPage=draw_page_number,
+        onLaterPages=draw_page_number
     )
 
-    report_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#163A5F")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 5),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
-    ]))
-
-    story.append(report_table)
-
-    document.build(story)
 
     pdf_buffer.seek(0)
 
