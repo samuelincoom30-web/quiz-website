@@ -2,110 +2,352 @@
 
 {% block content %}
 
-<h1>Student Dashboard</h1>
+<style>
+    .student-welcome {
+        background: linear-gradient(135deg, #173b65, #2563eb);
+        color: white;
+        padding: 32px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 24px rgba(23, 59, 101, 0.15);
+    }
 
-<h2>Available Quizzes</h2>
+    .student-welcome h1 {
+        color: white;
+        margin: 0 0 8px;
+        font-size: 30px;
+    }
+
+    .student-welcome p {
+        margin: 0;
+        color: #e2eaf7;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin: 28px 0 18px;
+        flex-wrap: wrap;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        color: #173b65;
+        font-size: 23px;
+    }
+
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .quiz-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+        min-width: 0;
+    }
+
+    .quiz-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 9px 24px rgba(15, 23, 42, 0.09);
+    }
+
+    .quiz-icon {
+        width: 46px;
+        height: 46px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #eaf1ff;
+        color: #1d4ed8;
+        border-radius: 12px;
+        font-size: 23px;
+        margin-bottom: 16px;
+    }
+
+    .quiz-card h3 {
+        color: #173b65;
+        font-size: 19px;
+        margin: 0 0 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .quiz-description {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0 0 18px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .quiz-teacher {
+        font-size: 13px;
+        color: #64748b;
+        border-top: 1px solid #edf0f5;
+        padding-top: 13px;
+        margin-top: auto;
+        margin-bottom: 16px;
+    }
+
+    .quiz-card .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .student-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+    }
+
+    .results-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 14px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .results-table th {
+        background: #f1f5f9;
+        color: #173b65;
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #dcfce7;
+        color: #166534;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 28px 15px;
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #64748b;
+    }
+
+    .empty-state strong {
+        display: block;
+        color: #334155;
+        margin-bottom: 5px;
+    }
+
+    .messages-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .messages-card h3 {
+        margin: 0 0 5px;
+        color: #173b65;
+    }
+
+    .messages-card p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+        .student-welcome {
+            padding: 24px 20px;
+        }
+
+        .student-welcome h1 {
+            font-size: 25px;
+        }
+
+        .quiz-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .student-panel {
+            padding: 16px;
+        }
+    }
+</style>
+
+<!-- Welcome Banner -->
+
+<div class="student-welcome">
+    <h1>Welcome to Your Dashboard</h1>
+    <p>
+        Welcome to STOCKWELL MONTESSORI SCHOOL's Online Examination Portal.
+        Choose an available quiz, review your results, and keep learning.
+    </p>
+</div>
+
+<!-- Available Quizzes -->
+
+<div class="section-heading">
+    <h2>Available Quizzes</h2>
+</div>
 
 {% if quizzes %}
 
-<table border="1" cellpadding="10" cellspacing="0">
+<div class="quiz-grid">
 
-    <tr>
-        <th>Quiz</th>
-        <th>Description</th>
-        <th>Teacher</th>
-        <th>Action</th>
-    </tr>
+```
+{% for quiz in quizzes %}
 
-    {% for quiz in quizzes %}
+<div class="quiz-card">
 
-    <tr>
+    <div class="quiz-icon" aria-hidden="true">📝</div>
 
-        <td>
-            {{ quiz["title"] }}
-        </td>
+    <h3>{{ quiz["title"] }}</h3>
 
-        <td>
+    <p class="quiz-description">
+        {% if quiz["description"] %}
             {{ quiz["description"] }}
-        </td>
+        {% else %}
+            Test your knowledge and see how well you perform.
+        {% endif %}
+    </p>
 
-        <td>
-            {{ quiz["teacher"] }}
-        </td>
+    <div class="quiz-teacher">
+        <strong>Teacher:</strong>
+        {{ quiz["teacher"] }}
+    </div>
 
-        <td>
-            <a href="{{ url_for('take_quiz', quiz_id=quiz['id']) }}">
-                Take Quiz
-            </a>
-        </td>
+    <a class="btn"
+       href="{{ url_for('take_quiz', quiz_id=quiz['id']) }}">
+        Start Quiz &rarr;
+    </a>
 
-    </tr>
+</div>
 
-    {% endfor %}
+{% endfor %}
+```
 
-</table>
+</div>
 
 {% else %}
 
-<p>No quizzes are available at the moment.</p>
+<div class="empty-state">
+    <strong>No quizzes available yet</strong>
+    Your teacher has not made any quizzes available at the moment.
+    Please check again later.
+</div>
 
 {% endif %}
 
+<!-- Student Results -->
 
-<hr>
+<div class="section-heading">
+    <h2>My Results</h2>
+</div>
 
+<div class="student-panel">
 
-<h2>My Results</h2>
 
 {% if results %}
 
-<table border="1" cellpadding="10" cellspacing="0">
+<div class="results-table-wrapper">
 
-    <tr>
-        <th>Quiz</th>
-        <th>Score</th>
-        <th>Total</th>
-    </tr>
+    <table class="results-table">
 
-    {% for result in results %}
+        <thead>
+            <tr>
+                <th>Quiz</th>
+                <th>Score</th>
+                <th>Total Marks</th>
+                <th>Performance</th>
+            </tr>
+        </thead>
 
-    <tr>
+        <tbody>
 
-        <td>
-            {{ result["title"] }}
-        </td>
+            {% for result in results %}
 
-        <td>
-            {{ result["score"] }}
-        </td>
+            <tr>
 
-        <td>
-            {{ result["total"] }}
-        </td>
+                <td>{{ result["title"] }}</td>
 
-    </tr>
+                <td>{{ result["score"] }}</td>
 
-    {% endfor %}
+                <td>{{ result["total"] }}</td>
 
-</table>
+                <td>
+                    {% if result["total"] and result["total"]|float > 0 %}
+                        <span class="score-badge">
+                            {{ "%.1f"|format((result["score"]|float / result["total"]|float) * 100) }}%
+                        </span>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
 
 {% else %}
 
-<p>You have not taken any quizzes yet.</p>
+<div class="empty-state">
+    <strong>No results yet</strong>
+    Your completed quiz results will appear here.
+</div>
 
 {% endif %}
 
 
-<hr>
+</div>
+
+<!-- Messages -->
+
+<div class="section-heading">
+    <h2>Communication</h2>
+</div>
+
+<div class="student-panel messages-card">
 
 
-<h2>Communication</h2>
+<div>
+    <h3>Messages to Your Teacher</h3>
+    <p>Ask questions or check replies from your teacher.</p>
+</div>
 
-<p>
-    <a href="{{ url_for('messages') }}">
-        My Messages
-    </a>
-</p>
+<a class="btn" href="{{ url_for('messages') }}">
+    Open My Messages &rarr;
+</a>
 
+
+</div>
 
 {% endblock %}

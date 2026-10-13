@@ -868,27 +868,27 @@ def edit_quiz(quiz_id):
                 ).strip()
 
                 option_a = request.form.get(
-                    f"option_a_{question_id}",
+                    f"option_{question_id}_A",
                     ""
                 ).strip()
 
                 option_b = request.form.get(
-                    f"option_b_{question_id}",
+                    f"option_{question_id}_B",
                     ""
                 ).strip()
 
                 option_c = request.form.get(
-                    f"option_c_{question_id}",
+                    f"option_{question_id}_C",
                     ""
                 ).strip()
 
                 option_d = request.form.get(
-                    f"option_d_{question_id}",
+                    f"option_{question_id}_D",
                     ""
                 ).strip()
 
                 correct_answer = request.form.get(
-                    f"correct_answer_{question_id}",
+                    f"correct_{question_id}",
                     ""
                 ).upper().strip()
 
@@ -1908,7 +1908,8 @@ def teacher_results():
                 SELECT
                     attempts.id,
                     quizzes.title,
-                    users.username AS student,
+                    users.full_name,
+                    users.username,
                     attempts.score,
                     attempts.total,
                     attempts.submitted_at
@@ -2197,55 +2198,239 @@ def download_attempt_report(attempt_id):
         download_name=f"student_quiz_report_{attempt_id}.pdf"
     )
 # ============================================================
-# MESSAGES
+## ============================================================
+# STUDENT MESSAGES
 # ============================================================
 
-@app.route("/messages")
-def messages():
-
-    if "user_id" not in session:
-
-        return redirect(
-            url_for("login")
-        )
-
+@app.route("/student/messages", methods=["GET", "POST"])
+@student_required
+def student_messages():
 
     conn = get_db()
 
     try:
+        if request.method == "POST":
 
-        messages = conn.execute("""
+            teacher_id = request.form.get(
+                "receiver_id",
+                type=int
+            )
+
+            subject = request.form.get(
+                "subject",
+                ""
+            ).strip()
+
+            message_text = request.form.get(
+                "message",
+                ""
+            ).strip()
+
+            if not teacher_id or not subject or not message_text:
+                flash("Please complete all message fields.")
+                return redirect(url_for("student_messages"))
+
+            teacher = conn.execute("""
+                SELECT id
+                FROM users
+                WHERE id = %s
+                AND role = 'teacher'
+            """, (teacher_id,)).fetchone()
+
+            if not teacher:
+                flash("Please select a valid teacher.")
+                return redirect(url_for("student_messages"))
+
+            conn.execute("""
+                INSERT INTO messages (
+                    sender_id,
+                    receiver_id,
+                    subject,
+                    message
+                )
+                VALUES (%s, %s, %s, %s)
+            """, (
+                session["user_id"],
+                teacher_id,
+                subject,
+                message_text
+            ))
+
+            conn.commit()
+
+            flash("Your message has been sent to the teacher.")
+            return redirect(url_for("student_messages"))
+
+        teachers = conn.execute("""
+            SELECT id, full_name, username
+            FROM users
+            WHERE role = 'teacher'
+            ORDER BY full_name
+        """).fetchall()
+
+        message_history = conn.execute("""
             SELECT
                 messages.id,
                 messages.subject,
                 messages.message,
                 messages.created_at,
                 messages.is_read,
-                users.username AS sender
+                messages.sender_id,
+                messages.receiver_id,
+                sender.username AS sender,
+                receiver.username AS receiver
             FROM messages
 
-            JOIN users
-                ON messages.sender_id = users.id
+            JOIN users AS sender
+                ON messages.sender_id = sender.id
 
-            WHERE messages.receiver_id = %s
+            JOIN users AS receiver
+                ON messages.receiver_id = receiver.id
+
+            WHERE messages.sender_id = %s
+               OR messages.receiver_id = %s
 
             ORDER BY messages.created_at DESC
         """, (
             session["user_id"],
+            session["user_id"]
         )).fetchall()
 
-
     finally:
-
         conn.close()
 
-
     return render_template(
-        "messages.html",
-        messages=messages
+        "student_messages.html",
+        teachers=teachers,
+        messages=message_history
     )
 
 
+# ============================================================
+# TEACHER MESSAGES
+# ============================================================
+
+@app.route("/teacher/messages", methods=["GET", "POST"])
+@teacher_required
+def teacher_messages():
+
+    conn = get_db()
+
+    try:
+        if request.method == "POST":
+
+            student_id = request.form.get(
+                "receiver_id",
+                type=int
+            )
+
+            subject = request.form.get(
+                "subject",
+                ""
+            ).strip()
+
+            message_text = request.form.get(
+                "message",
+                ""
+            ).strip()
+
+            if not student_id or not subject or not message_text:
+                flash("Please complete all message fields.")
+                return redirect(url_for("teacher_messages"))
+
+            student = conn.execute("""
+                SELECT id
+                FROM users
+                WHERE id = %s
+                AND role = 'student'
+            """, (student_id,)).fetchone()
+
+            if not student:
+                flash("Please select a valid student.")
+                return redirect(url_for("teacher_messages"))
+
+            conn.execute("""
+                INSERT INTO messages (
+                    sender_id,
+                    receiver_id,
+                    subject,
+                    message
+                )
+                VALUES (%s, %s, %s, %s)
+            """, (
+                session["user_id"],
+                student_id,
+                subject,
+                message_text
+            ))
+
+            conn.commit()
+
+            flash("Your message has been sent to the student.")
+            return redirect(url_for("teacher_messages"))
+
+        students = conn.execute("""
+            SELECT id, full_name, username
+            FROM users
+            WHERE role = 'student'
+            ORDER BY full_name
+        """).fetchall()
+
+        message_history = conn.execute("""
+            SELECT
+                messages.id,
+                messages.subject,
+                messages.message,
+                messages.created_at,
+                messages.is_read,
+                messages.sender_id,
+                messages.receiver_id,
+                sender.username AS sender,
+                receiver.username AS receiver
+            FROM messages
+
+            JOIN users AS sender
+                ON messages.sender_id = sender.id
+
+            JOIN users AS receiver
+                ON messages.receiver_id = receiver.id
+
+            WHERE messages.sender_id = %s
+               OR messages.receiver_id = %s
+
+            ORDER BY messages.created_at DESC
+        """, (
+            session["user_id"],
+            session["user_id"]
+        )).fetchall()
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "teacher_messages.html",
+        students=students,
+        messages=message_history
+    )
+
+
+# ============================================================
+# MESSAGES ENTRY POINT
+# ============================================================
+
+@app.route("/messages")
+def messages():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") == "student":
+        return redirect(url_for("student_messages"))
+
+    if session.get("role") == "teacher":
+        return redirect(url_for("teacher_messages"))
+
+    return redirect(url_for("login"))
 # ============================================================
 # RUN APPLICATION
 # ============================================================

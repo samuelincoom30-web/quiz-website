@@ -2,49 +2,417 @@
 
 {% block content %}
 
-<h1>Student Communication</h1>
+<style>
+    .messaging-container {
+        max-width: 1100px;
+        margin: 25px auto;
+        padding: 0 18px 35px;
+        color: #1f2937;
+    }
 
-<h2>Send Message</h2>
+    .messaging-header {
+        background: linear-gradient(135deg, #173b67, #285a91);
+        color: white;
+        padding: 28px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(23, 59, 103, 0.15);
+    }
 
-<form method="POST">
+    .messaging-header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+    }
 
-    <label>Select Student:</label>
+    .messaging-header p {
+        margin: 0;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
 
-    <select name="receiver_id" required>
-        <option value="">-- Select Student --</option>
+    .messaging-grid {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+        gap: 22px;
+        align-items: start;
+    }
 
-        {% for student in students %}
-        <option value="{{ student['id'] }}">
-            {{ student['full_name'] }} ({{ student['username'] }})
-        </option>
-        {% endfor %}
+    .message-panel {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        margin-bottom: 22px;
+        min-width: 0;
+    }
 
-    </select>
+    .message-panel h2 {
+        color: #173b67;
+        font-size: 20px;
+        margin: 0 0 8px;
+    }
 
-    <br><br>
+    .panel-description {
+        color: #667085;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
 
-    <label>Message:</label>
+    .message-form label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 17px 0 7px;
+    }
 
-    <br>
+    .message-form input,
+    .message-form select,
+    .message-form textarea {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d0d5dd;
+        border-radius: 7px;
+        font: inherit;
+        font-size: 14px;
+        background: #fff;
+    }
 
-    <textarea
-        name="message"
-        rows="6"
-        cols="60"
-        placeholder="Type your message here..."
-        required
-    ></textarea>
+    .message-form input:focus,
+    .message-form select:focus,
+    .message-form textarea:focus {
+        outline: 2px solid #bfd7f5;
+        border-color: #285a91;
+    }
 
-    <br><br>
+    .message-form textarea {
+        resize: vertical;
+        min-height: 130px;
+    }
 
-    <button type="submit">Send Message</button>
+    .send-button {
+        width: 100%;
+        border: none;
+        border-radius: 7px;
+        background: #173b67;
+        color: white;
+        padding: 13px 18px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
 
-</form>
+    .send-button:hover {
+        background: #0f2b4d;
+    }
 
-<br>
+    .conversation-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
 
-<a href="{{ url_for('teacher_dashboard') }}">
-    Back to Teacher Dashboard
+    .message-count {
+        display: inline-block;
+        background: #e8f0fb;
+        color: #173b67;
+        border-radius: 20px;
+        padding: 6px 11px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .conversation-card {
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #198754;
+        border-radius: 9px;
+        padding: 17px;
+        margin-bottom: 14px;
+        background: #fff;
+        overflow-wrap: anywhere;
+    }
+
+    .conversation-card.sent {
+        border-left-color: #285a91;
+        background: #f8fbff;
+    }
+
+    .conversation-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .conversation-top h3 {
+        margin: 0 0 6px;
+        color: #173b67;
+        font-size: 16px;
+    }
+
+    .conversation-person {
+        font-size: 13px;
+        color: #667085;
+    }
+
+    .message-badge {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 700;
+        background: #d1fae5;
+        color: #065f46;
+        white-space: nowrap;
+    }
+
+    .message-badge.sent-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .conversation-body {
+        white-space: pre-wrap;
+        line-height: 1.7;
+        font-size: 14px;
+        margin: 12px 0;
+    }
+
+    .conversation-date {
+        color: #667085;
+        font-size: 12px;
+        border-top: 1px solid #edf0f4;
+        padding-top: 11px;
+        margin-top: 12px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 35px 15px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 9px;
+        background: #f8fafc;
+        color: #667085;
+        line-height: 1.7;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 35px;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-link {
+        display: inline-block;
+        text-decoration: none;
+        background: #eef2f7;
+        color: #173b67;
+        padding: 11px 16px;
+        border-radius: 7px;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .dashboard-link:hover {
+        background: #dce6f2;
+    }
+
+    @media (max-width: 760px) {
+        .messaging-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .messaging-header {
+            padding: 22px;
+        }
+
+        .messaging-header h1 {
+            font-size: 23px;
+        }
+
+        .message-panel {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="messaging-container">
+
+```
+<header class="messaging-header">
+    <h1>💬 Student Communication</h1>
+    <p>
+        Manage student enquiries, read incoming messages and
+        communicate directly with your learners.
+    </p>
+</header>
+
+<div class="messaging-grid">
+
+    <!-- SEND MESSAGE -->
+
+    <section class="message-panel">
+
+        <h2>✉️ Compose Message</h2>
+
+        <p class="panel-description">
+            Select a student and send a message about their
+            learning, quizzes or academic progress.
+        </p>
+
+        <form method="POST"
+              action="{{ url_for('teacher_messages') }}"
+              class="message-form">
+
+            <label for="receiver_id">Recipient</label>
+
+            <select name="receiver_id"
+                    id="receiver_id"
+                    required>
+
+                <option value="">-- Choose a student --</option>
+
+                {% for student in students %}
+                    <option value="{{ student['id'] }}">
+                        {{ student['full_name'] or student['username'] }}
+                        ({{ student['username'] }})
+                    </option>
+                {% endfor %}
+
+            </select>
+
+            <label for="subject">Subject</label>
+
+            <input type="text"
+                   name="subject"
+                   id="subject"
+                   maxlength="255"
+                   placeholder="e.g. Mathematics quiz feedback"
+                   required>
+
+            <label for="message">Your Message</label>
+
+            <textarea name="message"
+                      id="message"
+                      rows="6"
+                      placeholder="Write your message here..."
+                      required></textarea>
+
+            <button type="submit" class="send-button">
+                Send Message
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- CONVERSATION HISTORY -->
+
+    <section class="message-panel">
+
+        <div class="conversation-summary">
+            <h2>📥 Message History</h2>
+
+            <span class="message-count">
+                {{ messages|length }} message(s)
+            </span>
+        </div>
+
+        <p class="panel-description">
+            Messages you have received from students and
+            messages you have sent are displayed below.
+        </p>
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <article class="conversation-card
+                    {% if message['sender_id'] == session['user_id'] %}sent{% endif %}">
+
+                    <div class="conversation-top">
+
+                        <div>
+                            <h3>
+                                {{ message['subject'] or 'No subject' }}
+                            </h3>
+
+                            <div class="conversation-person">
+
+                                {% if message['sender_id'] == session['user_id'] %}
+
+                                    To:
+                                    {{ message['receiver'] }}
+
+                                {% else %}
+
+                                    From:
+                                    {{ message['sender'] }}
+
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                        {% if message['sender_id'] == session['user_id'] %}
+
+                            <span class="message-badge sent-badge">
+                                SENT
+                            </span>
+
+                        {% else %}
+
+                            <span class="message-badge">
+                                RECEIVED
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="conversation-body">{{ message['message'] }}</div>
+
+                    <div class="conversation-date">
+                        🕒 {{ message['created_at'] }}
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+
+                <strong>No messages yet</strong>
+
+                <p>
+                    Messages from students will appear here.
+                    You can also start a conversation using
+                    the form on the left.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+<a href="{{ url_for('teacher_dashboard') }}"
+   class="dashboard-link">
+    ← Back to Teacher Dashboard
 </a>
+```
+
+</div>
 
 {% endblock %}

@@ -2,134 +2,296 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Online Quiz System</title>
+    <title>Stockwell Montessori School | Online Examination Portal</title>
 
     <style>
+        :root {
+            --primary: #173b65;
+            --primary-dark: #102b4b;
+            --accent: #2563eb;
+            --background: #f3f6fb;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #15803d;
+            --danger: #dc2626;
+        }
 
         * {
             box-sizing: border-box;
         }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            color: #222;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+
         nav {
-            background: #1f2937;
-            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
         }
 
         .logo {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
         }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            font-weight: normal;
+            letter-spacing: 1.2px;
+            color: #cbdcf4;
+            margin-top: 3px;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-block;
+            padding: 9px 12px;
+            margin: 3px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main page area */
 
         .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 20px;
+            width: min(1180px, 94%);
+            margin: 32px auto;
+            min-height: 65vh;
         }
 
+        /* Cards */
+
         .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: var(--surface);
+            padding: 26px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
+        }
+
+        .card h1,
+        .card h2,
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        h1,
+        h2,
+        h3 {
+            line-height: 1.3;
+        }
+
+        p {
+            overflow-wrap: anywhere;
+        }
+
+        /* Forms */
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 12px;
+            color: #334155;
         }
 
         input,
         textarea,
         select {
             width: 100%;
-            padding: 12px;
-            margin: 8px 0 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            padding: 12px 14px;
+            margin: 7px 0 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        /* Buttons */
 
         button,
         .btn {
-            background: #2563eb;
+            background: var(--accent);
             color: white;
             border: none;
             padding: 11px 18px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            transition: background 0.2s, transform 0.2s;
         }
 
         button:hover,
         .btn:hover {
             background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        button:focus-visible,
+        .btn:focus-visible,
+        nav a:focus-visible {
+            outline: 3px solid #93c5fd;
+            outline-offset: 2px;
         }
 
         .danger {
-            background: #dc2626;
+            background: var(--danger);
+        }
+
+        .danger:hover {
+            background: #b91c1c;
         }
 
         .success {
-            background: #16a34a;
+            background: var(--success);
         }
 
+        .success:hover {
+            background: #166534;
+        }
+
+        /* Quiz questions */
+
         .question {
-            margin-bottom: 25px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .question h3 {
+            margin-top: 0;
         }
 
         .option {
             margin: 10px 0;
         }
 
+        /* Messages */
+
         .flash {
-            background: #fff3cd;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            background: #fff7d6;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+            padding: 13px 16px;
+            margin-bottom: 18px;
+            border-radius: 9px;
         }
+
+        /* Tables */
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
         }
 
         th,
         td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
+            padding: 13px 15px;
+            border-bottom: 1px solid var(--border);
             text-align: left;
         }
 
+        th {
+            background: #edf3fb;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Welcome sections */
+
         .hero {
             text-align: center;
-            padding: 60px 20px;
+            padding: 55px 25px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
         }
 
         .hero h1 {
-            font-size: 40px;
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--primary);
+            margin-bottom: 12px;
         }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        /* Dashboard layouts */
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
             gap: 20px;
         }
 
@@ -138,102 +300,124 @@
             font-size: 20px;
         }
 
-        @media(max-width:600px) {
+        /* Footer */
 
+        .site-footer {
+            background: white;
+            color: var(--muted);
+            text-align: center;
+            padding: 22px 15px;
+            margin-top: 45px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        /* Small screens */
+
+        @media (max-width: 650px) {
             nav {
-                padding: 12px;
+                padding: 14px 4%;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
             }
 
             nav a {
-                margin-left: 7px;
+                margin: 2px 3px 2px 0;
+                padding: 8px 10px;
             }
 
-            .hero h1 {
-                font-size: 30px;
+            .logo {
+                font-size: 17px;
             }
 
+            .container {
+                width: 94%;
+                margin: 20px auto;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .hero {
+                padding: 35px 18px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            button,
+            .btn {
+                max-width: 100%;
+            }
         }
-
     </style>
-
 </head>
 
 <body>
 
 <nav>
-
     <div class="logo">
-        Online Quiz System
+        STOCKWELL MONTESSORI SCHOOL
+        <small>ONLINE EXAMINATION PORTAL</small>
     </div>
 
-    <div>
-
+    <div class="nav-links">
         {% if session.get("user_id") %}
 
             {% if session.get("role") == "teacher" %}
 
-                <a href="{{ url_for('teacher_dashboard') }}">
-                    Dashboard
-                </a>
-
-                <a href="{{ url_for('teacher_results') }}">
-                    Results
-                </a>
+                <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('teacher_results') }}">Results</a>
 
             {% else %}
 
-                <a href="{{ url_for('student_dashboard') }}">
-                    Dashboard
-                </a>
+                <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
 
             {% endif %}
 
-            <a href="{{ url_for('logout') }}">
-                Logout
-            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
 
         {% else %}
 
-            <a href="{{ url_for('login') }}">
-                Login
-            </a>
-
-            <a href="{{ url_for('register') }}">
-                Register
-            </a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
 
         {% endif %}
-
     </div>
-
 </nav>
-
 
 <div class="container">
 
     {% with messages = get_flashed_messages() %}
-
         {% if messages %}
-
             {% for message in messages %}
-
                 <div class="flash">
                     {{ message }}
                 </div>
-
             {% endfor %}
-
         {% endif %}
-
     {% endwith %}
 
-
     {% block content %}
-
     {% endblock %}
 
 </div>
 
-</body>
+<footer class="site-footer">
+    <p>
+        &copy; 2026 STOCKWELL MONTESSORI SCHOOL.
+        Online Examination Portal.
+    </p>
+</footer>
 
+</body>
 </html>
