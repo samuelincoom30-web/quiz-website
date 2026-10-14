@@ -1617,6 +1617,35 @@ def student_dashboard():
     )
 
 # ============================================================
+# STUDENT QUIZZES PAGE
+# ============================================================
+
+@app.route("/student/quizzes")
+@student_required
+def student_quizzes():
+    conn = get_db()
+    try:
+        quizzes = conn.execute("""
+            SELECT
+                quizzes.id,
+                quizzes.title,
+                quizzes.description,
+                quizzes.duration_minutes,
+                quizzes.max_attempts,
+                COUNT(questions.id) AS question_count
+            FROM quizzes
+            LEFT JOIN questions
+                ON quizzes.id = questions.quiz_id
+            WHERE quizzes.published = TRUE
+            GROUP BY quizzes.id
+            ORDER BY quizzes.id DESC
+        """).fetchall()
+    finally:
+        conn.close()
+
+    return render_template("quizzes.html", quizzes=quizzes)
+
+# ============================================================
 # TAKE QUIZ
 # ============================================================
 

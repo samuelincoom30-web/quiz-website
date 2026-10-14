@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #173b65, #2563eb);
+        color: white;
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        color: white;
+        margin: 0 0 8px;
+    }
+
+    .page-header p {
+        color: #e2eaf7;
+        margin: 0;
+    }
+
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .quiz-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .quiz-icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .quiz-card h2 {
+        color: #173b65;
+        font-size: 20px;
+        margin: 0 0 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .quiz-description {
+        color: #64748b;
+        font-size: 14px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .quiz-details {
+        color: #64748b;
+        font-size: 13px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 12px;
+        margin-top: auto;
+    }
+
+    .quiz-card .btn {
+        display: block;
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .empty-state {
+        background: white;
+        border: 1px dashed #cbd5e1;
+        border-radius: 14px;
+        padding: 35px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state h2 {
+        color: #173b65;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Available Quizzes</h1>
+    <p>Select a quiz below to begin your examination.</p>
+</div>
+
+{% if quizzes %}
+
+<div class="quiz-grid">
+
+    {% for quiz in quizzes %}
+
+    <article class="quiz-card">
+        <div class="quiz-icon" aria-hidden="true">📝</div>
+
+        <h2>{{ quiz["title"] }}</h2>
+
+        <p class="quiz-description">
+            {% if quiz["description"] %}
+                {{ quiz["description"] }}
+            {% else %}
+                Test your knowledge and see how well you perform.
+            {% endif %}
+        </p>
+
+        <div class="quiz-details">
+            <p><strong>Questions:</strong> {{ quiz["question_count"] }}</p>
+
+            {% if quiz["duration_minutes"] %}
+            <p><strong>Duration:</strong> {{ quiz["duration_minutes"] }} minutes</p>
+            {% endif %}
+        </div>
+
+        <a class="btn"
+           href="{{ url_for('take_quiz', quiz_id=quiz['id']) }}">
+            Start Quiz &rarr;
+        </a>
+    </article>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="empty-state">
+    <h2>No quizzes available yet</h2>
+    <p>Your teacher has not published any quizzes. Please check again later.</p>
+</div>
+
+{% endif %}
+
+{% endblock %}

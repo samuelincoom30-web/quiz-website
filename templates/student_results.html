@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .results-header {
+        background: linear-gradient(135deg, #173b65, #2563eb);
+        color: white;
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 25px;
+    }
+
+    .results-header h1 {
+        color: white;
+        margin: 0 0 8px;
+    }
+
+    .results-header p {
+        color: #e2eaf7;
+        margin: 0;
+    }
+
+    .results-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .results-table th {
+        background: #f1f5f9;
+        color: #173b65;
+    }
+
+    .score-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #dcfce7;
+        color: #166534;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 35px 20px;
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #64748b;
+    }
+
+    .empty-state h2 {
+        color: #173b65;
+    }
+
+    .page-actions {
+        margin-top: 22px;
+    }
+
+    @media (max-width: 600px) {
+        .results-panel {
+            padding: 12px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 10px;
+        }
+    }
+</style>
+
+<div class="results-header">
+    <h1>My Examination Results</h1>
+    <p>Review your scores and track your learning progress.</p>
+</div>
+
+<div class="results-panel">
+
+    {% if results %}
+
+    <div class="table-wrapper">
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Score</th>
+                    <th>Total Marks</th>
+                    <th>Performance</th>
+                    <th>Date Submitted</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result["title"] }}</td>
+                    <td>{{ result["score"] }}</td>
+                    <td>{{ result["total"] }}</td>
+
+                    <td>
+                        {% if result["total"] and result["total"]|float > 0 %}
+                            <span class="score-badge">
+                                {{ "%.1f"|format((result["score"]|float / result["total"]|float) * 100) }}%
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if result["submitted_at"] %}
+                            {{ result["submitted_at"] }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+        <h2>No results yet</h2>
+        <p>Your results will appear here after you complete a quiz.</p>
+    </div>
+
+    {% endif %}
+
+    <div class="page-actions">
+        <a class="btn" href="{{ url_for('student_dashboard') }}">
+            &larr; Back to Dashboard
+        </a>
+
+        <a class="btn success" href="{{ url_for('student_quizzes') }}">
+            View Quizzes
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

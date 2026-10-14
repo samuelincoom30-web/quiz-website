@@ -3,351 +3,178 @@
 {% block content %}
 
 <style>
-    .student-welcome {
+    .dashboard-welcome {
         background: linear-gradient(135deg, #173b65, #2563eb);
         color: white;
-        padding: 32px;
-        border-radius: 16px;
-        margin-bottom: 28px;
-        box-shadow: 0 8px 24px rgba(23, 59, 101, 0.15);
+        padding: 35px;
+        border-radius: 18px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(23, 59, 101, 0.15);
     }
 
-    .student-welcome h1 {
+    .dashboard-welcome h1 {
         color: white;
-        margin: 0 0 8px;
         font-size: 30px;
+        margin: 0 0 10px;
     }
 
-    .student-welcome p {
-        margin: 0;
+    .dashboard-welcome p {
         color: #e2eaf7;
-    }
-
-    .section-heading {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        margin: 28px 0 18px;
-        flex-wrap: wrap;
-    }
-
-    .section-heading h2 {
         margin: 0;
+        line-height: 1.8;
+    }
+
+    .dashboard-heading {
         color: #173b65;
         font-size: 23px;
+        margin: 0 0 20px;
     }
 
-    .quiz-grid {
+    .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 22px;
+        margin-bottom: 30px;
     }
 
-    .quiz-card {
+    .dashboard-card {
         background: white;
         border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 22px;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
         display: flex;
         flex-direction: column;
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
         transition: transform 0.2s, box-shadow 0.2s;
         min-width: 0;
     }
 
-    .quiz-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 9px 24px rgba(15, 23, 42, 0.09);
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09);
     }
 
-    .quiz-icon {
-        width: 46px;
-        height: 46px;
+    .dashboard-icon {
+        width: 55px;
+        height: 55px;
         display: flex;
+        align-items: center;
         justify-content: center;
-        align-items: center;
         background: #eaf1ff;
-        color: #1d4ed8;
-        border-radius: 12px;
-        font-size: 23px;
-        margin-bottom: 16px;
-    }
-
-    .quiz-card h3 {
-        color: #173b65;
-        font-size: 19px;
-        margin: 0 0 10px;
-        overflow-wrap: anywhere;
-    }
-
-    .quiz-description {
-        color: #64748b;
-        font-size: 14px;
-        margin: 0 0 18px;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-    }
-
-    .quiz-teacher {
-        font-size: 13px;
-        color: #64748b;
-        border-top: 1px solid #edf0f5;
-        padding-top: 13px;
-        margin-top: auto;
-        margin-bottom: 16px;
-    }
-
-    .quiz-card .btn {
-        width: 100%;
-        text-align: center;
-    }
-
-    .student-panel {
-        background: white;
-        border: 1px solid #e2e8f0;
         border-radius: 14px;
-        padding: 22px;
-        margin-bottom: 22px;
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+        font-size: 28px;
+        margin-bottom: 18px;
     }
 
-    .results-table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .results-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .results-table th,
-    .results-table td {
-        padding: 14px;
-        border-bottom: 1px solid #e2e8f0;
-        text-align: left;
-    }
-
-    .results-table th {
-        background: #f1f5f9;
+    .dashboard-card h2 {
         color: #173b65;
+        font-size: 20px;
+        margin: 0 0 10px;
     }
 
-    .score-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 20px;
-        background: #dcfce7;
-        color: #166534;
-        font-weight: bold;
-        font-size: 13px;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 28px 15px;
-        background: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 12px;
-        color: #64748b;
-    }
-
-    .empty-state strong {
-        display: block;
-        color: #334155;
-        margin-bottom: 5px;
-    }
-
-    .messages-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        flex-wrap: wrap;
-    }
-
-    .messages-card h3 {
-        margin: 0 0 5px;
-        color: #173b65;
-    }
-
-    .messages-card p {
-        margin: 0;
+    .dashboard-card p {
         color: #64748b;
         font-size: 14px;
+        line-height: 1.8;
+        margin: 0 0 22px;
+        flex-grow: 1;
+    }
+
+    .dashboard-card .btn {
+        display: block;
+        text-align: center;
+        margin-top: auto;
+    }
+
+    .dashboard-note {
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 14px;
+        padding: 20px;
+        color: #1e40af;
+        line-height: 1.8;
     }
 
     @media (max-width: 600px) {
-        .student-welcome {
-            padding: 24px 20px;
+        .dashboard-welcome {
+            padding: 25px 20px;
         }
 
-        .student-welcome h1 {
+        .dashboard-welcome h1 {
             font-size: 25px;
         }
 
-        .quiz-grid {
+        .dashboard-grid {
             grid-template-columns: 1fr;
-        }
-
-        .student-panel {
-            padding: 16px;
         }
     }
 </style>
 
-<!-- Welcome Banner -->
+<section class="dashboard-welcome">
+    <h1>Welcome to Your Student Dashboard</h1>
 
-<div class="student-welcome">
-    <h1>Welcome to Your Dashboard</h1>
     <p>
         Welcome to STOCKWELL MONTESSORI SCHOOL's Online Examination Portal.
-        Choose an available quiz, review your results, and keep learning.
+        Choose an option below to take examinations, check your performance,
+        or communicate with your teacher.
     </p>
-</div>
+</section>
 
-<!-- Available Quizzes -->
+<h2 class="dashboard-heading">Your Learning Centre</h2>
 
-<div class="section-heading">
-    <h2>Available Quizzes</h2>
-</div>
+<div class="dashboard-grid">
 
-{% if quizzes %}
+    <article class="dashboard-card">
+        <div class="dashboard-icon" aria-hidden="true">📝</div>
 
-<div class="quiz-grid">
+        <h2>Available Quizzes</h2>
 
-```
-{% for quiz in quizzes %}
+        <p>
+            View published examinations, read the quiz details,
+            and begin an available quiz when you are ready.
+        </p>
 
-<div class="quiz-card">
+        <a class="btn" href="{{ url_for('student_quizzes') }}">
+            View Quizzes &rarr;
+        </a>
+    </article>
 
-    <div class="quiz-icon" aria-hidden="true">📝</div>
+    <article class="dashboard-card">
+        <div class="dashboard-icon" aria-hidden="true">📊</div>
 
-    <h3>{{ quiz["title"] }}</h3>
+        <h2>My Results</h2>
 
-    <p class="quiz-description">
-        {% if quiz["description"] %}
-            {{ quiz["description"] }}
-        {% else %}
-            Test your knowledge and see how well you perform.
-        {% endif %}
-    </p>
+        <p>
+            Review your completed examinations, marks, and
+            performance to understand your progress.
+        </p>
 
-    <div class="quiz-teacher">
-        <strong>Teacher:</strong>
-        {{ quiz["teacher"] }}
-    </div>
+        <a class="btn" href="{{ url_for('student_results') }}">
+            View My Results &rarr;
+        </a>
+    </article>
 
-    <a class="btn"
-       href="{{ url_for('take_quiz', quiz_id=quiz['id']) }}">
-        Start Quiz &rarr;
-    </a>
+    <article class="dashboard-card">
+        <div class="dashboard-icon" aria-hidden="true">💬</div>
 
-</div>
+        <h2>Messages</h2>
 
-{% endfor %}
-```
+        <p>
+            Send messages to your teacher, ask questions,
+            and read responses.
+        </p>
 
-</div>
-
-{% else %}
-
-<div class="empty-state">
-    <strong>No quizzes available yet</strong>
-    Your teacher has not made any quizzes available at the moment.
-    Please check again later.
-</div>
-
-{% endif %}
-
-<!-- Student Results -->
-
-<div class="section-heading">
-    <h2>My Results</h2>
-</div>
-
-<div class="student-panel">
-
-
-{% if results %}
-
-<div class="results-table-wrapper">
-
-    <table class="results-table">
-
-        <thead>
-            <tr>
-                <th>Quiz</th>
-                <th>Score</th>
-                <th>Total Marks</th>
-                <th>Performance</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            {% for result in results %}
-
-            <tr>
-
-                <td>{{ result["title"] }}</td>
-
-                <td>{{ result["score"] }}</td>
-
-                <td>{{ result["total"] }}</td>
-
-                <td>
-                    {% if result["total"] and result["total"]|float > 0 %}
-                        <span class="score-badge">
-                            {{ "%.1f"|format((result["score"]|float / result["total"]|float) * 100) }}%
-                        </span>
-                    {% else %}
-                        —
-                    {% endif %}
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+        <a class="btn" href="{{ url_for('messages') }}">
+            Open Messages &rarr;
+        </a>
+    </article>
 
 </div>
 
-{% else %}
-
-<div class="empty-state">
-    <strong>No results yet</strong>
-    Your completed quiz results will appear here.
-</div>
-
-{% endif %}
-
-
-</div>
-
-<!-- Messages -->
-
-<div class="section-heading">
-    <h2>Communication</h2>
-</div>
-
-<div class="student-panel messages-card">
-
-
-<div>
-    <h3>Messages to Your Teacher</h3>
-    <p>Ask questions or check replies from your teacher.</p>
-</div>
-
-<a class="btn" href="{{ url_for('messages') }}">
-    Open My Messages &rarr;
-</a>
-
-
+<div class="dashboard-note">
+    <strong>Learning tip:</strong>
+    Read every question carefully, manage your examination time,
+    and review your results after completing a quiz.
 </div>
 
 {% endblock %}
