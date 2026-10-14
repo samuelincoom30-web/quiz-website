@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .result-page {
+        max-width: 900px;
+        margin: 35px auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        color: #1e293b;
+    }
+
+    .result-hero {
+        background: linear-gradient(135deg, #123c69, #2563eb);
+        color: white;
+        padding: 38px 25px;
+        border-radius: 22px;
+        text-align: center;
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.18);
+    }
+
+    .result-icon {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.16);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-radius: 50%;
+        font-size: 38px;
+    }
+
+    .result-hero h1 {
+        margin: 0 0 12px;
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .result-hero p {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.6;
+        opacity: 0.92;
+    }
+
+    .result-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 24px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .score-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 35px;
+        align-items: center;
+    }
+
+    .score-circle {
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+            #2563eb {{ percentage }}%,
+            #e2e8f0 {{ percentage }}%
+        );
+        position: relative;
+    }
+
+    .score-circle::before {
+        content: "";
+        position: absolute;
+        width: 154px;
+        height: 154px;
+        background: white;
+        border-radius: 50%;
+    }
+
+    .score-number,
+    .score-label {
+        position: relative;
+        z-index: 1;
+    }
+
+    .score-number {
+        font-size: 39px;
+        font-weight: 800;
+        color: #123c69;
+    }
+
+    .score-label {
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .score-details h2 {
+        margin: 0 0 12px;
+        font-size: 25px;
+        color: #0f172a;
+    }
+
+    .score-details p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    .score-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .stat-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        padding: 18px;
+    }
+
+    .stat-label {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        color: #0f172a;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .result-message {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 13px;
+        line-height: 1.6;
+        background: #eff6ff;
+        border-left: 5px solid #2563eb;
+        color: #1e40af;
+    }
+
+    .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .result-button {
+        display: inline-block;
+        text-decoration: none;
+        text-align: center;
+        padding: 13px 22px;
+        border-radius: 11px;
+        font-weight: 700;
+        transition: 0.2s ease;
+    }
+
+    .primary-button {
+        color: white;
+        background: #2563eb;
+    }
+
+    .primary-button:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+    }
+
+    .secondary-button {
+        color: #1e40af;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
+
+    .secondary-button:hover {
+        background: #dbeafe;
+    }
+
+    .result-footer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+        margin-top: 25px;
+    }
+
+    @media (max-width: 650px) {
+        .result-page {
+            margin: 15px auto;
+            padding: 12px;
+        }
+
+        .result-hero {
+            padding: 28px 18px;
+        }
+
+        .result-hero h1 {
+            font-size: 26px;
+        }
+
+        .result-card {
+            padding: 22px 16px;
+        }
+
+        .score-layout {
+            grid-template-columns: 1fr;
+            gap: 25px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 170px;
+            height: 170px;
+        }
+
+        .score-circle::before {
+            width: 138px;
+            height: 138px;
+        }
+
+        .score-number {
+            font-size: 34px;
+        }
+
+        .score-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .result-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+{% set safe_total = total|int %}
+{% set safe_score = score|int %}
+{% set percentage = ((safe_score * 100 / safe_total)|round(0, 'floor')|int) if safe_total > 0 else 0 %}
+{% set percentage = [0, [percentage, 100]|min]|max %}
+
+<div class="result-page">
+
+
+<section class="result-hero">
+    <div class="result-icon">
+        {% if percentage >= 80 %}
+            🏆
+        {% elif percentage >= 50 %}
+            🎉
+        {% else %}
+            📘
+        {% endif %}
+    </div>
+
+    <h1>Quiz Completed!</h1>
+
+    <p>
+        You have successfully submitted
+        <strong>{{ quiz.title }}</strong>.
+        Here is your performance summary.
+    </p>
+</section>
+
+<section class="result-card">
+
+    <div class="score-layout">
+
+        <div class="score-circle">
+            <div class="score-number">{{ percentage }}%</div>
+            <div class="score-label">YOUR SCORE</div>
+        </div>
+
+        <div class="score-details">
+            <h2>
+                {% if percentage >= 80 %}
+                    Excellent Work!
+                {% elif percentage >= 50 %}
+                    Good Effort!
+                                    {% else %}
+                        Keep Practising!
+                {% endif %}
+            </h2>
+
+            <p>
+                {% if percentage >= 80 %}
+                    Outstanding performance. Keep up the excellent work!
+                {% elif percentage >= 50 %}
+                    Well done. Review the topics you found difficult and keep improving.
+                {% else %}
+                    Every attempt is an opportunity to learn. Review your lessons and try again when permitted.
+                {% endif %}
+            </p>
+
+            <div class="score-stats">
+                <div class="stat-box">
+                    <span class="stat-label">Correct answers</span>
+                    <span class="stat-value">{{ safe_score }}</span>
+                </div>
+
+                <div class="stat-box">
+                    <span class="stat-label">Total questions</span>
+                    <span class="stat-value">{{ safe_total }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="result-message">
+        <strong>Keep learning!</strong><br>
+        Your result has been recorded. Continue practising to strengthen your knowledge.
+    </div>
+
+    <div class="result-actions">
+        <a href="{{ url_for('student_dashboard') }}"
+           class="result-button primary-button">
+            Return to Dashboard →
+        </a>
+    </div>
+
+</section>
+
+<div class="result-footer">
+    Online Quiz System · Keep learning, keep improving.
+</div>
+
+
+</div>
+
+{% endblock %}

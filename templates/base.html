@@ -373,10 +373,12 @@
     <div class="nav-links">
         {% if session.get("user_id") %}
 
-            {% if session.get("role") == "teacher" %}
+            {% if session.get("role") == "teacher" %} <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a> <a href="{{ url_for('teacher_results') }}">Results</a>
 
-                <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('teacher_results') }}">Results</a>
+
+{% if session.get("is_admin") %}
+    <a href="{{ url_for('manage_teachers') }}">Manage Teachers</a>
+{% endif %}
 
             {% else %}
 

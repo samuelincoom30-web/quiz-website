@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+    <h1>Manage Teachers</h1>
+
+```
+<p>STOCKWELL MONTESSORI SCHOOL</p>
+
+<p>
+    Create teacher accounts and manage access to the
+    Online Examination Portal.
+</p>
+```
+
+</div>
+
+<div class="card">
+    <h2>Create a Teacher Account</h2>
+
+```
+<form method="POST" action="{{ url_for('manage_teachers') }}">
+
+    <label for="full_name">Teacher's Full Name</label>
+    <input
+        type="text"
+        id="full_name"
+        name="full_name"
+        placeholder="Enter the teacher's full name"
+        required
+    >
+
+    <label for="username">Username</label>
+    <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Choose a username"
+        required
+    >
+
+    <label for="password">Temporary Password</label>
+    <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Create a password"
+        minlength="8"
+        required
+    >
+
+    <button type="submit">Create Teacher Account</button>
+
+</form>
+```
+
+</div>
+
+<div class="card">
+    <h2>Registered Teachers</h2>
+
+```
+{% if teachers %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Username</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for teacher in teachers %}
+                <tr>
+                    <td>{{ teacher.id }}</td>
+                    <td>{{ teacher.full_name or "Not provided" }}</td>
+                    <td>{{ teacher.username }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+
+    <p>No teacher accounts found.</p>
+
+{% endif %}
+```
+
+</div>
+
+<div class="card">
+    <a href="{{ url_for('teacher_dashboard') }}" class="btn">
+        Back to Dashboard
+    </a>
+</div>
+
+{% endblock %}

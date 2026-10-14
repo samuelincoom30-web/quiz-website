@@ -2,7 +2,7 @@ import os
 import re
 import uuid
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import psycopg
 import fitz
@@ -264,8 +264,8 @@ def init_db():
         """)
 
         conn.execute("""
-            ALTER TABLE quizzes
-            ADD COLUMN IF NOT EXISTS published
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS is_admin
             BOOLEAN DEFAULT FALSE
         """)
 
@@ -307,6 +307,23 @@ def teacher_required(func):
     wrapper.__name__ = func.__name__
 
     return wrapper
+def admin_required(func):
+
+    def wrapper(*args, **kwargs):
+
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+
+        if session.get("role") != "teacher" or not session.get("is_admin"):
+            flash("Administrator access required.")
+            return redirect(url_for("teacher_dashboard"))
+
+        return func(*args, **kwargs)
+
+    wrapper.__name__ = func.__name__
+
+    return wrapper
+
 
 
 def student_required(func):
@@ -387,11 +404,12 @@ def login():
         try:
 
             user = conn.execute("""
-                SELECT
+                                SELECT
                     id,
                     username,
                     password,
-                    role
+                    role,
+                    is_admin
                 FROM users
                 WHERE username = %s
             """, (
@@ -431,6 +449,8 @@ def login():
 
         session["role"] = user["role"]
 
+        session["is_admin"] = user["is_admin"]
+
 
         if user["role"] == "teacher":
 
@@ -461,7 +481,70 @@ def logout():
         url_for("login")
     )
 
+# ============================================================
+# ADMINISTRATOR: MANAGE TEACHERS
+# ============================================================
 
+@app.route("/admin/teachers", methods=["GET", "POST"])
+@admin_required
+def manage_teachers():
+
+    conn = get_db()
+
+    try:
+        if request.method == "POST":
+
+            full_name = request.form.get(
+                "full_name", ""
+            ).strip()
+
+            username = request.form.get(
+                "username", ""
+            ).strip()
+
+            password = request.form.get(
+                "password", ""
+            )
+
+            if not full_name or not username or not password:
+                flash("Please fill in all teacher details.")
+                return redirect(url_for("manage_teachers"))
+
+            existing = conn.execute("""
+                SELECT id
+                FROM users
+                WHERE username = %s
+            """, (username,)).fetchone()
+
+            if existing:
+                flash("That username already exists.")
+                return redirect(url_for("manage_teachers"))
+
+            conn.execute("""
+                INSERT INTO users
+                    (full_name, username, password, role, is_admin)
+                VALUES (%s, %s, %s, 'teacher', FALSE)
+            """, (full_name, username, password))
+
+            conn.commit()
+
+            flash("Teacher account created successfully.")
+
+            return redirect(url_for("manage_teachers"))
+
+        teachers = conn.execute("""
+            SELECT id, full_name, username
+            FROM users
+            WHERE role = 'teacher'
+            ORDER BY id
+        """).fetchall()
+    finally:
+        conn.close()
+
+    return render_template(
+        "manage_teachers.html",
+        teachers=teachers
+    )
 # ============================================================
 # STUDENT REGISTRATION
 # ============================================================
@@ -521,28 +604,51 @@ def teacher_dashboard():
 
     try:
 
-        quizzes = conn.execute("""
-            SELECT
-                quizzes.id,
-                quizzes.title,
-                quizzes.description,
-                quizzes.published,
-                quizzes.duration_minutes,
-                quizzes.max_attempts,
-                COUNT(questions.id) AS question_count
-            FROM quizzes
+        if session.get("is_admin"):
 
-            LEFT JOIN questions
-                ON quizzes.id = questions.quiz_id
+            quizzes = conn.execute("""
+                SELECT
+                    quizzes.id,
+                    quizzes.title,
+                    quizzes.description,
+                    quizzes.published,
+                    quizzes.duration_minutes,
+                    quizzes.max_attempts,
+                    COUNT(questions.id) AS question_count
+                FROM quizzes
 
-            WHERE quizzes.teacher_id = %s
+                LEFT JOIN questions
+                    ON quizzes.id = questions.quiz_id
 
-            GROUP BY quizzes.id
+                GROUP BY quizzes.id
 
-            ORDER BY quizzes.id DESC
-        """, (
-            session["user_id"],
-        )).fetchall()
+                ORDER BY quizzes.id DESC
+            """).fetchall()
+
+        else:
+
+            quizzes = conn.execute("""
+                SELECT
+                    quizzes.id,
+                    quizzes.title,
+                    quizzes.description,
+                    quizzes.published,
+                    quizzes.duration_minutes,
+                    quizzes.max_attempts,
+                    COUNT(questions.id) AS question_count
+                FROM quizzes
+
+                LEFT JOIN questions
+                    ON quizzes.id = questions.quiz_id
+
+                WHERE quizzes.teacher_id = %s
+
+                GROUP BY quizzes.id
+
+                ORDER BY quizzes.id DESC
+            """, (
+                session["user_id"],
+            )).fetchall()
 
 
         students = conn.execute("""
@@ -1099,6 +1205,7 @@ def unpublish_quiz(quiz_id):
 # DELETE QUIZ
 # ============================================================
 
+
 @app.route(
     "/teacher/quiz/<int:quiz_id>/delete",
     methods=["POST"]
@@ -1109,34 +1216,55 @@ def delete_quiz(quiz_id):
     conn = get_db()
 
     try:
+        # Find the quiz and check who owns it
+        quiz = conn.execute("""
+            SELECT id, teacher_id
+            FROM quizzes
+            WHERE id = %s
+        """, (quiz_id,)).fetchone()
 
+        if not quiz:
+            flash("Quiz not found.")
+            return redirect(url_for("teacher_dashboard"))
+
+        # Allow administrators to delete any quiz.
+        # Ordinary teachers can delete only their own quizzes.
+        is_admin = bool(session.get("is_admin"))
+        teacher_id = quiz["teacher_id"]
+
+        if not is_admin and teacher_id != session["user_id"]:
+            flash("You are not allowed to delete this quiz.")
+            return redirect(url_for("teacher_dashboard"))
+
+        # Delete student attempts for this quiz first.
+        # Their individual answers are linked to these attempts.
+        conn.execute("""
+            DELETE FROM attempts
+            WHERE quiz_id = %s
+        """, (quiz_id,))
+
+        # Delete the questions belonging to this quiz.
+        conn.execute("""
+            DELETE FROM questions
+            WHERE quiz_id = %s
+        """, (quiz_id,))
+
+        # Delete the quiz itself.
         conn.execute("""
             DELETE FROM quizzes
-
             WHERE id = %s
-            AND teacher_id = %s
-        """, (
-            quiz_id,
-            session["user_id"]
-        ))
-
+        """, (quiz_id,))
 
         conn.commit()
 
+        flash("Quiz and its related records deleted successfully.")
 
     finally:
-
         conn.close()
 
-
-    flash(
-        "Quiz deleted successfully."
-    )
+    return redirect(url_for("teacher_dashboard"))
 
 
-    return redirect(
-        url_for("teacher_dashboard")
-    )
 
 
 # ============================================================
@@ -1740,6 +1868,36 @@ def take_quiz(quiz_id):
                 url_for("student_dashboard")
             )
 
+        # ----------------------------------------------------
+        # QUIZ COUNTDOWN TIMER
+        # ----------------------------------------------------
+
+        timer_key = f"quiz_start_{quiz_id}"
+
+        duration_seconds = max(
+            60,
+            int(quiz["duration_minutes"] or 30) * 60
+        )
+
+        if request.method == "GET":
+            if timer_key not in session:
+                session[timer_key] = datetime.now().timestamp()
+
+        elif timer_key not in session:
+            session[timer_key] = (
+                datetime.now().timestamp() - duration_seconds
+            )
+
+        start_time = float(session[timer_key])
+
+        elapsed_seconds = (
+            datetime.now().timestamp() - start_time
+        )
+
+        remaining_seconds = max(
+            0,
+            int(duration_seconds - elapsed_seconds)
+        )
 
         # ----------------------------------------------------
         # SUBMIT QUIZ
@@ -1836,7 +1994,8 @@ def take_quiz(quiz_id):
     return render_template(
         "take_quiz.html",
         quiz=quiz,
-        questions=questions
+        questions=questions,
+        remaining_seconds=remaining_seconds
     )
 
 

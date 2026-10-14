@@ -5,7 +5,7 @@ html
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Teacher Dashboard</title>
+    <title>Teacher Dashboard | Quiz Management System</title>
 
     <style>
         * {
@@ -18,36 +18,55 @@ html
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f7fb;
             color: #1f2937;
+            line-height: 1.5;
         }
 
         .header {
-            background: #173b67;
+            background: linear-gradient(135deg, #173b67, #24558b);
             color: white;
-            padding: 18px 35px;
+            padding: 20px 4%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
         }
 
         .header h1 {
             font-size: 25px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .header p {
             font-size: 14px;
-            opacity: 0.85;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .messages-link {
+            background: #24558b;
+            border: 1px solid rgba(255,255,255,0.4);
         }
 
         .logout {
             background: #dc3545;
-            color: white;
-            text-decoration: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-size: 14px;
         }
 
         .logout:hover {
@@ -56,7 +75,7 @@ html
 
         .container {
             width: 94%;
-            max-width: 1250px;
+            max-width: 1400px;
             margin: 30px auto;
         }
 
@@ -66,35 +85,54 @@ html
 
         .welcome h2 {
             color: #173b67;
-            font-size: 24px;
+            font-size: 25px;
             margin-bottom: 6px;
         }
 
         .welcome p {
             color: #667085;
+            max-width: 850px;
+        }
+
+        .section-title {
+            color: #173b67;
+            font-size: 20px;
+            margin-bottom: 16px;
         }
 
         /* STATISTICS */
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
             background: white;
             padding: 22px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
             border-left: 5px solid #173b67;
+        }
+
+        .stat-card:nth-child(2) {
+            border-left-color: #198754;
+        }
+
+        .stat-card:nth-child(3) {
+            border-left-color: #f0ad4e;
+        }
+
+        .stat-card:nth-child(4) {
+            border-left-color: #6f42c1;
         }
 
         .stat-card h3 {
             color: #667085;
             font-size: 14px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .stat-number {
@@ -103,19 +141,11 @@ html
             font-weight: bold;
         }
 
-        /* SECTION */
-
-        .section-title {
-            color: #173b67;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
         /* QUICK ACTIONS */
 
         .actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
             margin-bottom: 35px;
         }
@@ -123,46 +153,71 @@ html
         .action-card {
             background: white;
             padding: 22px;
-            border-radius: 10px;
+            border-radius: 12px;
             text-decoration: none;
             color: #1f2937;
             border: 1px solid #e5e7eb;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            transition: 0.2s;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .action-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.10);
+            box-shadow: 0 7px 18px rgba(0,0,0,0.10);
         }
 
         .action-icon {
-            font-size: 30px;
-            margin-bottom: 10px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaf1fb;
+            border-radius: 10px;
+            font-size: 25px;
+            margin-bottom: 13px;
         }
 
         .action-card h3 {
             color: #173b67;
-            margin-bottom: 7px;
+            font-size: 17px;
+            margin-bottom: 8px;
         }
 
         .action-card p {
             color: #667085;
             font-size: 13px;
-            line-height: 1.5;
         }
 
         /* QUIZ TABLE */
 
         .quiz-section {
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
             margin-bottom: 30px;
         }
 
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-count {
+            background: #eaf1fb;
+            color: #173b67;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         .table-wrapper {
+            width: 100%;
             overflow-x: auto;
         }
 
@@ -170,23 +225,25 @@ html
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            min-width: 950px;
         }
 
         th {
             background: #173b67;
             color: white;
-            padding: 13px;
+            padding: 14px 12px;
             text-align: left;
             font-size: 13px;
         }
 
         td {
-            padding: 13px;
+            padding: 14px 12px;
             border-bottom: 1px solid #e5e7eb;
             font-size: 13px;
+            vertical-align: middle;
         }
 
-        tr:hover {
+        tbody tr:hover {
             background: #f8fafc;
         }
 
@@ -194,7 +251,7 @@ html
             display: inline-block;
             padding: 5px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -208,15 +265,20 @@ html
             color: #92400e;
         }
 
-        .edit-btn,
-        .results-btn {
+        /* BUTTONS */
+
+        .button {
             display: inline-block;
+            border: none;
             color: white;
             text-decoration: none;
-            padding: 7px 12px;
+            padding: 8px 11px;
             border-radius: 5px;
             font-size: 12px;
-            margin-right: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 2px;
+            white-space: nowrap;
         }
 
         .edit-btn {
@@ -235,18 +297,53 @@ html
             background: #146c43;
         }
 
+        .publish-btn {
+            background: #0d6efd;
+        }
+
+        .publish-btn:hover {
+            background: #0b5ed7;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background: #bb2d3b;
+        }
+
+        .actions-cell {
+            min-width: 250px;
+        }
+
+        .inline-form {
+            display: inline-block;
+            margin: 2px;
+        }
+
         .no-quizzes {
             text-align: center;
-            padding: 35px;
+            padding: 45px 20px;
             color: #667085;
         }
 
-        /* FEATURES */
+        .no-quizzes .empty-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .no-quizzes h3 {
+            color: #173b67;
+            margin-bottom: 7px;
+        }
+
+        /* SYSTEM FEATURES */
 
         .features-section {
             background: #eef4ff;
             border: 1px solid #d7e3f7;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
         }
@@ -263,18 +360,17 @@ html
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
         }
 
         .feature {
             background: white;
-            padding: 13px 15px;
-            border-radius: 7px;
-            font-size: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #e5eaf3;
         }
-
-        /* FOOTER */
 
         .footer {
             text-align: center;
@@ -283,25 +379,38 @@ html
             font-size: 13px;
         }
 
-        /* MOBILE */
+        /* FLASH MESSAGES */
 
-        @media (max-width: 900px) {
+        .flash-messages {
+            margin-bottom: 20px;
+        }
 
+        .flash-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 7px;
+            margin-bottom: 8px;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* RESPONSIVE DESIGN */
+
+        @media (max-width: 1100px) {
             .stats {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             .actions {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             .feature-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
         @media (max-width: 600px) {
-
             .header {
                 padding: 18px;
             }
@@ -316,7 +425,8 @@ html
             }
 
             .stats,
-            .actions {
+            .actions,
+            .feature-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -325,9 +435,8 @@ html
                 padding: 17px;
             }
 
-            th,
-            td {
-                white-space: nowrap;
+            .stat-card {
+                padding: 18px;
             }
         }
     </style>
@@ -336,365 +445,272 @@ html
 <body>
 
 <header class="header">
-
     <div>
         <h1>Teacher Dashboard</h1>
         <p>Quiz Management System</p>
     </div>
 
-    <a href="{{ url_for('logout') }}" class="logout">
-        Logout
-    </a>
+    <div class="header-actions">
+        <a href="{{ url_for('teacher_messages') }}"
+           class="header-link messages-link">
+            💬 Messages
+        </a>
 
+        <a href="{{ url_for('logout') }}"
+           class="header-link logout">
+            Logout
+        </a>
+    </div>
 </header>
-
 
 <main class="container">
 
     <!-- WELCOME -->
 
     <section class="welcome">
-
-        <h2>Welcome, Teacher</h2>
+        <h2>Welcome, {{ session.get('full_name', session.get('username', 'Teacher')) }}</h2>
 
         <p>
-            Manage your quizzes, upload examination questions,
-            review learner performance and prepare assessments.
+            Manage quizzes, upload examination questions, review learner
+            performance, communicate with students and prepare assessments.
         </p>
-
     </section>
 
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <!-- STATISTICS -->
 
     <section class="stats">
 
         <div class="stat-card">
-
             <h3>Total Quizzes</h3>
-
-            <div class="stat-number">
-                {{ quizzes|length }}
-            </div>
-
+            <div class="stat-number">{{ quizzes|length }}</div>
         </div>
 
-
         <div class="stat-card">
-
             <h3>Published Quizzes</h3>
-
             <div class="stat-number">
                 {{ quizzes|selectattr('published')|list|length }}
             </div>
-
         </div>
 
-
         <div class="stat-card">
-
             <h3>Draft Quizzes</h3>
-
             <div class="stat-number">
                 {{ quizzes|rejectattr('published')|list|length }}
             </div>
-
         </div>
 
-
         <div class="stat-card">
-
             <h3>Students</h3>
-
-            <div class="stat-number">
-                {{ student_count|default(0) }}
-            </div>
-
+            <div class="stat-number">{{ student_count|default(0) }}</div>
         </div>
 
     </section>
-
 
     <!-- QUICK ACTIONS -->
 
-    <h2 class="section-title">
-        Quick Actions
-    </h2>
-
+    <h2 class="section-title">Quick Actions</h2>
 
     <section class="actions">
 
-        <a href="{{ url_for('create_quiz') }}"
-           class="action-card">
-
+        <a href="{{ url_for('create_quiz') }}" class="action-card">
             <div class="action-icon">📄</div>
-
             <h3>Upload Questions</h3>
-
             <p>
-                Upload a PDF containing examination questions.
-                The system will extract the questions and options
-                automatically.
+                Start the quiz creation process and upload examination
+                questions using the available PDF upload feature.
             </p>
-
         </a>
 
-
-        <a href="{{ url_for('create_quiz') }}"
-           class="action-card">
-
+        <a href="{{ url_for('create_quiz') }}" class="action-card">
             <div class="action-icon">➕</div>
-
             <h3>Create Quiz</h3>
-
             <p>
-                Create a quiz manually and add questions,
-                options and correct answers.
+                Create a quiz manually and add questions, options
+                and correct answers.
             </p>
-
         </a>
 
-
-        <a href="{{ url_for('teacher_results') }}"
-           class="action-card">
-
+        <a href="{{ url_for('teacher_results') }}" class="action-card">
             <div class="action-icon">📊</div>
-
             <h3>Student Results</h3>
-
             <p>
-                View learner scores, attempts and performance
-                information.
+                Review learner scores, attempts and performance information.
             </p>
-
         </a>
-        <a href="{{ url_for('teacher_messages') }}"
-           class="action-card">
 
+        <a href="{{ url_for('teacher_messages') }}" class="action-card">
             <div class="action-icon">💬</div>
-
             <h3>Student Messages</h3>
-
             <p>
-                Read messages from students, review previous
-                conversations and send replies directly to learners.
+                Read student messages and respond to learners directly.
             </p>
-
         </a>
+
     </section>
 
-
-    <!-- MY QUIZZES -->
+    <!-- QUIZ LIST -->
 
     <section class="quiz-section">
 
-        <h2 class="section-title">
-            My Quizzes
-        </h2>
-
+        <div class="section-heading">
+            <h2 class="section-title">My Quizzes</h2>
+            <span class="quiz-count">
+                {{ quizzes|length }} quiz(es)
+            </span>
+        </div>
 
         {% if quizzes %}
 
-        <div class="table-wrapper">
+            <div class="table-wrapper">
 
-            <table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Quiz Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Attempts</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
-                <thead>
+                    <tbody>
 
-                    <tr>
-                        <th>ID</th>
-                        <th>Quiz Title</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Duration</th>
-                        <th>Attempts</th>
-                        <th>Actions</th>
-                    </tr>
+                        {% for quiz in quizzes %}
 
-                </thead>
+                            <tr>
+                                <td>{{ quiz.id }}</td>
 
+                                <td>
+                                    <strong>{{ quiz.title }}</strong>
+                                </td>
 
-                <tbody>
+                                <td>
+                                    {{ quiz.description or 'No description' }}
+                                </td>
 
-                    {% for quiz in quizzes %}
+                                <td>
+                                    {% if quiz.published %}
+                                        <span class="status published">
+                                            Published
+                                        </span>
+                                    {% else %}
+                                        <span class="status draft">
+                                            Draft
+                                        </span>
+                                    {% endif %}
+                                </td>
 
-                    <tr>
+                                <td>
+                                    {% if quiz.duration_minutes %}
+                                        {{ quiz.duration_minutes }} min
+                                    {% else %}
+                                        No limit
+                                    {% endif %}
+                                </td>
 
-                        <td>
-                            {{ quiz.id }}
-                        </td>
+                                <td>
+                                    {{ quiz.max_attempts or 1 }}
+                                </td>
 
+                                <td class="actions-cell">
 
-                        <td>
-                            <strong>
-                                {{ quiz.title }}
-                            </strong>
-                        </td>
+                                    <a href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
+                                       class="button edit-btn">
+                                        ✏️ Edit
+                                    </a>
 
+                                    <a href="{{ url_for('teacher_results', quiz_id=quiz.id) }}"
+                                       class="button results-btn">
+                                        📊 Results
+                                    </a>
 
-                        <td>
-                            {{ quiz.description or 'No description' }}
-                        </td>
+                                    {% if not quiz.published %}
+                                        <form method="POST"
+                                              action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
+                                              class="inline-form">
 
+                                            <button type="submit"
+                                                    class="button publish-btn">
+                                                🚀 Publish
+                                            </button>
+                                        </form>
+                                    {% endif %}
 
-                        <td>
+                                    <form method="POST"
+                                          action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}"
+                                          class="inline-form"
+                                          onsubmit="return confirmDeleteQuiz('{{ quiz.title|e }}');">
 
-                            {% if quiz.published %}
+                                        <button type="submit"
+                                                class="button delete-btn">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
 
-                            <span class="status published">
-                                Published
-                            </span>
+                                </td>
+                            </tr>
 
-                            {% else %}
+                        {% endfor %}
 
-                            <span class="status draft">
-                                Draft
-                            </span>
+                    </tbody>
+                </table>
 
-                            {% endif %}
-
-                        </td>
-
-
-                        <td>
-
-                            {% if quiz.duration_minutes %}
-
-                                {{ quiz.duration_minutes }} min
-
-                            {% else %}
-
-                                No limit
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <td>
-                            {{ quiz.max_attempts or 1 }}
-                        </td>
-
-
-                        <td>
-
-                            <a href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
-                               class="edit-btn">
-                                Edit
-                            </a>
-
-
-                            <a href="{{ url_for('teacher_results', quiz_id=quiz.id) }}"
-                               class="results-btn">
-                                Results
-                            </a>
-{% if not quiz.published %}
-
-<form method="POST"
-      action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
-      style="display: inline;">
-
-    <button type="submit"
-            class="publish-btn">
-        Publish
-    </button>
-
-</form>
-
-{% endif %}
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+            </div>
 
         {% else %}
 
-        <div class="no-quizzes">
-
-            <h3>No quizzes available</h3>
-
-            <p>
-                Create your first quiz or upload questions from a PDF.
-            </p>
-
-        </div>
+            <div class="no-quizzes">
+                <div class="empty-icon">📚</div>
+                <h3>No quizzes available</h3>
+                <p>
+                    Create your first quiz or upload questions from a PDF
+                    to get started.
+                </p>
+            </div>
 
         {% endif %}
 
     </section>
 
-
-    <!-- QUIZ SYSTEM FEATURES -->
+    <!-- SYSTEM FEATURES -->
 
     <section class="features-section">
 
-        <h2>
-            Quiz System Features
-        </h2>
+        <h2>Quiz System Features</h2>
 
         <p>
-            Features currently built into the system or planned
-            for the next development stages.
+            Tools available in the quiz management system.
         </p>
-
 
         <div class="feature-grid">
 
-            <div class="feature">
-                📄 Automatic PDF question extraction
-            </div>
-
-            <div class="feature">
-                ✏️ Teacher question editing
-            </div>
-
-            <div class="feature">
-                ✅ Correct-answer selection
-            </div>
-
-            <div class="feature">
-                🚀 Publish and unpublish quizzes
-            </div>
-
-            <div class="feature">
-                👨‍🎓 Student login
-            </div>
-
-            <div class="feature">
-                📝 Student quiz attempts
-            </div>
-
-            <div class="feature">
-                📊 Automatic marking
-            </div>
-
-            <div class="feature">
-                📈 Student performance reports
-            </div>
-
-            <div class="feature">
-                ⏱️ Timed examinations
-            </div>
-
-            <div class="feature">
-                🔀 Random questions and options
-            </div>
-
-            <div class="feature">
-                📋 Multiple quiz attempts
-            </div>
-
-            <div class="feature">
-                📱 Mobile-friendly student interface
-            </div>
+            <div class="feature">📄 Automatic PDF question extraction</div>
+            <div class="feature">✏️ Teacher question editing</div>
+            <div class="feature">✅ Correct-answer selection</div>
+            <div class="feature">🚀 Publish quizzes</div>
+            <div class="feature">👨‍🎓 Student login</div>
+            <div class="feature">📝 Student quiz attempts</div>
+            <div class="feature">📊 Automatic marking</div>
+            <div class="feature">📈 Student performance reports</div>
+            <div class="feature">⏱️ Timed examinations</div>
+            <div class="feature">🔀 Random questions and options</div>
+            <div class="feature">📋 Multiple quiz attempts</div>
+            <div class="feature">💬 Teacher-student messaging</div>
 
         </div>
 
@@ -702,14 +718,19 @@ html
 
 </main>
 
-
 <footer class="footer">
-
-    <p>
-        Quiz Management System &copy; 2026
-    </p>
-
+    <p>Quiz Management System &copy; 2026</p>
 </footer>
+
+<script>
+    function confirmDeleteQuiz(title) {
+        return confirm(
+            "Are you sure you want to delete the quiz \"" +
+            title +
+            "\"?\n\nThis action may permanently delete its questions and student attempts/results. This cannot be undone."
+        );
+    }
+</script>
 
 </body>
 </html>

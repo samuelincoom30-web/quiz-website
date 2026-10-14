@@ -13,7 +13,12 @@
 </div>
 
 
-<form method="POST">
+<div class="card" style="text-align: center;">
+    <h2>Time Remaining</h2>
+    <h1 id="countdown" style="color: red;">Loading...</h1>
+</div>
+
+<form method="POST" id="quiz-form">
 
     {% for question in questions %}
 
@@ -96,5 +101,33 @@
     </button>
 
 </form>
+<script>
+    let remainingSeconds = {{ remaining_seconds }};
+    let timerInterval;
+
+    const countdownDisplay = document.getElementById("countdown");
+    const quizForm = document.getElementById("quiz-form");
+
+    function updateCountdown() {
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+
+        countdownDisplay.textContent =
+            String(minutes).padStart(2, "0") + ":" +
+            String(seconds).padStart(2, "0");
+
+        if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            countdownDisplay.textContent = "Time is up! Submitting...";
+            quizForm.submit();
+            return;
+        }
+
+        remainingSeconds--;
+    }
+
+    updateCountdown();
+    timerInterval = setInterval(updateCountdown, 1000);
+</script>
 
 {% endblock %}
