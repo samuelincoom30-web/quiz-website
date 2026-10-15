@@ -1,416 +1,761 @@
+html
 {% extends "base.html" %}
 
 {% block content %}
 
 <style>
-    .student-messaging {
-        max-width: 1100px;
-        margin: 25px auto;
-        padding: 0 18px 35px;
-        color: #1f2937;
+    /* =========================================
+       STOCKWELL STUDENT MESSAGING
+       Lemon yellow, navy blue and white theme
+       ========================================= */
+
+    .sm-page {
+        --sm-navy: #173b65;
+        --sm-navy-dark: #102b4b;
+        --sm-lemon: #f5f871;
+        --sm-lemon-light: #fffed1;
+        --sm-lemon-border: #e5e85b;
+        --sm-text: #1e293b;
+        --sm-muted: #64748b;
+        --sm-border: #e2e8f0;
+
+        max-width: 1180px;
+        margin: 24px auto 40px;
+        padding: 0 12px;
+        color: var(--sm-text);
     }
 
-    .student-message-header {
-        background: linear-gradient(135deg, #173b67, #285a91);
+    .sm-page * {
+        box-sizing: border-box;
+    }
+
+    /* Welcome banner */
+
+    .sm-hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(125deg, var(--sm-navy-dark), var(--sm-navy));
         color: white;
-        padding: 28px;
-        border-radius: 14px;
-        margin-bottom: 25px;
-        box-shadow: 0 5px 15px rgba(23, 59, 103, 0.15);
+        padding: 32px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(16, 43, 75, 0.15);
     }
 
-    .student-message-header h1 {
-        margin: 0 0 8px;
-        font-size: 28px;
+    .sm-hero::after {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        right: -50px;
+        top: -75px;
+        background: var(--sm-lemon);
+        opacity: 0.12;
+        border-radius: 50%;
     }
 
-    .student-message-header p {
+    .sm-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sm-eyebrow {
+        display: inline-block;
+        background: rgba(245, 248, 113, 0.16);
+        color: var(--sm-lemon);
+        padding: 5px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        margin-bottom: 12px;
+    }
+
+    .sm-hero h1 {
+        color: white;
+        font-size: clamp(26px, 4vw, 35px);
+        margin: 0 0 10px;
+        line-height: 1.25;
+    }
+
+    .sm-hero p {
+        max-width: 680px;
         margin: 0;
-        line-height: 1.6;
-        opacity: 0.9;
+        color: #e2eaf5;
+        line-height: 1.7;
+        font-size: 14px;
     }
 
-    .student-message-grid {
+    .sm-hero-highlight {
+        display: inline-block;
+        margin-top: 19px;
+        background: var(--sm-lemon);
+        color: var(--sm-navy-dark);
+        border-radius: 9px;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    /* Summary cards */
+
+    .sm-stats {
         display: grid;
-        grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .sm-stat {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        background: white;
+        border: 1px solid var(--sm-border);
+        border-radius: 15px;
+        padding: 18px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+        min-width: 0;
+    }
+
+    .sm-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: var(--sm-lemon);
+        color: var(--sm-navy-dark);
+        font-size: 22px;
+    }
+
+    .sm-stat-number {
+        display: block;
+        font-size: 25px;
+        font-weight: 800;
+        color: var(--sm-navy);
+        line-height: 1.2;
+    }
+
+    .sm-stat-label {
+        display: block;
+        font-size: 12px;
+        color: var(--sm-muted);
+        margin-top: 4px;
+    }
+
+    /* Main layout */
+
+    .sm-layout {
+        display: grid;
+        grid-template-columns: minmax(270px, 0.85fr) minmax(0, 1.4fr);
         gap: 22px;
         align-items: start;
     }
 
-    .student-message-panel {
+    .sm-panel {
         background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        border: 1px solid var(--sm-border);
+        border-radius: 17px;
         padding: 24px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-        margin-bottom: 22px;
         min-width: 0;
-    }
-
-    .student-message-panel h2 {
-        color: #173b67;
-        font-size: 20px;
-        margin: 0 0 8px;
-    }
-
-    .student-panel-description {
-        color: #667085;
-        font-size: 14px;
-        line-height: 1.6;
         margin-bottom: 22px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
     }
 
-    .student-message-form label {
-        display: block;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 17px 0 7px;
-    }
-
-    .student-message-form input,
-    .student-message-form select,
-    .student-message-form textarea {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #d0d5dd;
-        border-radius: 7px;
-        font: inherit;
-        font-size: 14px;
-        background: #fff;
-    }
-
-    .student-message-form input:focus,
-    .student-message-form select:focus,
-    .student-message-form textarea:focus {
-        outline: 2px solid #bfd7f5;
-        border-color: #285a91;
-    }
-
-    .student-message-form textarea {
-        resize: vertical;
-        min-height: 130px;
-    }
-
-    .student-send-button {
-        width: 100%;
-        border: none;
-        border-radius: 7px;
-        background: #173b67;
-        color: white;
-        padding: 13px 18px;
-        font-weight: 600;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-
-    .student-send-button:hover {
-        background: #0f2b4d;
-    }
-
-    .student-history-heading {
+    .sm-panel-heading {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 18px;
-    }
-
-    .student-message-count {
-        display: inline-block;
-        background: #e8f0fb;
-        color: #173b67;
-        border-radius: 20px;
-        padding: 6px 11px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .student-conversation-card {
-        border: 1px solid #e5e7eb;
-        border-left: 4px solid #198754;
-        border-radius: 9px;
-        padding: 17px;
-        margin-bottom: 14px;
-        background: #fff;
-        overflow-wrap: anywhere;
-    }
-
-    .student-conversation-card.sent {
-        border-left-color: #285a91;
-        background: #f8fbff;
-    }
-
-    .student-conversation-top {
-        display: flex;
-        justify-content: space-between;
         align-items: flex-start;
         gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 12px;
+        margin-bottom: 7px;
     }
 
-    .student-conversation-top h3 {
-        margin: 0 0 6px;
-        color: #173b67;
-        font-size: 16px;
+    .sm-panel-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: var(--sm-lemon-light);
+        font-size: 21px;
     }
 
-    .student-conversation-person {
+    .sm-panel-heading h2 {
+        color: var(--sm-navy);
+        font-size: 20px;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .sm-description {
         font-size: 13px;
-        color: #667085;
+        color: var(--sm-muted);
+        line-height: 1.7;
+        margin: 8px 0 20px;
     }
 
-    .student-message-badge {
-        display: inline-block;
-        border-radius: 20px;
-        padding: 5px 9px;
+    /* Compose form */
+
+    .sm-form label {
+        display: block;
+        margin: 16px 0 7px;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--sm-navy);
+    }
+
+    .sm-form input,
+    .sm-form select,
+    .sm-form textarea {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 13px;
+        margin: 0;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #fff;
+        color: var(--sm-text);
+        font: inherit;
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .sm-form input:focus,
+    .sm-form select:focus,
+    .sm-form textarea:focus {
+        outline: none;
+        border-color: var(--sm-navy);
+        box-shadow: 0 0 0 3px rgba(245, 248, 113, 0.65);
+    }
+
+    .sm-form textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .sm-send-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        padding: 13px 16px;
+        margin-top: 20px;
+        background: var(--sm-navy);
+        color: white;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .sm-send-button:hover {
+        background: var(--sm-navy-dark);
+        transform: translateY(-1px);
+    }
+
+    .sm-form-note {
+        text-align: center;
+        color: var(--sm-muted);
         font-size: 11px;
-        font-weight: 700;
-        background: #d1fae5;
-        color: #065f46;
+        margin: 12px 0 0;
+        line-height: 1.6;
+    }
+
+    /* Inbox and sent sections */
+
+    .sm-section {
+        margin-top: 24px;
+    }
+
+    .sm-section:first-of-type {
+        margin-top: 18px;
+    }
+
+    .sm-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--sm-border);
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+    .sm-section-heading h3 {
+        color: var(--sm-navy);
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .sm-count {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: var(--sm-lemon);
+        color: var(--sm-navy-dark);
+        font-size: 11px;
+        font-weight: 800;
         white-space: nowrap;
     }
 
-    .student-message-badge.sent-badge {
+    /* Individual messages */
+
+    .sm-message {
+        border: 1px solid var(--sm-border);
+        border-left: 5px solid var(--sm-lemon-border);
+        border-radius: 12px;
+        padding: 17px;
+        margin-bottom: 13px;
+        background: #fffef7;
+        overflow-wrap: anywhere;
+        min-width: 0;
+    }
+
+    .sm-message.sm-sent {
+        border-left-color: var(--sm-navy);
+        background: #f8fbff;
+    }
+
+    .sm-message-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .sm-message-subject {
+        color: var(--sm-navy);
+        font-size: 15px;
+        font-weight: 800;
+        margin: 0 0 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .sm-message-person {
+        font-size: 12px;
+        color: var(--sm-muted);
+        line-height: 1.7;
+    }
+
+    .sm-message-status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        background: var(--sm-lemon);
+        color: var(--sm-navy-dark);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .sm-message-status.sent {
         background: #dbeafe;
         color: #1d4ed8;
     }
 
-    .student-conversation-body {
+    .sm-message-body {
         white-space: pre-wrap;
-        line-height: 1.7;
+        overflow-wrap: anywhere;
+        line-height: 1.75;
         font-size: 14px;
-        margin: 12px 0;
+        margin: 15px 0;
+        color: #334155;
     }
 
-    .student-conversation-date {
-        color: #667085;
-        font-size: 12px;
-        border-top: 1px solid #edf0f4;
-        padding-top: 11px;
+    .sm-message-date {
+        border-top: 1px solid #e8edf3;
+        padding-top: 10px;
         margin-top: 12px;
+        color: var(--sm-muted);
+        font-size: 11px;
     }
 
-    .student-empty-state {
+    /* Empty state */
+
+    .sm-empty {
         text-align: center;
-        padding: 35px 15px;
-        border: 1px dashed #cbd5e1;
-        border-radius: 9px;
-        background: #f8fafc;
-        color: #667085;
+        padding: 25px 15px;
+        border: 1px dashed #d5dce5;
+        border-radius: 12px;
+        background: #fafbfc;
+        color: var(--sm-muted);
         line-height: 1.7;
     }
 
-    .student-empty-icon {
-        font-size: 35px;
-        margin-bottom: 10px;
+    .sm-empty-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
     }
 
-    .student-dashboard-link {
-        display: inline-block;
+    .sm-empty strong {
+        display: block;
+        color: var(--sm-navy);
+        font-size: 14px;
+    }
+
+    .sm-empty p {
+        font-size: 12px;
+        margin: 6px 0 0;
+    }
+
+    /* Back link */
+
+    .sm-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         text-decoration: none;
-        background: #eef2f7;
-        color: #173b67;
+        color: var(--sm-navy);
+        background: var(--sm-lemon);
         padding: 11px 16px;
-        border-radius: 7px;
-        font-weight: 600;
-        margin-top: 8px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 800;
+        transition: background 0.2s;
     }
 
-    .student-dashboard-link:hover {
-        background: #dce6f2;
+    .sm-back-link:hover {
+        background: #eef16a;
     }
 
-    @media (max-width: 760px) {
-        .student-message-grid {
+    /* Responsive layout */
+
+    @media (max-width: 850px) {
+        .sm-layout {
             grid-template-columns: 1fr;
         }
 
-        .student-message-header {
-            padding: 22px;
+        .sm-stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
-        .student-message-header h1 {
-            font-size: 23px;
+        .sm-panel {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .sm-page {
+            padding: 0 2px;
+            margin-top: 16px;
         }
 
-        .student-message-panel {
-            padding: 18px;
+        .sm-hero {
+            padding: 23px 19px;
+            border-radius: 15px;
+        }
+
+        .sm-stats {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .sm-stat {
+            padding: 13px 15px;
+        }
+
+        .sm-stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sm-stat-number {
+            font-size: 22px;
+        }
+
+        .sm-panel {
+            padding: 17px;
+            border-radius: 14px;
+        }
+
+        .sm-message {
+            padding: 13px;
+        }
+
+        .sm-message-top {
+            flex-direction: column;
         }
     }
 </style>
 
-<div class="student-messaging">
+<div class="sm-page">
 
-```
-<header class="student-message-header">
-    <h1>💬 My Messages</h1>
-    <p>
-        Contact your teachers, ask questions and keep track
-        of your academic conversations in one place.
-    </p>
-</header>
+    {% set inbox = messages
+        | rejectattr('sender_id', 'equalto', session['user_id'])
+        | list
+    %}
 
-<div class="student-message-grid">
+    {% set sent_messages = messages
+        | selectattr('sender_id', 'equalto', session['user_id'])
+        | list
+    %}
 
-    <!-- COMPOSE MESSAGE -->
+    <!-- WELCOME BANNER -->
 
-    <section class="student-message-panel">
+    <header class="sm-hero">
+        <div class="sm-hero-content">
 
-        <h2>✉️ Compose Message</h2>
+            <span class="sm-eyebrow">STUDENT COMMUNICATION CENTRE</span>
 
-        <p class="student-panel-description">
-            Select your teacher, enter a subject and write
-            your message below.
-        </p>
+            <h1>💬 My Messages</h1>
 
-        <form method="POST"
-              action="{{ url_for('student_messages') }}"
-              class="student-message-form">
+            <p>
+                Keep in touch with your teachers, ask academic questions
+                and follow your conversations from one convenient place.
+            </p>
 
-            <label for="receiver_id">Recipient</label>
-
-            <select name="receiver_id"
-                    id="receiver_id"
-                    required>
-
-                <option value="">-- Choose a teacher --</option>
-
-                {% for teacher in teachers %}
-                    <option value="{{ teacher['id'] }}">
-                        {{ teacher['full_name'] or teacher['username'] }}
-                        ({{ teacher['username'] }})
-                    </option>
-                {% endfor %}
-
-            </select>
-
-            <label for="subject">Subject</label>
-
-            <input type="text"
-                   name="subject"
-                   id="subject"
-                   maxlength="255"
-                   placeholder="e.g. Question about Mathematics"
-                   required>
-
-            <label for="message">Your Message</label>
-
-            <textarea name="message"
-                      id="message"
-                      rows="6"
-                      placeholder="Write your message here..."
-                      required></textarea>
-
-            <button type="submit" class="student-send-button">
-                Send Message
-            </button>
-
-        </form>
-
-    </section>
-
-    <!-- MESSAGE HISTORY -->
-
-    <section class="student-message-panel">
-
-        <div class="student-history-heading">
-            <h2>📨 Conversation History</h2>
-
-            <span class="student-message-count">
-                {{ messages|length }} message(s)
+            <span class="sm-hero-highlight">
+                ✨ Your voice matters at Stockwell Montessori School
             </span>
+
+        </div>
+    </header>
+
+    <!-- MESSAGE STATISTICS -->
+
+    <section class="sm-stats" aria-label="Message statistics">
+
+        <div class="sm-stat">
+            <div class="sm-stat-icon">📨</div>
+            <div>
+                <span class="sm-stat-number">{{ inbox|length }}</span>
+                <span class="sm-stat-label">Received messages</span>
+            </div>
         </div>
 
-        <p class="student-panel-description">
-            View messages you have sent and messages you
-            have received from your teachers.
-        </p>
-
-        {% if messages %}
-
-            {% for message in messages %}
-
-                <article class="student-conversation-card
-                    {% if message['sender_id'] == session['user_id'] %}sent{% endif %}">
-
-                    <div class="student-conversation-top">
-
-                        <div>
-                            <h3>
-                                {{ message['subject'] or 'No subject' }}
-                            </h3>
-
-                            <div class="student-conversation-person">
-
-                                {% if message['sender_id'] == session['user_id'] %}
-
-                                    To teacher:
-                                    {{ message['receiver'] }}
-
-                                {% else %}
-
-                                    From teacher:
-                                    {{ message['sender'] }}
-
-                                {% endif %}
-
-                            </div>
-                        </div>
-
-                        {% if message['sender_id'] == session['user_id'] %}
-
-                            <span class="student-message-badge sent-badge">
-                                SENT
-                            </span>
-
-                        {% else %}
-
-                            <span class="student-message-badge">
-                                RECEIVED
-                            </span>
-
-                        {% endif %}
-
-                    </div>
-
-                    <div class="student-conversation-body">{{ message['message'] }}</div>
-
-                    <div class="student-conversation-date">
-                        🕒 {{ message['created_at'] }}
-                    </div>
-
-                </article>
-
-            {% endfor %}
-
-        {% else %}
-
-            <div class="student-empty-state">
-                <div class="student-empty-icon">📭</div>
-
-                <strong>No messages yet</strong>
-
-                <p>
-                    Your messages and teacher replies will
-                    appear here when available.
-                </p>
+        <div class="sm-stat">
+            <div class="sm-stat-icon">📤</div>
+            <div>
+                <span class="sm-stat-number">{{ sent_messages|length }}</span>
+                <span class="sm-stat-label">Sent messages</span>
             </div>
+        </div>
 
-        {% endif %}
+        <div class="sm-stat">
+            <div class="sm-stat-icon">👩‍🏫</div>
+            <div>
+                <span class="sm-stat-number">{{ teachers|length }}</span>
+                <span class="sm-stat-label">Available teachers</span>
+            </div>
+        </div>
 
     </section>
 
-</div>
+    <!-- COMPOSE AND HISTORY -->
 
-<a href="{{ url_for('student_dashboard') }}"
-   class="student-dashboard-link">
-    ← Back to Student Dashboard
-</a>
-```
+    <div class="sm-layout">
+
+        <!-- COMPOSE MESSAGE -->
+
+        <section class="sm-panel">
+
+            <div class="sm-panel-heading">
+                <div class="sm-panel-icon">✉️</div>
+                <div>
+                    <h2>Compose a Message</h2>
+                </div>
+            </div>
+
+            <p class="sm-description">
+                Choose a teacher, enter a subject and explain what you need help with.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('student_messages') }}"
+                  class="sm-form">
+
+                <label for="receiver_id">Send to teacher</label>
+
+                <select name="receiver_id" id="receiver_id" required>
+                    <option value="">Choose a teacher</option>
+
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher['id'] }}">
+                            {{ teacher['full_name'] or teacher['username'] }}
+                            ({{ teacher['username'] }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="subject">Message subject</label>
+
+                <input type="text"
+                       name="subject"
+                       id="subject"
+                       maxlength="255"
+                       placeholder="e.g. Mathematics assignment"
+                       required>
+
+                <label for="message">Your message</label>
+
+                <textarea name="message"
+                          id="message"
+                          rows="6"
+                          placeholder="Write your message here..."
+                          required></textarea>
+
+                <button type="submit" class="sm-send-button">
+                    <span>✉️</span>
+                    <span>Send Message</span>
+                </button>
+
+                <p class="sm-form-note">
+                    Please keep your messages respectful and related to school.
+                </p>
+
+            </form>
+
+        </section>
+
+        <!-- MESSAGE HISTORY -->
+
+        <section class="sm-panel">
+
+            <div class="sm-panel-heading">
+                <div class="sm-panel-icon">📚</div>
+                <div>
+                    <h2>My Conversations</h2>
+                </div>
+            </div>
+
+            <p class="sm-description">
+                View your teacher's messages and review messages you have sent.
+            </p>
+
+            <!-- INBOX -->
+
+            <div class="sm-section">
+
+                <div class="sm-section-heading">
+                    <h3>📥 Inbox</h3>
+                    <span class="sm-count">{{ inbox|length }} received</span>
+                </div>
+
+                {% if inbox %}
+
+                    {% for message in inbox %}
+
+                        <article class="sm-message">
+
+                            <div class="sm-message-top">
+
+                                <div>
+                                    <h4 class="sm-message-subject">
+                                        {{ message['subject'] or 'No subject' }}
+                                    </h4>
+
+                                    <div class="sm-message-person">
+                                        From teacher:
+                                        <strong>{{ message['sender'] }}</strong>
+                                    </div>
+                                </div>
+
+                                <span class="sm-message-status">
+                                    RECEIVED
+                                </span>
+
+                            </div>
+
+                            <div class="sm-message-body">{{ message['message'] }}</div>
+
+                            <div class="sm-message-date">
+                                🕒 {{ message['created_at'] }}
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="sm-empty">
+                        <div class="sm-empty-icon">📭</div>
+                        <strong>Your inbox is empty</strong>
+                        <p>Messages from your teachers will appear here.</p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- SENT MESSAGES -->
+
+            <div class="sm-section">
+
+                <div class="sm-section-heading">
+                    <h3>📤 Sent Messages</h3>
+                    <span class="sm-count">{{ sent_messages|length }} sent</span>
+                </div>
+
+                {% if sent_messages %}
+
+                    {% for message in sent_messages %}
+
+                        <article class="sm-message sm-sent">
+
+                            <div class="sm-message-top">
+
+                                <div>
+                                    <h4 class="sm-message-subject">
+                                        {{ message['subject'] or 'No subject' }}
+                                    </h4>
+
+                                    <div class="sm-message-person">
+                                        To teacher:
+                                        <strong>{{ message['receiver'] }}</strong>
+                                    </div>
+                                </div>
+
+                                <span class="sm-message-status sent">
+                                    SENT
+                                </span>
+
+                            </div>
+
+                            <div class="sm-message-body">{{ message['message'] }}</div>
+
+                            <div class="sm-message-date">
+                                🕒 {{ message['created_at'] }}
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="sm-empty">
+                        <div class="sm-empty-icon">📤</div>
+                        <strong>No sent messages yet</strong>
+                        <p>Messages you send to teachers will appear here.</p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- BACK TO DASHBOARD -->
+
+    <a href="{{ url_for('student_dashboard') }}" class="sm-back-link">
+        ← Back to Student Dashboard
+    </a>
 
 </div>
 

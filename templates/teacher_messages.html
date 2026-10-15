@@ -3,281 +3,540 @@
 {% block content %}
 
 <style>
-    .messaging-container {
-        max-width: 1100px;
-        margin: 25px auto;
-        padding: 0 18px 35px;
-        color: #1f2937;
+    .tm-page {
+        --tm-navy: #173b65;
+        --tm-navy-dark: #102b4b;
+        --tm-lemon: #f5f871;
+        --tm-lemon-light: #fffed1;
+        --tm-lemon-border: #e5e85b;
+        --tm-text: #1e293b;
+        --tm-muted: #64748b;
+        --tm-border: #e2e8f0;
+
+        max-width: 1180px;
+        margin: 24px auto 40px;
+        padding: 0 12px;
+        color: var(--tm-text);
     }
 
-    .messaging-header {
-        background: linear-gradient(135deg, #173b67, #285a91);
+    .tm-page * {
+        box-sizing: border-box;
+    }
+
+    .tm-hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(125deg, var(--tm-navy-dark), var(--tm-navy));
         color: white;
-        padding: 28px;
-        border-radius: 14px;
-        margin-bottom: 25px;
-        box-shadow: 0 5px 15px rgba(23, 59, 103, 0.15);
+        padding: 32px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(16, 43, 75, 0.15);
     }
 
-    .messaging-header h1 {
-        margin: 0 0 8px;
-        font-size: 28px;
+    .tm-hero::after {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        right: -50px;
+        top: -75px;
+        background: var(--tm-lemon);
+        opacity: 0.12;
+        border-radius: 50%;
     }
 
-    .messaging-header p {
+    .tm-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .tm-eyebrow {
+        display: inline-block;
+        background: rgba(245, 248, 113, 0.16);
+        color: var(--tm-lemon);
+        padding: 5px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        margin-bottom: 12px;
+    }
+
+    .tm-hero h1 {
+        color: white;
+        font-size: clamp(26px, 4vw, 35px);
+        margin: 0 0 10px;
+        line-height: 1.25;
+    }
+
+    .tm-hero p {
+        max-width: 680px;
         margin: 0;
-        line-height: 1.6;
-        opacity: 0.9;
+        color: #e2eaf5;
+        line-height: 1.7;
+        font-size: 14px;
     }
 
-    .messaging-grid {
+    .tm-highlight {
+        display: inline-block;
+        margin-top: 19px;
+        background: var(--tm-lemon);
+        color: var(--tm-navy-dark);
+        border-radius: 9px;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .tm-stats {
         display: grid;
-        grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .tm-stat {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        background: white;
+        border: 1px solid var(--tm-border);
+        border-radius: 15px;
+        padding: 18px;
+        min-width: 0;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+    }
+
+    .tm-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: var(--tm-lemon);
+        color: var(--tm-navy-dark);
+        font-size: 22px;
+    }
+
+    .tm-stat-number {
+        display: block;
+        font-size: 25px;
+        font-weight: 800;
+        color: var(--tm-navy);
+        line-height: 1.2;
+    }
+
+    .tm-stat-label {
+        display: block;
+        font-size: 12px;
+        color: var(--tm-muted);
+        margin-top: 4px;
+    }
+
+    .tm-layout {
+        display: grid;
+        grid-template-columns: minmax(270px, 0.85fr) minmax(0, 1.4fr);
         gap: 22px;
         align-items: start;
     }
 
-    .message-panel {
+    .tm-panel {
         background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        border: 1px solid var(--tm-border);
+        border-radius: 17px;
         padding: 24px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-        margin-bottom: 22px;
         min-width: 0;
-    }
-
-    .message-panel h2 {
-        color: #173b67;
-        font-size: 20px;
-        margin: 0 0 8px;
-    }
-
-    .panel-description {
-        color: #667085;
-        font-size: 14px;
-        line-height: 1.5;
         margin-bottom: 22px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
     }
 
-    .message-form label {
-        display: block;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 17px 0 7px;
-    }
-
-    .message-form input,
-    .message-form select,
-    .message-form textarea {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #d0d5dd;
-        border-radius: 7px;
-        font: inherit;
-        font-size: 14px;
-        background: #fff;
-    }
-
-    .message-form input:focus,
-    .message-form select:focus,
-    .message-form textarea:focus {
-        outline: 2px solid #bfd7f5;
-        border-color: #285a91;
-    }
-
-    .message-form textarea {
-        resize: vertical;
-        min-height: 130px;
-    }
-
-    .send-button {
-        width: 100%;
-        border: none;
-        border-radius: 7px;
-        background: #173b67;
-        color: white;
-        padding: 13px 18px;
-        font-weight: 600;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-
-    .send-button:hover {
-        background: #0f2b4d;
-    }
-
-    .conversation-summary {
+    .tm-panel-heading {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 18px;
-    }
-
-    .message-count {
-        display: inline-block;
-        background: #e8f0fb;
-        color: #173b67;
-        border-radius: 20px;
-        padding: 6px 11px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .conversation-card {
-        border: 1px solid #e5e7eb;
-        border-left: 4px solid #198754;
-        border-radius: 9px;
-        padding: 17px;
-        margin-bottom: 14px;
-        background: #fff;
-        overflow-wrap: anywhere;
-    }
-
-    .conversation-card.sent {
-        border-left-color: #285a91;
-        background: #f8fbff;
-    }
-
-    .conversation-top {
-        display: flex;
-        justify-content: space-between;
         align-items: flex-start;
         gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 12px;
+        margin-bottom: 7px;
     }
 
-    .conversation-top h3 {
-        margin: 0 0 6px;
-        color: #173b67;
-        font-size: 16px;
+    .tm-panel-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: var(--tm-lemon-light);
+        font-size: 21px;
     }
 
-    .conversation-person {
+    .tm-panel-heading h2 {
+        color: var(--tm-navy);
+        font-size: 20px;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .tm-description {
         font-size: 13px;
-        color: #667085;
+        color: var(--tm-muted);
+        line-height: 1.7;
+        margin: 8px 0 20px;
     }
 
-    .message-badge {
-        display: inline-block;
-        border-radius: 20px;
-        padding: 5px 9px;
+    .tm-form label {
+        display: block;
+        margin: 16px 0 7px;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--tm-navy);
+    }
+
+    .tm-form input,
+    .tm-form select,
+    .tm-form textarea {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 13px;
+        margin: 0;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #fff;
+        color: var(--tm-text);
+        font: inherit;
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .tm-form input:focus,
+    .tm-form select:focus,
+    .tm-form textarea:focus {
+        outline: none;
+        border-color: var(--tm-navy);
+        box-shadow: 0 0 0 3px rgba(245, 248, 113, 0.65);
+    }
+
+    .tm-form textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .tm-send-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        padding: 13px 16px;
+        margin-top: 20px;
+        background: var(--tm-navy);
+        color: white;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .tm-send-button:hover {
+        background: var(--tm-navy-dark);
+        transform: translateY(-1px);
+    }
+
+    .tm-form-note {
+        text-align: center;
+        color: var(--tm-muted);
         font-size: 11px;
-        font-weight: 700;
-        background: #d1fae5;
-        color: #065f46;
+        margin: 12px 0 0;
+        line-height: 1.6;
+    }
+
+    .tm-section {
+        margin-top: 24px;
+    }
+
+    .tm-section:first-of-type {
+        margin-top: 18px;
+    }
+
+    .tm-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--tm-border);
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+    .tm-section-heading h3 {
+        color: var(--tm-navy);
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .tm-count {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: var(--tm-lemon);
+        color: var(--tm-navy-dark);
+        font-size: 11px;
+        font-weight: 800;
         white-space: nowrap;
     }
 
-    .message-badge.sent-badge {
+    .tm-message {
+        border: 1px solid var(--tm-border);
+        border-left: 5px solid var(--tm-lemon-border);
+        border-radius: 12px;
+        padding: 17px;
+        margin-bottom: 13px;
+        background: #fffef7;
+        overflow-wrap: anywhere;
+        min-width: 0;
+    }
+
+    .tm-message.tm-sent {
+        border-left-color: var(--tm-navy);
+        background: #f8fbff;
+    }
+
+    .tm-message-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tm-message-subject {
+        color: var(--tm-navy);
+        font-size: 15px;
+        font-weight: 800;
+        margin: 0 0 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .tm-message-person {
+        font-size: 12px;
+        color: var(--tm-muted);
+        line-height: 1.7;
+    }
+
+    .tm-message-status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        background: var(--tm-lemon);
+        color: var(--tm-navy-dark);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .tm-message-status.sent {
         background: #dbeafe;
         color: #1d4ed8;
     }
 
-    .conversation-body {
+    .tm-message-body {
         white-space: pre-wrap;
-        line-height: 1.7;
+        overflow-wrap: anywhere;
+        line-height: 1.75;
         font-size: 14px;
-        margin: 12px 0;
+        margin: 15px 0;
+        color: #334155;
     }
 
-    .conversation-date {
-        color: #667085;
-        font-size: 12px;
-        border-top: 1px solid #edf0f4;
-        padding-top: 11px;
+    .tm-message-date {
+        border-top: 1px solid #e8edf3;
+        padding-top: 10px;
         margin-top: 12px;
+        color: var(--tm-muted);
+        font-size: 11px;
     }
 
-    .empty-state {
+    .tm-empty {
         text-align: center;
-        padding: 35px 15px;
-        border: 1px dashed #cbd5e1;
-        border-radius: 9px;
-        background: #f8fafc;
-        color: #667085;
+        padding: 25px 15px;
+        border: 1px dashed #d5dce5;
+        border-radius: 12px;
+        background: #fafbfc;
+        color: var(--tm-muted);
         line-height: 1.7;
     }
 
-    .empty-state .empty-icon {
-        font-size: 35px;
-        margin-bottom: 10px;
+    .tm-empty-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
     }
 
-    .dashboard-link {
-        display: inline-block;
+    .tm-empty strong {
+        display: block;
+        color: var(--tm-navy);
+        font-size: 14px;
+    }
+
+    .tm-empty p {
+        font-size: 12px;
+        margin: 6px 0 0;
+    }
+
+    .tm-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         text-decoration: none;
-        background: #eef2f7;
-        color: #173b67;
+        color: var(--tm-navy);
+        background: var(--tm-lemon);
         padding: 11px 16px;
-        border-radius: 7px;
-        font-weight: 600;
-        margin-top: 8px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 800;
+        transition: background 0.2s;
     }
 
-    .dashboard-link:hover {
-        background: #dce6f2;
+    .tm-back-link:hover {
+        background: #eef16a;
     }
 
-    @media (max-width: 760px) {
-        .messaging-grid {
+    @media (max-width: 850px) {
+        .tm-layout {
             grid-template-columns: 1fr;
         }
 
-        .messaging-header {
-            padding: 22px;
+        .tm-panel {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .tm-page {
+            padding: 0 2px;
+            margin-top: 16px;
         }
 
-        .messaging-header h1 {
-            font-size: 23px;
+        .tm-hero {
+            padding: 23px 19px;
+            border-radius: 15px;
         }
 
-        .message-panel {
-            padding: 18px;
+        .tm-stats {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .tm-stat {
+            padding: 13px 15px;
+        }
+
+        .tm-stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .tm-stat-number {
+            font-size: 22px;
+        }
+
+        .tm-panel {
+            padding: 17px;
+            border-radius: 14px;
+        }
+
+        .tm-message {
+            padding: 13px;
+        }
+
+        .tm-message-top {
+            flex-direction: column;
         }
     }
 </style>
 
-<div class="messaging-container">
+<div class="tm-page">
 
 ```
-<header class="messaging-header">
-    <h1>💬 Student Communication</h1>
-    <p>
-        Manage student enquiries, read incoming messages and
-        communicate directly with your learners.
-    </p>
+{% set inbox = messages
+    | rejectattr('sender_id', 'equalto', session['user_id'])
+    | list
+%}
+
+{% set sent_messages = messages
+    | selectattr('sender_id', 'equalto', session['user_id'])
+    | list
+%}
+
+<header class="tm-hero">
+    <div class="tm-hero-content">
+        <span class="tm-eyebrow">TEACHER COMMUNICATION CENTRE</span>
+        <h1>💬 Teacher Messages</h1>
+        <p>
+            Communicate with students, respond to academic enquiries
+            and keep track of your conversations in one convenient place.
+        </p>
+        <span class="tm-highlight">
+            ✨ Supporting communication at Stockwell Montessori School
+        </span>
+    </div>
 </header>
 
-<div class="messaging-grid">
+<section class="tm-stats" aria-label="Message statistics">
+    <div class="tm-stat">
+        <div class="tm-stat-icon">📨</div>
+        <div>
+            <span class="tm-stat-number">{{ inbox|length }}</span>
+            <span class="tm-stat-label">Received messages</span>
+        </div>
+    </div>
 
-    <!-- SEND MESSAGE -->
+    <div class="tm-stat">
+        <div class="tm-stat-icon">📤</div>
+        <div>
+            <span class="tm-stat-number">{{ sent_messages|length }}</span>
+            <span class="tm-stat-label">Sent messages</span>
+        </div>
+    </div>
 
-    <section class="message-panel">
+    <div class="tm-stat">
+        <div class="tm-stat-icon">👨‍🎓</div>
+        <div>
+            <span class="tm-stat-number">{{ students|length }}</span>
+            <span class="tm-stat-label">Available students</span>
+        </div>
+    </div>
+</section>
 
-        <h2>✉️ Compose Message</h2>
+<div class="tm-layout">
 
-        <p class="panel-description">
-            Select a student and send a message about their
-            learning, quizzes or academic progress.
+    <section class="tm-panel">
+        <div class="tm-panel-heading">
+            <div class="tm-panel-icon">✉️</div>
+            <div>
+                <h2>Compose a Message</h2>
+            </div>
+        </div>
+
+        <p class="tm-description">
+            Select a student, enter a subject and write your message.
         </p>
 
         <form method="POST"
               action="{{ url_for('teacher_messages') }}"
-              class="message-form">
+              class="tm-form">
 
-            <label for="receiver_id">Recipient</label>
-
-            <select name="receiver_id"
-                    id="receiver_id"
-                    required>
-
-                <option value="">-- Choose a student --</option>
+            <label for="receiver_id">Send to student</label>
+            <select name="receiver_id" id="receiver_id" required>
+                <option value="">Choose a student</option>
 
                 {% for student in students %}
                     <option value="{{ student['id'] }}">
@@ -285,133 +544,133 @@
                         ({{ student['username'] }})
                     </option>
                 {% endfor %}
-
             </select>
 
-            <label for="subject">Subject</label>
-
+            <label for="subject">Message subject</label>
             <input type="text"
                    name="subject"
                    id="subject"
                    maxlength="255"
-                   placeholder="e.g. Mathematics quiz feedback"
+                   placeholder="e.g. Mathematics assignment"
                    required>
 
-            <label for="message">Your Message</label>
-
+            <label for="message">Your message</label>
             <textarea name="message"
                       id="message"
                       rows="6"
-                      placeholder="Write your message here..."
+                      placeholder="Write your message to the student..."
                       required></textarea>
 
-            <button type="submit" class="send-button">
-                Send Message
+            <button type="submit" class="tm-send-button">
+                <span>✉️</span>
+                <span>Send Message</span>
             </button>
 
+            <p class="tm-form-note">
+                Keep messages respectful, clear and related to school.
+            </p>
         </form>
-
     </section>
 
-    <!-- CONVERSATION HISTORY -->
-
-    <section class="message-panel">
-
-        <div class="conversation-summary">
-            <h2>📥 Message History</h2>
-
-            <span class="message-count">
-                {{ messages|length }} message(s)
-            </span>
+    <section class="tm-panel">
+        <div class="tm-panel-heading">
+            <div class="tm-panel-icon">📚</div>
+            <div>
+                <h2>My Conversations</h2>
+            </div>
         </div>
 
-        <p class="panel-description">
-            Messages you have received from students and
-            messages you have sent are displayed below.
+        <p class="tm-description">
+            Review messages received from students and messages you have sent.
         </p>
 
-        {% if messages %}
-
-            {% for message in messages %}
-
-                <article class="conversation-card
-                    {% if message['sender_id'] == session['user_id'] %}sent{% endif %}">
-
-                    <div class="conversation-top">
-
-                        <div>
-                            <h3>
-                                {{ message['subject'] or 'No subject' }}
-                            </h3>
-
-                            <div class="conversation-person">
-
-                                {% if message['sender_id'] == session['user_id'] %}
-
-                                    To:
-                                    {{ message['receiver'] }}
-
-                                {% else %}
-
-                                    From:
-                                    {{ message['sender'] }}
-
-                                {% endif %}
-
-                            </div>
-                        </div>
-
-                        {% if message['sender_id'] == session['user_id'] %}
-
-                            <span class="message-badge sent-badge">
-                                SENT
-                            </span>
-
-                        {% else %}
-
-                            <span class="message-badge">
-                                RECEIVED
-                            </span>
-
-                        {% endif %}
-
-                    </div>
-
-                    <div class="conversation-body">{{ message['message'] }}</div>
-
-                    <div class="conversation-date">
-                        🕒 {{ message['created_at'] }}
-                    </div>
-
-                </article>
-
-            {% endfor %}
-
-        {% else %}
-
-            <div class="empty-state">
-                <div class="empty-icon">📭</div>
-
-                <strong>No messages yet</strong>
-
-                <p>
-                    Messages from students will appear here.
-                    You can also start a conversation using
-                    the form on the left.
-                </p>
+        <div class="tm-section">
+            <div class="tm-section-heading">
+                <h3>📥 Inbox</h3>
+                <span class="tm-count">{{ inbox|length }} received</span>
             </div>
 
-        {% endif %}
+            {% if inbox %}
+                {% for message in inbox %}
+                    <article class="tm-message">
+                        <div class="tm-message-top">
+                            <div>
+                                <h4 class="tm-message-subject">
+                                    {{ message['subject'] or 'No subject' }}
+                                </h4>
 
+                                <div class="tm-message-person">
+                                    From student:
+                                    <strong>{{ message['sender'] }}</strong>
+                                </div>
+                            </div>
+
+                            <span class="tm-message-status">RECEIVED</span>
+                        </div>
+
+                        <div class="tm-message-body">{{ message['message'] }}</div>
+
+                        <div class="tm-message-date">
+                            🕒 {{ message['created_at'] }}
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <div class="tm-empty">
+                    <div class="tm-empty-icon">📭</div>
+                    <strong>Your inbox is empty</strong>
+                    <p>Messages from students will appear here.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="tm-section">
+            <div class="tm-section-heading">
+                <h3>📤 Sent Messages</h3>
+                <span class="tm-count">{{ sent_messages|length }} sent</span>
+            </div>
+
+            {% if sent_messages %}
+                {% for message in sent_messages %}
+                    <article class="tm-message tm-sent">
+                        <div class="tm-message-top">
+                            <div>
+                                <h4 class="tm-message-subject">
+                                    {{ message['subject'] or 'No subject' }}
+                                </h4>
+
+                                <div class="tm-message-person">
+                                    To student:
+                                    <strong>{{ message['receiver'] }}</strong>
+                                </div>
+                            </div>
+
+                            <span class="tm-message-status sent">SENT</span>
+                        </div>
+
+                        <div class="tm-message-body">{{ message['message'] }}</div>
+
+                        <div class="tm-message-date">
+                            🕒 {{ message['created_at'] }}
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <div class="tm-empty">
+                    <div class="tm-empty-icon">📤</div>
+                    <strong>No sent messages yet</strong>
+                    <p>Messages you send to students will appear here.</p>
+                </div>
+            {% endif %}
+        </div>
     </section>
 
 </div>
 
-<a href="{{ url_for('teacher_dashboard') }}"
-   class="dashboard-link">
+<a href="{{ url_for('teacher_dashboard') }}" class="tm-back-link">
     ← Back to Teacher Dashboard
 </a>
-```
+
 
 </div>
 

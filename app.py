@@ -71,7 +71,42 @@ def get_db():
         row_factory=dict_row,
         connect_timeout=10
     )
+# ============================================================
+# UNREAD MESSAGE NOTIFICATIONS
+# ============================================================
 
+@app.context_processor
+def inject_unread_message_count():
+
+    unread_message_count = 0
+    user_id = session.get("user_id")
+
+    if user_id:
+        conn = None
+
+        try:
+            conn = get_db()
+
+            result = conn.execute("""
+                SELECT COUNT(*) AS unread_count
+                FROM messages
+                WHERE receiver_id = %s
+                  AND is_read = FALSE
+            """, (user_id,)).fetchone()
+
+            if result:
+                unread_message_count = result["unread_count"]
+
+        except Exception:
+            unread_message_count = 0
+
+        finally:
+            if conn:
+                conn.close()
+
+    return {
+        "unread_message_count": unread_message_count
+    }
 
 # ============================================================
 # DATABASE INITIALIZATION
@@ -2780,6 +2815,14 @@ def student_messages():
             WHERE role = 'teacher'
             ORDER BY full_name
         """).fetchall()
+        conn.execute("""
+            UPDATE messages
+            SET is_read = TRUE
+            WHERE receiver_id = %s
+              AND is_read = FALSE
+        """, (session["user_id"],))
+
+        conn.commit()
 
         message_history = conn.execute("""
             SELECT
@@ -2822,30 +2865,16 @@ def student_messages():
 # ============================================================
 # TEACHER MESSAGES
 # ============================================================
-
 @app.route("/teacher/messages", methods=["GET", "POST"])
 @teacher_required
 def teacher_messages():
-
     conn = get_db()
 
     try:
         if request.method == "POST":
-
-            student_id = request.form.get(
-                "receiver_id",
-                type=int
-            )
-
-            subject = request.form.get(
-                "subject",
-                ""
-            ).strip()
-
-            message_text = request.form.get(
-                "message",
-                ""
-            ).strip()
+            student_id = request.form.get("receiver_id", type=int)
+            subject = request.form.get("subject", "").strip()
+            message_text = request.form.get("message", "").strip()
 
             if not student_id or not subject or not message_text:
                 flash("Please complete all message fields.")
@@ -2854,8 +2883,7 @@ def teacher_messages():
             student = conn.execute("""
                 SELECT id
                 FROM users
-                WHERE id = %s
-                AND role = 'student'
+                WHERE id = %s AND role = 'student'
             """, (student_id,)).fetchone()
 
             if not student:
@@ -2878,7 +2906,6 @@ def teacher_messages():
             ))
 
             conn.commit()
-
             flash("Your message has been sent to the student.")
             return redirect(url_for("teacher_messages"))
 
@@ -2889,6 +2916,17 @@ def teacher_messages():
             ORDER BY full_name
         """).fetchall()
 
+        # Mark messages received by this teacher as read.
+        conn.execute("""
+            UPDATE messages
+            SET is_read = TRUE
+            WHERE receiver_id = %s
+              AND is_read = FALSE
+        """, (session["user_id"],))
+
+        conn.commit()
+
+        # Load messages sent and received by this teacher.
         message_history = conn.execute("""
             SELECT
                 messages.id,
@@ -2901,16 +2939,12 @@ def teacher_messages():
                 sender.username AS sender,
                 receiver.username AS receiver
             FROM messages
-
             JOIN users AS sender
                 ON messages.sender_id = sender.id
-
             JOIN users AS receiver
                 ON messages.receiver_id = receiver.id
-
             WHERE messages.sender_id = %s
                OR messages.receiver_id = %s
-
             ORDER BY messages.created_at DESC
         """, (
             session["user_id"],

@@ -3,178 +3,640 @@
 {% block content %}
 
 <style>
-    .dashboard-welcome {
-        background: linear-gradient(135deg, #173b65, #2563eb);
-        color: white;
-        padding: 35px;
-        border-radius: 18px;
-        margin-bottom: 30px;
-        box-shadow: 0 8px 25px rgba(23, 59, 101, 0.15);
+    .student-dashboard {
+        --sd-primary: #173b65;
+        --sd-accent: #2563eb;
+        --sd-muted: #64748b;
+        --sd-border: #e5eaf2;
+        color: #1e293b;
     }
 
-    .dashboard-welcome h1 {
-        color: white;
-        font-size: 30px;
-        margin: 0 0 10px;
+    .student-dashboard * {
+        box-sizing: border-box;
     }
 
-    .dashboard-welcome p {
+    .sd-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(26px, 5vw, 48px);
+        margin-bottom: 28px;
+        border-radius: 24px;
+        color: white;
+        background: linear-gradient(125deg, #102b4b 0%, #174a80 55%, #3478e5 100%);
+        box-shadow: 0 14px 35px rgba(23, 59, 101, 0.18);
+    }
+
+    .sd-hero::before,
+    .sd-hero::after {
+        content: "";
+        position: absolute;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .sd-hero::before {
+        width: 280px;
+        height: 280px;
+        right: -65px;
+        top: -125px;
+    }
+
+    .sd-hero::after {
+        width: 190px;
+        height: 190px;
+        right: 10px;
+        bottom: -125px;
+    }
+
+    .sd-hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 650px;
+    }
+
+    .sd-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        margin-bottom: 17px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #e4efff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .sd-hero h1 {
+        color: white;
+        font-size: clamp(27px, 4vw, 39px);
+        line-height: 1.2;
+        margin: 0 0 14px;
+        letter-spacing: -0.8px;
+        overflow-wrap: anywhere;
+    }
+
+    .sd-hero p {
+        max-width: 570px;
         color: #e2eaf7;
-        margin: 0;
-        line-height: 1.8;
+        font-size: 15px;
+        line-height: 1.9;
+        margin: 0 0 25px;
     }
 
-    .dashboard-heading {
-        color: #173b65;
-        font-size: 23px;
-        margin: 0 0 20px;
-    }
-
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-        gap: 22px;
-        margin-bottom: 30px;
-    }
-
-    .dashboard-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+    .sd-hero-actions {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .student-dashboard .sd-hero .btn {
+        margin: 0;
+        padding: 12px 19px;
+        border-radius: 10px;
+        background: white;
+        color: #173b65;
         transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .student-dashboard .sd-hero .btn:hover {
+        background: #eff6ff;
+        color: #173b65;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .student-dashboard .sd-hero .btn.sd-secondary {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .sd-section {
+        margin-bottom: 32px;
+    }
+
+    .sd-section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 17px;
+    }
+
+    .sd-section-heading h2 {
+        color: #173b65;
+        font-size: 21px;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .sd-section-heading p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .sd-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 17px;
+        margin-bottom: 34px;
+    }
+
+    .sd-stat {
         min-width: 0;
+        padding: 22px;
+        background: white;
+        border: 1px solid #e5eaf2;
+        border-radius: 17px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .dashboard-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09);
+    .sd-stat:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.075);
     }
 
-    .dashboard-icon {
-        width: 55px;
-        height: 55px;
+    .sd-stat-top {
         display: flex;
         align-items: center;
-        justify-content: center;
-        background: #eaf1ff;
-        border-radius: 14px;
-        font-size: 28px;
+        justify-content: space-between;
+        gap: 10px;
         margin-bottom: 18px;
     }
 
-    .dashboard-card h2 {
+    .sd-stat-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        font-size: 22px;
+    }
+
+    .sd-icon-blue {
+        background: #eaf1ff;
+    }
+
+    .sd-icon-green {
+        background: #e7f8ee;
+    }
+
+    .sd-icon-purple {
+        background: #f1eaff;
+    }
+
+    .sd-stat-label {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .sd-stat-value {
+        display: block;
         color: #173b65;
-        font-size: 20px;
+        font-size: clamp(25px, 3vw, 34px);
+        font-weight: 800;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+
+    .sd-stat-caption {
+        color: #94a3b8;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .sd-learning-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .sd-learning-card {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        padding: 24px;
+        background: white;
+        border: 1px solid #e5eaf2;
+        border-radius: 18px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .sd-learning-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    .sd-card-icon {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        font-size: 25px;
+        margin-bottom: 19px;
+    }
+
+    .sd-learning-card h3 {
+        color: #173b65;
+        font-size: 18px;
         margin: 0 0 10px;
     }
 
-    .dashboard-card p {
-        color: #64748b;
-        font-size: 14px;
-        line-height: 1.8;
-        margin: 0 0 22px;
+    .sd-learning-card p {
         flex-grow: 1;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.85;
+        margin: 0 0 22px;
     }
 
-    .dashboard-card .btn {
-        display: block;
-        text-align: center;
+    .student-dashboard .sd-learning-card .btn {
+        width: 100%;
         margin-top: auto;
+        padding: 11px 14px;
+        border-radius: 9px;
     }
 
-    .dashboard-note {
-        background: #eff6ff;
+    .sd-results-panel {
+        background: white;
+        border: 1px solid #e5eaf2;
+        border-radius: 17px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+    }
+
+    .sd-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .student-dashboard .sd-results-panel table {
+        min-width: 500px;
+        border-collapse: collapse;
+    }
+
+    .student-dashboard .sd-results-panel th {
+        padding: 15px 19px;
+        background: #f5f8fd;
+        color: #64748b;
+        font-size: 11px;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .student-dashboard .sd-results-panel td {
+        padding: 17px 19px;
+        color: #334155;
+        font-size: 13px;
+    }
+
+    .sd-score {
+        display: inline-block;
+        padding: 5px 10px;
+        background: #eaf1ff;
+        color: #1d4ed8;
+        border-radius: 7px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .sd-empty {
+        padding: 32px 22px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .sd-empty-icon {
+        font-size: 34px;
+        margin-bottom: 10px;
+    }
+
+    .sd-empty h3 {
+        margin: 0 0 7px;
+        color: #173b65;
+        font-size: 17px;
+    }
+
+    .sd-empty p {
+        font-size: 13px;
+        margin: 0 0 17px;
+    }
+
+    .sd-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 21px;
         border: 1px solid #dbeafe;
-        border-radius: 14px;
-        padding: 20px;
-        color: #1e40af;
+        border-radius: 16px;
+        background: linear-gradient(110deg, #eff6ff, #f8fbff);
+    }
+
+    .sd-tip-icon {
+        display: grid;
+        place-items: center;
+        flex: 0 0 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #dbeafe;
+        font-size: 22px;
+    }
+
+    .sd-tip h3 {
+        color: #173b65;
+        font-size: 15px;
+        margin: 0 0 5px;
+    }
+
+    .sd-tip p {
+        color: #475569;
+        font-size: 13px;
         line-height: 1.8;
+        margin: 0;
+    }
+
+    @media (max-width: 850px) {
+        .sd-learning-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     @media (max-width: 600px) {
-        .dashboard-welcome {
-            padding: 25px 20px;
-        }
-
-        .dashboard-welcome h1 {
-            font-size: 25px;
-        }
-
-        .dashboard-grid {
+        .sd-stats {
             grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .sd-stat {
+            padding: 19px;
+        }
+
+        .sd-stat-top {
+            margin-bottom: 12px;
+        }
+
+        .sd-learning-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sd-learning-card {
+            padding: 21px;
+        }
+
+        .sd-hero {
+            border-radius: 18px;
+        }
+
+        .sd-hero-actions {
+            flex-direction: column;
+        }
+
+        .student-dashboard .sd-hero-actions .btn {
+            width: 100%;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .student-dashboard *,
+        .student-dashboard *::before,
+        .student-dashboard *::after {
+            scroll-behavior: auto !important;
+            transition: none !important;
         }
     }
 </style>
 
-<section class="dashboard-welcome">
-    <h1>Welcome to Your Student Dashboard</h1>
+<div class="student-dashboard">
 
-    <p>
-        Welcome to STOCKWELL MONTESSORI SCHOOL's Online Examination Portal.
-        Choose an option below to take examinations, check your performance,
-        or communicate with your teacher.
-    </p>
-</section>
+    {% set score_stats = namespace(total_percent=0, count=0) %}
 
-<h2 class="dashboard-heading">Your Learning Centre</h2>
+    {% for result in results %}
+        {% if result.total and result.total|int > 0 %}
+            {% set score_stats.total_percent = score_stats.total_percent + (result.score|float / result.total|float * 100) %}
+            {% set score_stats.count = score_stats.count + 1 %}
+        {% endif %}
+    {% endfor %}
 
-<div class="dashboard-grid">
+    <section class="sd-hero">
+        <div class="sd-hero-content">
+            <div class="sd-eyebrow">
+                <span aria-hidden="true">✦</span>
+                STUDENT LEARNING CENTRE
+            </div>
 
-    <article class="dashboard-card">
-        <div class="dashboard-icon" aria-hidden="true">📝</div>
+            <h1>
+                Welcome back, {{ session.get("username", "Student") }}!
+            </h1>
 
-        <h2>Available Quizzes</h2>
+            <p>
+                Welcome to STOCKWELL MONTESSORI SCHOOL's Online Examination
+                Portal. Continue learning, challenge yourself with an examination,
+                and follow your progress as you work towards your goals.
+            </p>
 
-        <p>
-            View published examinations, read the quiz details,
-            and begin an available quiz when you are ready.
-        </p>
+            <div class="sd-hero-actions">
+                <a class="btn" href="{{ url_for('student_quizzes') }}">
+                    📝 &nbsp; Explore Examinations
+                </a>
 
-        <a class="btn" href="{{ url_for('student_quizzes') }}">
-            View Quizzes &rarr;
-        </a>
-    </article>
+                <a class="btn sd-secondary" href="{{ url_for('student_results') }}">
+                    📊 &nbsp; My Performance
+                </a>
+            </div>
+        </div>
+    </section>
 
-    <article class="dashboard-card">
-        <div class="dashboard-icon" aria-hidden="true">📊</div>
+    <section class="sd-stats" aria-label="Your learning statistics">
 
-        <h2>My Results</h2>
+        <article class="sd-stat">
+            <div class="sd-stat-top">
+                <span class="sd-stat-label">Available Examinations</span>
+                <span class="sd-stat-icon sd-icon-blue" aria-hidden="true">📚</span>
+            </div>
 
-        <p>
-            Review your completed examinations, marks, and
-            performance to understand your progress.
-        </p>
+            <span class="sd-stat-value">{{ quizzes|length }}</span>
+            <div class="sd-stat-caption">Published quizzes to explore</div>
+        </article>
 
-        <a class="btn" href="{{ url_for('student_results') }}">
-            View My Results &rarr;
-        </a>
-    </article>
+        <article class="sd-stat">
+            <div class="sd-stat-top">
+                <span class="sd-stat-label">Completed Attempts</span>
+                <span class="sd-stat-icon sd-icon-green" aria-hidden="true">✓</span>
+            </div>
 
-    <article class="dashboard-card">
-        <div class="dashboard-icon" aria-hidden="true">💬</div>
+            <span class="sd-stat-value">{{ results|length }}</span>
+            <div class="sd-stat-caption">Recorded examination attempts</div>
+        </article>
 
-        <h2>Messages</h2>
+        <article class="sd-stat">
+            <div class="sd-stat-top">
+                <span class="sd-stat-label">Average Score</span>
+                <span class="sd-stat-icon sd-icon-purple" aria-hidden="true">📈</span>
+            </div>
 
-        <p>
-            Send messages to your teacher, ask questions,
-            and read responses.
-        </p>
+            <span class="sd-stat-value">
+                {% if score_stats.count > 0 %}
+                    {{ "%.1f"|format(score_stats.total_percent / score_stats.count) }}%
+                {% else %}
+                    —
+                {% endif %}
+            </span>
 
-        <a class="btn" href="{{ url_for('messages') }}">
-            Open Messages &rarr;
-        </a>
-    </article>
+            <div class="sd-stat-caption">Across attempts with recorded scores</div>
+        </article>
 
-</div>
+    </section>
 
-<div class="dashboard-note">
-    <strong>Learning tip:</strong>
-    Read every question carefully, manage your examination time,
-    and review your results after completing a quiz.
+    <section class="sd-section">
+        <div class="sd-section-heading">
+            <div>
+                <h2>Your Learning Centre</h2>
+                <p>Everything you need to continue your learning journey.</p>
+            </div>
+        </div>
+
+        <div class="sd-learning-grid">
+
+            <article class="sd-learning-card">
+                <div class="sd-card-icon sd-icon-blue" aria-hidden="true">📝</div>
+                <h3>Available Quizzes</h3>
+                <p>
+                    Explore published examinations, read the details,
+                    and choose a quiz when you are ready.
+                </p>
+                <a class="btn" href="{{ url_for('student_quizzes') }}">
+                    Browse Quizzes &rarr;
+                </a>
+            </article>
+
+            <article class="sd-learning-card">
+                <div class="sd-card-icon sd-icon-green" aria-hidden="true">🏆</div>
+                <h3>My Results</h3>
+                <p>
+                    Review your marks and previous attempts.
+                    Use your results to identify where you can improve.
+                </p>
+                <a class="btn" href="{{ url_for('student_results') }}">
+                    View Results &rarr;
+                </a>
+            </article>
+
+            <article class="sd-learning-card">
+                <div class="sd-card-icon sd-icon-purple" aria-hidden="true">💬</div>
+                <h3>Messages</h3>
+                <p>
+                    Communicate with your teacher, ask questions,
+                    and check for responses to your messages.
+                </p>
+                <a class="btn" href="{{ url_for('messages') }}">
+                    Open Messages &rarr;
+                </a>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="sd-section">
+        <div class="sd-section-heading">
+            <div>
+                <h2>Recent Examination Results</h2>
+                <p>Your latest recorded performance.</p>
+            </div>
+
+            <a href="{{ url_for('student_results') }}"
+               style="font-size:13px;font-weight:700;color:#2563eb;text-decoration:none;">
+                All results &rarr;
+            </a>
+        </div>
+
+        <div class="sd-results-panel">
+
+            {% if results %}
+
+                <div class="sd-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Examination</th>
+                                <th>Score</th>
+                                <th>Date Submitted</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for result in results[:5] %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ result.title }}</strong>
+                                    </td>
+
+                                    <td>
+                                        <span class="sd-score">
+                                            {{ result.score }}/{{ result.total }}
+                                            {% if result.total and result.total|int > 0 %}
+                                                · {{ "%.1f"|format(result.score|float / result.total|float * 100) }}%
+                                            {% endif %}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {% if result.submitted_at %}
+                                            {{ result.submitted_at }}
+                                        {% else %}
+                                            Not available
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+
+                <div class="sd-empty">
+                    <div class="sd-empty-icon" aria-hidden="true">📘</div>
+                    <h3>Your learning journey starts here</h3>
+                    <p>
+                        You have no recorded examination attempts yet.
+                        Choose an available quiz to get started.
+                    </p>
+                    <a class="btn" href="{{ url_for('student_quizzes') }}">
+                        Find Your First Quiz &rarr;
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </div>
+    </section>
+
+    <section class="sd-tip">
+        <div class="sd-tip-icon" aria-hidden="true">💡</div>
+        <div>
+            <h3>A little learning every day goes a long way</h3>
+            <p>
+                Read every question carefully, manage your examination time,
+                and review your results after each attempt. Consistent practice
+                can help you build confidence and improve your understanding.
+            </p>
+        </div>
+    </section>
+
 </div>
 
 {% endblock %}

@@ -36,7 +36,22 @@
             color: var(--text);
             line-height: 1.6;
         }
+        /* Unread message notification badge */
 
+        .nav-badge {
+            display: inline-block;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            min-width: 20px;
+            padding: 2px 6px;
+            margin-left: 5px;
+            border-radius: 999px;
+            text-align: center;
+            line-height: 1.5;
+            vertical-align: middle;
+        }
         /* Navigation */
 
         nav {
@@ -369,34 +384,41 @@
         STOCKWELL MONTESSORI SCHOOL
         <small>ONLINE EXAMINATION PORTAL</small>
     </div>
-
+html
     <div class="nav-links">
         {% if session.get("user_id") %}
 
-            {% if session.get("role") == "teacher" %} <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a> <a href="{{ url_for('teacher_results') }}">Results</a>
+            {% if session.get("role") == "teacher" %}
+                <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('teacher_results') }}">Results</a>
 
-
-{% if session.get("is_admin") %}
-    <a href="{{ url_for('manage_teachers') }}">Manage Teachers</a>
-{% endif %}
+                {% if session.get("is_admin") %}
+                    <a href="{{ url_for('manage_teachers') }}">Manage Teachers</a>
+                {% endif %}
 
             {% else %}
-
                 <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
                 <a href="{{ url_for('student_quizzes') }}">Quizzes</a>
-
             {% endif %}
+
+            <a href="{{ url_for('messages') }}">
+                Messages
+                {% if unread_message_count > 0 %}
+                    <span class="nav-badge" aria-label="{{ unread_message_count }} unread messages">
+                        {{ unread_message_count }}
+                    </span>
+                {% endif %}
+            </a>
 
             <a href="{{ url_for('logout') }}">Logout</a>
 
         {% else %}
-
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}">Register</a>
-
         {% endif %}
     </div>
-</nav>
+
+    </nav>
 
 <div class="container">
 
