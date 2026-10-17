@@ -1,1488 +1,905 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#12315a">
-
-    <title>Teacher Dashboard | Online Quiz System</title>
-
-    <style>
-        :root {
-            --navy: #12315a;
-            --navy-dark: #0b2040;
-            --blue: #2864dc;
-            --blue-light: #edf3ff;
-            --green: #15805d;
-            --green-light: #e8f7ef;
-            --amber: #a96809;
-            --amber-light: #fff5df;
-            --red: #c03945;
-            --purple: #7652c8;
-            --purple-light: #f1ecff;
-            --ink: #18243a;
-            --muted: #718096;
-            --line: #e7ecf3;
-            --background: #f4f7fc;
-            --radius: 16px;
-            --shadow: 0 8px 28px rgba(22, 43, 77, 0.06);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        [hidden] {
-            display: none !important;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: Inter, "Segoe UI", Arial, sans-serif;
-            background: var(--background);
-            color: var(--ink);
-            line-height: 1.6;
-        }
-
-        a {
-            color: inherit;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        button:focus-visible,
-        a:focus-visible,
-        input:focus-visible {
-            outline: 3px solid #8caef5;
-            outline-offset: 3px;
-        }
-
-        /* TOP BAR */
-
-        .topbar {
-            background: linear-gradient(120deg, var(--navy-dark), var(--navy));
-            color: white;
-            padding: 20px 4%;
-            box-shadow: 0 5px 22px rgba(11, 32, 64, 0.16);
-        }
-
-        .topbar-inner {
-            max-width: 1500px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            min-width: 0;
-        }
-
-        .brand-mark {
-            width: 49px;
-            height: 49px;
-            flex-shrink: 0;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            background: rgba(255, 255, 255, 0.13);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 25px;
-        }
-
-        .brand h1 {
-            font-size: clamp(19px, 2vw, 26px);
-            line-height: 1.3;
-            letter-spacing: -0.5px;
-        }
-
-        .brand p {
-            font-size: 13px;
-            color: #d4e2f7;
-            margin-top: 3px;
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .top-link {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 7px;
-            min-height: 44px;
-            padding: 9px 14px;
-            border-radius: 10px;
-            color: white;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            background: rgba(255, 255, 255, 0.08);
-            transition: background 0.2s;
-        }
-
-        .top-link:hover {
-            background: rgba(255, 255, 255, 0.17);
-        }
-
-        .top-link.logout {
-            background: #c83d4b;
-            border-color: #c83d4b;
-        }
-
-        .top-link.logout:hover {
-            background: #a92d3a;
-        }
-
-        /* PAGE AND WELCOME */
-
-        .page {
-            width: min(1500px, 92%);
-            margin: 30px auto;
-        }
-
-        .welcome-panel {
-            position: relative;
-            overflow: hidden;
-            padding: clamp(24px, 4vw, 39px);
-            border-radius: 22px;
-            background:
-                radial-gradient(circle at 90% 20%, rgba(94, 143, 255, 0.26), transparent 28%),
-                linear-gradient(120deg, #ffffff, #edf4ff);
-            border: 1px solid #e0eaff;
-            box-shadow: var(--shadow);
-            margin-bottom: 26px;
-        }
-
-        .eyebrow {
-            color: var(--blue);
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.6px;
-            margin-bottom: 8px;
-        }
-
-        .welcome-panel h2 {
-            color: var(--navy);
-            font-size: clamp(25px, 3vw, 35px);
-            letter-spacing: -0.8px;
-            line-height: 1.25;
-            margin-bottom: 10px;
-            overflow-wrap: anywhere;
-        }
-
-        .welcome-panel p {
-            max-width: 730px;
-            color: #61718a;
-            font-size: 14px;
-        }
-
-        .welcome-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 9px;
-            margin-top: 19px;
-        }
-
-        .welcome-badge {
-            background: white;
-            border: 1px solid #dfe8fa;
-            color: #36537d;
-            border-radius: 30px;
-            padding: 6px 11px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        /* FLASH MESSAGES */
-
-        .flash-messages {
-            margin-bottom: 22px;
-        }
-
-        .flash-message {
-            padding: 13px 16px;
-            border: 1px solid #bde9d2;
-            border-radius: 11px;
-            background: var(--green-light);
-            color: #126746;
-            margin-bottom: 8px;
-            font-size: 13px;
-            overflow-wrap: anywhere;
-        }
-
-        /* SECTION HEADINGS */
-
-        .section-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 17px;
-        }
-
-        .section-heading h2 {
-            color: var(--navy);
-            font-size: 20px;
-            letter-spacing: -0.3px;
-        }
-
-        .section-description {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .section-label {
-            padding: 6px 11px;
-            background: var(--blue-light);
-            color: var(--navy);
-            border-radius: 30px;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        /* STATISTICS */
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 17px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 22px;
-            box-shadow: var(--shadow);
-            min-width: 0;
-        }
-
-        .stat-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 17px;
-        }
-
-        .stat-icon {
-            width: 45px;
-            height: 45px;
-            flex-shrink: 0;
-            display: grid;
-            place-items: center;
-            border-radius: 13px;
-            font-size: 22px;
-        }
-
-        .icon-blue { background: var(--blue-light); }
-        .icon-green { background: var(--green-light); }
-        .icon-amber { background: var(--amber-light); }
-        .icon-purple { background: var(--purple-light); }
-
-        .stat-caption {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 650;
-        }
-
-        .stat-number {
-            font-size: clamp(27px, 3vw, 34px);
-            font-weight: 800;
-            color: var(--navy);
-            line-height: 1.2;
-            overflow-wrap: anywhere;
-        }
-
-        .stat-footnote {
-            color: #8994a7;
-            font-size: 11px;
-            margin-top: 8px;
-        }
-
-        /* QUICK ACTIONS */
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 17px;
-            margin-bottom: 32px;
-        }
-
-        .action-card {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 22px;
-            text-decoration: none;
-            box-shadow: var(--shadow);
-            min-width: 0;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .action-card:hover {
-            border-color: #c6d7fa;
-            box-shadow: 0 14px 30px rgba(22, 43, 77, 0.09);
-        }
-
-        .action-icon {
-            width: 49px;
-            height: 49px;
-            display: grid;
-            place-items: center;
-            border-radius: 14px;
-            background: var(--blue-light);
-            font-size: 24px;
-            margin-bottom: 16px;
-        }
-
-        .action-card h3 {
-            color: var(--navy);
-            font-size: 16px;
-            margin-bottom: 6px;
-        }
-
-        .action-card p {
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.7;
-            flex-grow: 1;
-        }
-
-        .action-arrow {
-            color: var(--blue);
-            font-size: 12px;
-            font-weight: 800;
-            margin-top: 15px;
-        }
-
-        .admin-card {
-            border-color: #dcd4fa;
-            background: linear-gradient(145deg, #ffffff, #f8f5ff);
-        }
-
-        .admin-card .action-icon {
-            background: var(--purple-light);
-        }
-
-        .admin-card .action-arrow {
-            color: var(--purple);
-        }
-
-        /* GENERAL BUTTONS */
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            min-height: 40px;
-            padding: 9px 13px;
-            border: 0;
-            border-radius: 9px;
-            color: white;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            text-align: center;
-            transition: filter 0.2s;
-        }
-
-        .button:hover {
-            filter: brightness(0.93);
-        }
-
-        .primary-btn {
-            background: var(--blue);
-        }
-
-        .secondary-btn {
-            background: var(--navy);
-        }
-
-        .edit-btn {
-            background: var(--navy);
-        }
-
-        .results-btn {
-            background: var(--green);
-        }
-
-        .publish-btn {
-            background: var(--blue);
-        }
-
-        .delete-btn {
-            background: var(--red);
-        }
-
-        /* SHARED PANELS */
-
-        .panel {
-            background: white;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: clamp(18px, 2.5vw, 27px);
-            margin-bottom: 28px;
-            min-width: 0;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 17px;
-        }
-
-        .panel-header h2 {
-            color: var(--navy);
-            font-size: 20px;
-            overflow-wrap: anywhere;
-        }
-
-        .panel-header p {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* LEADERBOARD TOGGLE */
-
-        .leaderboard-control {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-        }
-
-        .leaderboard-control h2 {
-            color: var(--navy);
-            font-size: 19px;
-        }
-
-        .leaderboard-control p {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .leaderboard-toggle {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            min-height: 46px;
-            padding: 11px 17px;
-            border: 0;
-            border-radius: 11px;
-            background: var(--navy);
-            color: white;
-            font-weight: 800;
-            font-size: 13px;
-            box-shadow: 0 5px 16px rgba(18, 49, 90, 0.16);
-        }
-
-        .leaderboard-toggle:hover {
-            background: #1c477c;
-        }
-
-        .leaderboard-panel {
-            border-top: 4px solid #f1c75b;
-            animation: panelIn 0.22s ease-out;
-        }
-
-        @keyframes panelIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .leaderboard-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .leader-row {
-            display: grid;
-            grid-template-columns: 45px minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 13px;
-            padding: 13px 15px;
-            border: 1px solid #edf0f5;
-            border-radius: 13px;
-            background: #fcfdff;
-        }
-
-        .leader-rank {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            display: grid;
-            place-items: center;
-            font-size: 14px;
-            font-weight: 850;
-            color: #51617a;
-            background: #eef2f8;
-        }
-
-        .rank-one {
-            background: #fff0c2;
-            color: #946200;
-        }
-
-        .rank-two {
-            background: #e7ebf0;
-            color: #4d5b6c;
-        }
-
-        .rank-three {
-            background: #f8e3d1;
-            color: #8c4d24;
-        }
-
-        .leader-name {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--ink);
-            overflow-wrap: anywhere;
-        }
-
-        .leader-username {
-            font-size: 11px;
-            color: var(--muted);
-            overflow-wrap: anywhere;
-        }
-
-        .leader-score {
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .leader-score strong {
-            display: block;
-            font-size: 17px;
-            color: var(--navy);
-        }
-
-        .leader-score span {
-            display: block;
-            color: var(--muted);
-            font-size: 10px;
-        }
-
-        .leaderboard-note {
-            margin-top: 14px;
-            padding: 11px 13px;
-            background: #f5f8ff;
-            border-radius: 10px;
-            color: #62728b;
-            font-size: 11px;
-        }
-
-        /* EMPTY STATE */
-
-        .empty-state {
-            text-align: center;
-            padding: 35px 18px;
-            border: 1px dashed #dce3ee;
-            border-radius: 13px;
-            background: #fbfcff;
-        }
-
-        .empty-icon {
-            font-size: 34px;
-            margin-bottom: 8px;
-        }
-
-        .empty-state h3 {
-            color: var(--navy);
-            font-size: 15px;
-            margin-bottom: 5px;
-        }
-
-        .empty-state p {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        /* QUIZ SEARCH AND TABLE */
-
-        .table-toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 13px;
-        }
-
-        .table-toolbar p {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .search-box {
-            width: min(100%, 310px);
-            min-height: 44px;
-            padding: 10px 13px;
-            border: 1px solid #dfe5ef;
-            border-radius: 10px;
-            outline: none;
-            background: white;
-            color: var(--ink);
-            font-size: 13px;
-        }
-
-        .search-box:focus {
-            border-color: #8caef5;
-            box-shadow: 0 0 0 3px rgba(40, 100, 220, 0.1);
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 880px;
-        }
-
-        th {
-            background: #f3f6fb;
-            color: #5b6b84;
-            padding: 14px 13px;
-            text-align: left;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 15px 13px;
-            border-top: 1px solid #edf0f5;
-            font-size: 12px;
-            vertical-align: middle;
-        }
-
-        tbody tr:hover {
-            background: #fafcff;
-        }
-
-        .quiz-title {
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .quiz-description {
-            color: var(--muted);
-            max-width: 250px;
-            overflow-wrap: anywhere;
-        }
-
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 9px;
-            border-radius: 30px;
-            font-size: 10px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        .status::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .published {
-            color: #126b4d;
-            background: #e2f7ed;
-        }
-
-        .draft {
-            color: #92600b;
-            background: #fff3d8;
-        }
-
-        .actions-cell {
-            min-width: 235px;
-        }
-
-        .inline-form {
-            display: inline-block;
-            margin: 2px;
-        }
-
-        .inline-form .button {
-            font-size: 10px;
-            min-height: 35px;
-            padding: 7px 10px;
-        }
-
-        /* FEATURES */
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 11px;
-        }
-
-        .feature {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            background: #f8faff;
-            border: 1px solid #e9eef7;
-            border-radius: 11px;
-            padding: 13px;
-            color: #4e607c;
-            font-size: 11px;
-            min-width: 0;
-        }
-
-        .feature span {
-            font-size: 17px;
-            flex-shrink: 0;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 22px 15px 30px;
-            color: #8a96a9;
-            font-size: 11px;
-        }
-
-        /* RESPONSIVE LAYOUT */
-
-        @media (max-width: 1150px) {
-            .stats-grid,
-            .actions-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .features-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 650px) {
-            .topbar {
-                padding: 17px 4%;
-            }
-
-            .topbar-inner {
-                align-items: flex-start;
-            }
-
-            .brand-mark {
-                width: 42px;
-                height: 42px;
-            }
-
-            .brand p {
-                font-size: 12px;
-            }
-
-            .topbar-actions {
-                width: 100%;
-            }
-
-            .top-link {
-                flex: 1;
-            }
-
-            .page {
-                width: 94%;
-                margin-top: 18px;
-            }
-
-            .welcome-panel {
-                border-radius: 16px;
-            }
-
-            .stats-grid,
-            .actions-grid,
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                padding: 18px;
-            }
-
-            .stat-top {
-                margin-bottom: 10px;
-            }
-
-            .panel {
-                padding: 16px;
-            }
-
-            .leaderboard-control {
-                align-items: stretch;
-            }
-
-            .leaderboard-toggle {
-                width: 100%;
-            }
-
-            .leader-row {
-                grid-template-columns: 36px minmax(0, 1fr) auto;
-                gap: 8px;
-                padding: 11px 9px;
-            }
-
-            .leader-rank {
-                width: 33px;
-                height: 33px;
-            }
-
-            .leader-score strong {
-                font-size: 14px;
-            }
-
-            .search-box {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .page {
-                width: 95%;
-            }
-
-            .welcome-panel {
-                padding: 19px;
-            }
-
-            .leader-row {
-                grid-template-columns: 31px minmax(0, 1fr);
-            }
-
-            .leader-rank {
-                width: 29px;
-                height: 29px;
-            }
-
-            .leader-score {
-                grid-column: 2;
-                text-align: left;
-            }
-
-            .leader-score strong,
-            .leader-score span {
-                display: inline;
-                margin-right: 5px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<header class="topbar">
-    <div class="topbar-inner">
-        <div class="brand">
-            <div class="brand-mark" aria-hidden="true">🎓</div>
-            <div>
-                <h1>Teacher Dashboard</h1>
-                <p>Online Quiz &amp; Assessment Management</p>
-            </div>
-        </div>
-
-        <nav class="topbar-actions" aria-label="Account navigation">
-            <a href="{{ url_for('teacher_messages') }}" class="top-link">
-                💬 Messages
-            </a>
-
-            <a href="{{ url_for('logout') }}" class="top-link logout">
-                ↪ Logout
-            </a>
-        </nav>
-    </div>
-</header>
-
-<main class="page">
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================
+   TEACHER DASHBOARD
+========================================= */
+
+.teacher-dashboard {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 18px 12px 35px;
+    color: #172033;
+}
+
+.teacher-dashboard * {
+    box-sizing: border-box;
+}
+
+.teacher-dashboard a {
+    text-decoration: none;
+}
+
+.teacher-dashboard .page-heading {
+    margin-bottom: 22px;
+}
+
+.teacher-dashboard .page-heading h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: #172033;
+}
+
+.teacher-dashboard .page-heading p {
+    margin: 7px 0 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* =========================================
+   WELCOME PANEL
+========================================= */
+
+.teacher-dashboard .welcome-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 25px;
+    margin-bottom: 22px;
+    border-radius: 17px;
+    color: white;
+    background: linear-gradient(120deg, #1d4ed8, #2563eb, #4f46e5);
+}
+
+.teacher-dashboard .welcome-panel h2 {
+    margin: 0;
+    color: white;
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-weight: 800;
+}
+
+.teacher-dashboard .welcome-panel p {
+    margin: 9px 0 0;
+    color: rgba(255,255,255,.9);
+    line-height: 1.6;
+}
+
+.teacher-dashboard .welcome-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.15);
+    font-size: 2.5rem;
+}
+
+/* =========================================
+   BUTTONS — COMPACT SIZE
+========================================= */
+
+.teacher-dashboard .button,
+.teacher-dashboard .edit-btn,
+.teacher-dashboard .results-btn,
+.teacher-dashboard .publish-btn,
+.teacher-dashboard .delete-btn,
+.teacher-dashboard button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 31px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: .78rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
+}
+
+.teacher-dashboard .button {
+    background: #2563eb;
+    color: white;
+}
+
+.teacher-dashboard .button:hover {
+    background: #1d4ed8;
+    color: white;
+}
+
+.teacher-dashboard .edit-btn {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+.teacher-dashboard .edit-btn:hover {
+    background: #dbeafe;
+}
+
+.teacher-dashboard .results-btn {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+.teacher-dashboard .results-btn:hover {
+    background: #d1fae5;
+}
+
+.teacher-dashboard .publish-btn {
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.teacher-dashboard .publish-btn:hover {
+    background: #fde68a;
+}
+
+.teacher-dashboard .delete-btn {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.teacher-dashboard .delete-btn:hover {
+    background: #fee2e2;
+}
+
+.teacher-dashboard .secondary-btn {
+    background: #fff;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+.teacher-dashboard .secondary-btn:hover {
+    background: #f8fafc;
+}
+
+.teacher-dashboard .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+}
+
+.teacher-dashboard .button-row form {
+    display: inline-flex;
+    margin: 0;
+}
+
+/* =========================================
+   STATISTICS
+========================================= */
+
+.teacher-dashboard .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.teacher-dashboard .stat-card {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    background: white;
+    box-shadow: 0 3px 12px rgba(15,23,42,.035);
+}
+
+.teacher-dashboard .stat-label {
+    color: #64748b;
+    font-size: .85rem;
+    font-weight: 650;
+}
+
+.teacher-dashboard .stat-value {
+    margin-top: 9px;
+    color: #172033;
+    font-size: 1.9rem;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.teacher-dashboard .stat-note {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: .8rem;
+}
+
+/* =========================================
+   ACTION CARDS
+========================================= */
+
+.teacher-dashboard .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.teacher-dashboard .action-card {
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    background: white;
+}
+
+.teacher-dashboard .action-card .action-icon {
+    margin-bottom: 10px;
+    font-size: 1.7rem;
+}
+
+.teacher-dashboard .action-card h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+.teacher-dashboard .action-card p {
+    margin: 7px 0 13px;
+    color: #64748b;
+    font-size: .85rem;
+    line-height: 1.55;
+}
+
+/* =========================================
+   GENERAL PANELS
+========================================= */
+
+.teacher-dashboard .panel {
+    margin-top: 25px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: white;
+    box-shadow: 0 3px 12px rgba(15,23,42,.025);
+}
+
+.teacher-dashboard .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 17px 19px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.teacher-dashboard .panel-header h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 1.12rem;
+    font-weight: 800;
+}
+
+.teacher-dashboard .panel-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: .85rem;
+}
+
+.teacher-dashboard .panel-body {
+    padding: 18px;
+}
+
+/* =========================================
+   QUIZ SEARCH
+========================================= */
+
+.teacher-dashboard .quiz-search {
+    width: 100%;
+    max-width: 360px;
+    min-height: 38px;
+    padding: 8px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    color: #172033;
+    font-size: .9rem;
+}
+
+.teacher-dashboard .quiz-search:focus {
+    outline: 2px solid #bfdbfe;
+    border-color: #2563eb;
+}
+
+/* =========================================
+   QUIZ TABLE
+========================================= */
+
+.teacher-dashboard .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.teacher-dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.teacher-dashboard th,
+.teacher-dashboard td {
+    padding: 12px 13px;
+    border-bottom: 1px solid #edf2f7;
+    text-align: left;
+    vertical-align: middle;
+    font-size: .85rem;
+}
+
+.teacher-dashboard th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: .76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+}
+
+.teacher-dashboard tbody tr:hover {
+    background: #f8fafc;
+}
+
+.teacher-dashboard tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.teacher-dashboard .quiz-title {
+    color: #172033;
+    font-weight: 750;
+}
+
+.teacher-dashboard .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.teacher-dashboard .status-published {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.teacher-dashboard .status-draft {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.teacher-dashboard .empty-state {
+    padding: 28px 15px;
+    color: #64748b;
+    text-align: center;
+}
+
+.teacher-dashboard .empty-state strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #172033;
+    font-size: 1rem;
+}
+
+/* =========================================
+   STUDENT LEADERBOARD
+========================================= */
+
+.teacher-dashboard .leaderboard-list {
+    display: grid;
+    gap: 10px;
+}
+
+.teacher-dashboard .leader-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+}
+
+.teacher-dashboard .leader-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.teacher-dashboard .leader-name {
+    color: #172033;
+    font-size: .9rem;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.teacher-dashboard .leader-detail {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: .78rem;
+}
+
+.teacher-dashboard .leader-score {
+    color: #047857;
+    font-size: .95rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.teacher-dashboard #leaderboardPanel[hidden] {
+    display: none !important;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+    .teacher-dashboard .actions-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .teacher-dashboard .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .teacher-dashboard .actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .teacher-dashboard .panel-header {
+        align-items: flex-start;
+    }
+
+    .teacher-dashboard .quiz-search {
+        max-width: none;
+    }
+
+    .teacher-dashboard .table-wrapper table {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 480px) {
+    .teacher-dashboard {
+        padding: 10px 3px 25px;
+    }
+
+    .teacher-dashboard .welcome-panel {
+        padding: 18px;
+    }
+
+    .teacher-dashboard .welcome-icon {
+        display: none;
+    }
+
+    .teacher-dashboard .stats-grid {
+        gap: 9px;
+    }
+
+    .teacher-dashboard .stat-card {
+        padding: 13px;
+    }
+
+    .teacher-dashboard .stat-value {
+        font-size: 1.55rem;
+    }
+
+    .teacher-dashboard .panel-header,
+    .teacher-dashboard .panel-body {
+        padding: 13px;
+    }
+
+    .teacher-dashboard .button,
+    .teacher-dashboard .edit-btn,
+    .teacher-dashboard .results-btn,
+    .teacher-dashboard .publish-btn,
+    .teacher-dashboard .delete-btn,
+    .teacher-dashboard button {
+        min-height: 32px;
+        padding: 7px 9px;
+        font-size: .76rem;
+    }
+
+    .teacher-dashboard .leader-row {
+        grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .teacher-dashboard .leader-rank {
+        width: 32px;
+        height: 32px;
+    }
+
+    .teacher-dashboard .leader-score {
+        grid-column: 2;
+    }
+}
+</style>
+
+<div class="teacher-dashboard">
 
     <!-- WELCOME -->
-
     <section class="welcome-panel">
-        <div class="eyebrow">Teaching &amp; Learning Portal</div>
-
-        <h2>
-            Welcome,
-            {{ session.get('full_name', session.get('username', 'Teacher')) }}!
-        </h2>
-
-        <p>
-            Manage assessments, monitor student performance, review quiz
-            results and communicate with learners from one central workspace.
-        </p>
-
-        <div class="welcome-badges">
-            <span class="welcome-badge">📚 Quiz Management</span>
-            <span class="welcome-badge">📊 Performance Tracking</span>
-            <span class="welcome-badge">💬 Student Communication</span>
+        <div>
+            <h2>Welcome to Your Teacher Dashboard</h2>
+            <p>
+                Create and manage quizzes, monitor student performance,
+                review results, and support your students' progress.
+            </p>
         </div>
+
+        <div class="welcome-icon" aria-hidden="true">👩‍🏫</div>
     </section>
 
-    <!-- FLASH MESSAGES -->
+    <!-- STATISTICS -->
+    <section class="stats-grid" aria-label="Dashboard statistics">
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flash-messages" role="status" aria-live="polite">
-                {% for message in messages %}
-                    <div class="flash-message">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+        <article class="stat-card">
+            <div class="stat-label">Total Quizzes</div>
+            <div class="stat-value">{{ quizzes|length }}</div>
+            <div class="stat-note">Quizzes in your dashboard</div>
+        </article>
 
-    <!-- DASHBOARD STATISTICS -->
+        <article class="stat-card">
+            <div class="stat-label">Registered Students</div>
+            <div class="stat-value">{{ student_count }}</div>
+            <div class="stat-note">Students in the system</div>
+        </article>
 
-    <section aria-labelledby="overview-heading">
-        <div class="section-heading">
-            <div>
-                <h2 id="overview-heading">Dashboard Overview</h2>
-                <p class="section-description">
-                    A quick view of your assessment activities.
-                </p>
-            </div>
-        </div>
+        <article class="stat-card">
+            <div class="stat-label">Teacher Tools</div>
+            <div class="stat-value">📚</div>
+            <div class="stat-note">Quizzes, results, and student management</div>
+        </article>
 
-        <div class="stats-grid">
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span class="stat-caption">Total Quizzes</span>
-                    <span class="stat-icon icon-blue" aria-hidden="true">📚</span>
-                </div>
-                <div class="stat-number">{{ quizzes|length }}</div>
-                <p class="stat-footnote">All quizzes in your dashboard</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span class="stat-caption">Published Quizzes</span>
-                    <span class="stat-icon icon-green" aria-hidden="true">🚀</span>
-                </div>
-                <div class="stat-number">
-                    {{ quizzes|selectattr('published')|list|length }}
-                </div>
-                <p class="stat-footnote">Available to students</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span class="stat-caption">Draft Quizzes</span>
-                    <span class="stat-icon icon-amber" aria-hidden="true">📝</span>
-                </div>
-                <div class="stat-number">
-                    {{ quizzes|rejectattr('published')|list|length }}
-                </div>
-                <p class="stat-footnote">Not yet published</p>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-top">
-                    <span class="stat-caption">Students</span>
-                    <span class="stat-icon icon-purple" aria-hidden="true">👨‍🎓</span>
-                </div>
-                <div class="stat-number">{{ student_count|default(0) }}</div>
-                <p class="stat-footnote">Registered student accounts</p>
-            </article>
-        </div>
     </section>
 
     <!-- QUICK ACTIONS -->
+    <section class="actions-grid">
 
-    <section aria-labelledby="quick-actions-heading">
-        <div class="section-heading">
+        <article class="action-card">
+            <div class="action-icon" aria-hidden="true">📝</div>
+            <h3>Create a Quiz</h3>
+            <p>Create a new quiz and add questions for your students.</p>
+
+            <a class="button" href="{{ url_for('create_quiz') }}">
+                + Create Quiz
+            </a>
+        </article>
+
+        <article class="action-card">
+            <div class="action-icon" aria-hidden="true">📊</div>
+            <h3>View Results</h3>
+            <p>Review student attempts and monitor quiz performance.</p>
+
+            <a class="button" href="{{ url_for('teacher_results') }}">
+                View Results
+            </a>
+        </article>
+
+        <article class="action-card">
+            <div class="action-icon" aria-hidden="true">💬</div>
+            <h3>Messages</h3>
+            <p>Open your messages and communicate with students.</p>
+
+            <a class="button" href="{{ url_for('teacher_messages') }}">
+                Open Messages
+            </a>
+        </article>
+
+        <article class="action-card">
+            <div class="action-icon" aria-hidden="true">🎓</div>
+            <h3>Manage Students</h3>
+            <p>View and manage student accounts.</p>
+
+            <a class="button" href="{{ url_for('manage_students') }}">
+                Manage Students
+            </a>
+        </article>
+
+        {% if session.get('role') == 'teacher' and session.get('is_admin') %}
+
+        <article class="action-card">
+            <div class="action-icon" aria-hidden="true">👩‍🏫</div>
+            <h3>Manage Teachers</h3>
+            <p>Manage teacher accounts and access.</p>
+
+            <a class="button" href="{{ url_for('manage_teachers') }}">
+                Manage Teachers
+            </a>
+        </article>
+
+        {% endif %}
+
+    </section>
+
+    <!-- QUIZ MANAGEMENT -->
+    <section class="panel">
+
+        <div class="panel-header">
             <div>
-                <h2 id="quick-actions-heading">Quick Actions</h2>
-                <p class="section-description">
-                    Open the tools you use most often.
-                </p>
+                <h2>Quiz Management</h2>
+                <p>Manage quizzes and their publication status.</p>
             </div>
+
+            <input
+                type="search"
+                id="quizSearch"
+                class="quiz-search"
+                placeholder="Search quizzes..."
+                aria-label="Search quizzes"
+            >
         </div>
 
-        <div class="actions-grid">
+        <div class="table-wrapper">
 
-            <a href="{{ url_for('create_quiz') }}" class="action-card">
-                <div class="action-icon" aria-hidden="true">📄</div>
-                <h3>Upload Questions</h3>
-                <p>
-                    Start creating an assessment using the question-upload
-                    features available in your system.
-                </p>
-                <span class="action-arrow">Open quiz creation →</span>
-            </a>
+            <table id="quizTable">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
-            <a href="{{ url_for('create_quiz') }}" class="action-card">
-                <div class="action-icon" aria-hidden="true">✏️</div>
-                <h3>Create a Quiz</h3>
-                <p>
-                    Create a quiz and prepare questions, answer options
-                    and correct answers.
-                </p>
-                <span class="action-arrow">Create quiz →</span>
-            </a>
+                <tbody>
 
-            <a href="{{ url_for('teacher_results') }}" class="action-card">
-                <div class="action-icon" aria-hidden="true">📊</div>
-                <h3>Student Results</h3>
-                <p>
-                    Review quiz attempts, scores and student performance.
-                </p>
-                <span class="action-arrow">View results →</span>
-            </a>
+                    {% for quiz in quizzes %}
 
-            <a href="{{ url_for('teacher_messages') }}" class="action-card">
-                <div class="action-icon" aria-hidden="true">💬</div>
-                <h3>Student Messages</h3>
-                <p>
-                    View messages and communicate with students.
-                </p>
-                <span class="action-arrow">Open messages →</span>
-            </a>
+                    <tr>
+                        <td>
+                            <span class="quiz-title">{{ quiz.title }}</span>
+                        </td>
 
-            {% if session.get('role') == 'teacher' and session.get('is_admin') %}
+                        <td>
+                            {% if quiz.is_published %}
+                                <span class="status-badge status-published">
+                                    Published
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-draft">
+                                    Draft
+                                </span>
+                            {% endif %}
+                        </td>
 
-                <a href="{{ url_for('manage_students') }}"
-                   class="action-card admin-card">
-                    <div class="action-icon" aria-hidden="true">👨‍🎓</div>
-                    <h3>Manage Students</h3>
-                    <p>
-                        Find student accounts, update student details,
-                        reset passwords and manage student accounts.
-                    </p>
-                    <span class="action-arrow">Manage student accounts →</span>
-                </a>
+                        <td>
+                            <div class="button-row">
 
-                <a href="{{ url_for('manage_teachers') }}"
-                   class="action-card admin-card">
-                    <div class="action-icon" aria-hidden="true">👩‍🏫</div>
-                    <h3>Manage Teachers</h3>
-                    <p>
-                        Open the existing teacher management page to
-                        manage teacher accounts.
-                    </p>
-                    <span class="action-arrow">Manage teacher accounts →</span>
-                </a>
+                                <a
+                                    class="edit-btn"
+                                    href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
+                                >
+                                    ✏️ Edit
+                                </a>
+
+                                <a
+                                    class="results-btn"
+                                    href="{{ url_for('teacher_results') }}"
+                                >
+                                    📊 Results
+                                </a>
+
+                                {% if quiz.is_published %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
+                                    onsubmit="return confirm('Unpublish this quiz?');"
+                                >
+
+
+                                    <button type="submit" class="publish-btn">
+                                        Unpublish
+                                    </button>
+                                </form>
+
+                                {% else %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
+                                    onsubmit="return confirm('Publish this quiz?');"
+
+
+                                    <button type="submit" class="publish-btn">
+                                        🚀 Publish
+                                    </button>
+                                </form>
+
+                                {% endif %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this quiz? This action cannot be undone.');"
+                                >
+
+
+                                    <button type="submit" class="delete-btn">
+                                        🗑 Delete
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <strong>No quizzes yet</strong>
+                                Create your first quiz to get started.
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <!-- STUDENT LEADERBOARD TOGGLE -->
+    <section class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h2>🏆 Student Leaderboard</h2>
+                <p>View student performance and quiz participation.</p>
+            </div>
+
+            <button
+                type="button"
+                id="leaderboardToggle"
+                class="button"
+                aria-expanded="false"
+                aria-controls="leaderboardPanel"
+            >
+                🏆 Show Student Leaderboard
+            </button>
+        </div>
+
+        <div id="leaderboardPanel" class="panel-body" hidden>
+
+            {% if student_leaderboard %}
+
+            <div class="leaderboard-list">
+
+                {% for student in student_leaderboard %}
+
+                <article class="leader-row">
+
+                    <div class="leader-rank">
+                        {{ loop.index }}
+                    </div>
+
+                    <div>
+                        <div class="leader-name">
+                            {{ student.full_name or student.username }}
+                        </div>
+
+                        <div class="leader-detail">
+                            @{{ student.username }}
+                            · {{ student.quizzes_completed }} quizzes completed
+                        </div>
+                    </div>
+
+                    <div class="leader-score">
+                        {{ "%.1f"|format(student.average_score|float) }}%
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                <strong>No leaderboard data yet</strong>
+                Student rankings will appear here when results are available.
+            </div>
 
             {% endif %}
 
         </div>
     </section>
 
-    <!-- LEADERBOARD BUTTON: VISIBLE BY DEFAULT -->
+    <!-- LOGOUT -->
+    <div class="button-row" style="margin-top: 22px;">
+        <a class="button secondary-btn" href="{{ url_for('logout') }}">
+            🚪 Log Out
+        </a>
+    </div>
 
-    <section class="leaderboard-control" aria-label="Student leaderboard controls">
-        <div>
-            <h2>🏆 Student Leaderboard</h2>
-            <p>Click the button to view the current student rankings.</p>
-        </div>
-
-        <button
-            type="button"
-            id="leaderboardToggle"
-            class="leaderboard-toggle"
-            aria-expanded="false"
-            aria-controls="leaderboardPanel"
-        >
-            🏆 Show Student Leaderboard
-        </button>
-    </section>
-
-    <!-- LEADERBOARD PANEL: HIDDEN UNTIL BUTTON IS CLICKED -->
-
-    <section
-        id="leaderboardPanel"
-        class="panel leaderboard-panel"
-        aria-labelledby="leaderboard-heading"
-        hidden
-    >
-        <div class="panel-header">
-            <div>
-                <h2 id="leaderboard-heading">🏆 Student Leaderboard</h2>
-                <p>
-                    Recognise students' performance based on recorded quiz results.
-                </p>
-            </div>
-            <span class="section-label">TOP PERFORMERS</span>
-        </div>
-
-        {% if student_leaderboard|default([]) %}
-
-            <div class="leaderboard-list">
-                {% for student in student_leaderboard %}
-                    <article class="leader-row">
-                        <div class="leader-rank
-                            {% if loop.index == 1 %}rank-one
-                            {% elif loop.index == 2 %}rank-two
-                            {% elif loop.index == 3 %}rank-three
-                            {% endif %}">
-
-                            {% if loop.index == 1 %}
-                                🥇
-                            {% elif loop.index == 2 %}
-                                🥈
-                            {% elif loop.index == 3 %}
-                                🥉
-                            {% else %}
-                                {{ loop.index }}
-                            {% endif %}
-                        </div>
-
-                        <div>
-                            <div class="leader-name">
-                                {{ student.full_name or student.username or 'Student' }}
-                            </div>
-
-                            <div class="leader-username">
-                                {{ student.username or '' }}
-
-                                {% if student.quizzes_completed is defined %}
-                                    · {{ student.quizzes_completed }} quiz attempt(s)
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="leader-score">
-                            <strong>
-                                {% if student.average_score is defined and student.average_score is not none %}
-                                    {{ "%.1f"|format(student.average_score|float) }}%
-                                {% elif student.total_score is defined and student.total_score is not none %}
-                                    {{ "%.1f"|format(student.total_score|float) }}
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </strong>
-
-                            <span>
-                                {% if student.average_score is defined and student.average_score is not none %}
-                                    Average score
-                                {% else %}
-                                    Score
-                                {% endif %}
-                            </span>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-
-            <p class="leaderboard-note">
-                Rankings depend on the results supplied by the application.
-                Only recorded results should be used to determine student positions.
-            </p>
-
-        {% else %}
-
-            <div class="empty-state">
-                <div class="empty-icon" aria-hidden="true">🏆</div>
-                <h3>Leaderboard data is not available yet</h3>
-                <p>
-                    No leaderboard entries were provided by the application.
-                    Once student results are available, the rankings can appear here.
-                </p>
-            </div>
-
-        {% endif %}
-    </section>
-
-    <!-- QUIZ MANAGEMENT -->
-
-    <section class="panel" aria-labelledby="quiz-list-heading">
-        <div class="panel-header">
-            <div>
-                <h2 id="quiz-list-heading">My Quizzes</h2>
-                <p>
-                    Manage, publish and review the assessments in your system.
-                </p>
-            </div>
-
-            <span class="section-label">
-                {{ quizzes|length }} quiz(es)
-            </span>
-        </div>
-
-        {% if quizzes %}
-
-            <div class="table-toolbar">
-                <p>Search the quiz list by title, description, status or ID.</p>
-
-                <input
-                    type="search"
-                    id="quizSearch"
-                    class="search-box"
-                    placeholder="Search quizzes..."
-                    aria-label="Search quizzes"
-                >
-            </div>
-
-            <div class="table-wrapper">
-                <table id="quizTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Quiz Title</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th>Duration</th>
-                            <th>Max Attempts</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for quiz in quizzes %}
-                            <tr>
-                                <td>{{ quiz.id }}</td>
-
-                                <td>
-                                    <span class="quiz-title">{{ quiz.title }}</span>
-                                </td>
-
-                                <td>
-                                    <span class="quiz-description">
-                                        {{ quiz.description or 'No description' }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {% if quiz.published %}
-                                        <span class="status published">Published</span>
-                                    {% else %}
-                                        <span class="status draft">Draft</span>
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    {% if quiz.duration_minutes %}
-                                        {{ quiz.duration_minutes }} min
-                                    {% else %}
-                                        No limit
-                                    {% endif %}
-                                </td>
-
-                                <td>{{ quiz.max_attempts or 1 }}</td>
-
-                                <td class="actions-cell">
-                                    <a
-                                        href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
-                                        class="button edit-btn"
-                                    >✏️ Edit</a>
-
-                                    <a
-                                        href="{{ url_for('teacher_results', quiz_id=quiz.id) }}"
-                                        class="button results-btn"
-                                    >📊 Results</a>
-
-                                    {% if not quiz.published %}
-                                        <form
-                                            method="POST"
-                                            action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
-                                            class="inline-form"
-                                        >
-                                            <button type="submit" class="button publish-btn">
-                                                🚀 Publish
-                                            </button>
-                                        </form>
-                                    {% endif %}
-
-                                    <form
-                                        method="POST"
-                                        action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}"
-                                        class="inline-form"
-                                        onsubmit="return confirmDeleteQuiz(this);"
-                                    >
-                                        <button type="submit" class="button delete-btn">
-                                            🗑️ Delete
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="noSearchResults" class="empty-state" hidden>
-                <h3>No matching quizzes</h3>
-                <p>Try a different search term.</p>
-            </div>
-
-        {% else %}
-
-            <div class="empty-state">
-                <div class="empty-icon" aria-hidden="true">📚</div>
-                <h3>No quizzes available</h3>
-                <p>Create your first quiz to get started.</p>
-            </div>
-
-        {% endif %}
-    </section>
-
-    <!-- SYSTEM FEATURES -->
-
-    <section class="panel" aria-labelledby="features-heading">
-        <div class="panel-header">
-            <div>
-                <h2 id="features-heading">System Features</h2>
-                <p>Tools available in your quiz management system.</p>
-            </div>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature"><span>📄</span> Question upload</div>
-            <div class="feature"><span>✏️</span> Quiz editing</div>
-            <div class="feature"><span>✅</span> Automatic marking</div>
-            <div class="feature"><span>🚀</span> Quiz publishing</div>
-            <div class="feature"><span>👨‍🎓</span> Student accounts</div>
-            <div class="feature"><span>📝</span> Quiz attempts</div>
-            <div class="feature"><span>📊</span> Results and reports</div>
-            <div class="feature"><span>⏱️</span> Timed examinations</div>
-            <div class="feature"><span>🔀</span> Randomised questions</div>
-            <div class="feature"><span>📋</span> Attempt limits</div>
-            <div class="feature"><span>💬</span> Teacher-student messaging</div>
-            <div class="feature"><span>🏆</span> Student leaderboard</div>
-        </div>
-    </section>
-
-</main>
-
-<footer class="footer">
-    <p>Online Quiz Management System &copy; 2026</p>
-</footer>
+</div>
 
 <script>
-    /* SHOW OR HIDE THE STUDENT LEADERBOARD */
+(function () {
+    const searchInput = document.getElementById("quizSearch");
+    const quizTable = document.getElementById("quizTable");
 
-    const leaderboardToggle = document.getElementById("leaderboardToggle");
-    const leaderboardPanel = document.getElementById("leaderboardPanel");
+    if (searchInput && quizTable) {
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase().trim();
+            const rows = quizTable.querySelectorAll("tbody tr");
+
+            rows.forEach(function (row) {
+                const titleCell = row.querySelector("td:first-child");
+                const title = titleCell
+                    ? titleCell.textContent.toLowerCase()
+                    : "";
+
+                row.style.display = title.includes(query) ? "" : "none";
+            });
+        });
+    }
+
+    const leaderboardToggle =
+        document.getElementById("leaderboardToggle");
+
+    const leaderboardPanel =
+        document.getElementById("leaderboardPanel");
 
     if (leaderboardToggle && leaderboardPanel) {
         leaderboardToggle.addEventListener("click", function () {
-            const isCurrentlyHidden = leaderboardPanel.hidden;
+            const isHidden = leaderboardPanel.hidden;
 
-            leaderboardPanel.hidden = !isCurrentlyHidden;
-            leaderboardToggle.setAttribute("aria-expanded", String(isCurrentlyHidden));
+            leaderboardPanel.hidden = !isHidden;
 
-            leaderboardToggle.innerHTML = isCurrentlyHidden
+            leaderboardToggle.setAttribute(
+                "aria-expanded",
+                String(isHidden)
+            );
+
+            leaderboardToggle.textContent = isHidden
                 ? "✖ Hide Student Leaderboard"
                 : "🏆 Show Student Leaderboard";
 
-            if (isCurrentlyHidden) {
+            if (isHidden) {
                 leaderboardPanel.scrollIntoView({
-                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-                        ? "auto"
-                        : "smooth",
+                    behavior: "smooth",
                     block: "start"
                 });
             }
         });
     }
-
-    /* SEARCH QUIZZES */
-
-    const searchInput = document.getElementById("quizSearch");
-    const quizTable = document.getElementById("quizTable");
-    const noSearchResults = document.getElementById("noSearchResults");
-
-    if (searchInput && quizTable) {
-        searchInput.addEventListener("input", function () {
-            const query = this.value.trim().toLowerCase();
-            const rows = quizTable.querySelectorAll("tbody tr");
-            let visibleCount = 0;
-
-            rows.forEach(function (row) {
-                const matches = row.textContent.toLowerCase().includes(query);
-                row.hidden = !matches;
-
-                if (matches) {
-                    visibleCount++;
-                }
-            });
-
-            if (noSearchResults) {
-                noSearchResults.hidden = visibleCount !== 0;
-            }
-        });
-    }
-
-    /* CONFIRM QUIZ DELETION */
-
-    function confirmDeleteQuiz(form) {
-        const titleCell = form.closest("tr")?.querySelector(".quiz-title");
-        const title = titleCell ? titleCell.textContent.trim() : "this quiz";
-
-        return confirm(
-            'Are you sure you want to delete "' + title + '"?\n\n' +
-            "This may permanently remove the quiz and related student " +
-            "attempts or results. This action cannot be undone."
-        );
-    }
+})();
 </script>
 
-</body>
-</html>
+{% endblock %}
