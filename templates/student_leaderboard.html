@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .leaderboard-page {
+        max-width: 1050px;
+        margin: 30px auto;
+        padding: 20px;
+        color: #172033;
+    }
+
+    .leaderboard-header {
+        padding: 30px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #123c69, #2563a6);
+        color: white;
+        margin-bottom: 24px;
+    }
+
+    .leaderboard-header h1 {
+        margin: 0 0 10px;
+        font-size: clamp(25px, 4vw, 36px);
+    }
+
+    .leaderboard-header p {
+        margin: 0;
+        line-height: 1.7;
+        opacity: 0.95;
+    }
+
+    .my-rank-card {
+        background: #eef6ff;
+        border: 1px solid #c8def8;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .my-rank-card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+    }
+
+    .my-rank-number {
+        font-size: 30px;
+        font-weight: 800;
+        color: #174a7e;
+    }
+
+    .leaderboard-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .leaderboard-card h2 {
+        padding: 20px;
+        margin: 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .leaderboard-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 560px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 15px 18px;
+        text-align: left;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .leaderboard-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .leaderboard-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #eef2f7;
+        font-weight: 800;
+    }
+
+    .rank-first {
+        background: #fff0b3;
+        color: #805900;
+    }
+
+    .rank-second {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .rank-third {
+        background: #f8ddc8;
+        color: #854d0e;
+    }
+
+    .student-name {
+        font-weight: 700;
+    }
+
+    .student-username {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .score-value {
+        font-weight: 800;
+        color: #166534;
+    }
+
+    .my-row {
+        background: #eff6ff;
+    }
+
+    .empty-leaderboard {
+        padding: 35px 20px;
+        text-align: center;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .leaderboard-note {
+        padding: 16px 20px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+        .leaderboard-page {
+            padding: 12px;
+            margin: 15px auto;
+        }
+
+        .leaderboard-header {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="leaderboard-page">
+
+
+<section class="leaderboard-header">
+    <h1>🏆 Student Leaderboard</h1>
+    <p>
+        Celebrate academic achievement! See the ten highest-ranked
+        students based on their recorded quiz performance.
+    </p>
+</section>
+
+{% if my_rank %}
+<section class="my-rank-card">
+    <h2>Your Overall Position</h2>
+
+    <div class="my-rank-number">
+        Rank #{{ my_rank.rank_position }}
+    </div>
+
+    <p>
+        Your average score:
+        <strong>{{ "%.1f"|format(my_rank.average_percentage) }}%</strong>
+    </p>
+
+    <p>
+        Completed attempts:
+        <strong>{{ my_rank.attempts_count }}</strong>
+    </p>
+
+    {% if my_rank.rank_position <= 10 %}
+    <p>Congratulations! You are among the Top 10 students.</p>
+    {% else %}
+    <p>Keep practising and working towards the Top 10!</p>
+    {% endif %}
+</section>
+{% else %}
+<section class="my-rank-card">
+    <h2>Your Overall Position</h2>
+    <p>
+        Your rank will appear after you complete a quiz that records
+        a valid score.
+    </p>
+</section>
+{% endif %}
+
+<section class="leaderboard-card">
+    <h2>🌟 Top 10 Students</h2>
+
+    {% if leaderboard %}
+    <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Student</th>
+                    <th>Average Score</th>
+                    <th>Attempts</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for student in leaderboard %}
+                <tr class="{% if student.student_id == session.get('user_id') %}my-row{% endif %}">
+                    <td>
+                        <span class="rank-badge
+                            {% if student.rank_position == 1 %}rank-first
+                            {% elif student.rank_position == 2 %}rank-second
+                            {% elif student.rank_position == 3 %}rank-third
+                            {% endif %}">
+                            {{ student.rank_position }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="student-name">
+                            {{ student.full_name or student.username }}
+                        </div>
+                        <div class="student-username">
+                            @{{ student.username }}
+                        </div>
+                    </td>
+
+                    <td class="score-value">
+                        {{ "%.1f"|format(student.average_percentage) }}%
+                    </td>
+
+                    <td>{{ student.attempts_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="leaderboard-note">
+        Rankings use recorded quiz percentages. Students with equal
+        average scores are ordered by number of attempts and then name.
+    </div>
+
+    {% else %}
+    <div class="empty-leaderboard">
+        <h3>No leaderboard results yet</h3>
+        <p>
+            The leaderboard will appear when students have completed
+            quizzes with valid recorded scores.
+        </p>
+    </div>
+    {% endif %}
+</section>
+
+
+</div>
+{% endblock %}

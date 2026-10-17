@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .sm-page {
+        max-width: 1250px;
+        margin: 25px auto;
+        padding: 0 18px 40px;
+        color: #1e293b;
+    }
+
+    .sm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .sm-header h1 {
+        margin: 0 0 8px;
+        font-size: clamp(24px, 4vw, 34px);
+        color: #123b63;
+    }
+
+    .sm-header p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .sm-count {
+        background: #e8f2ff;
+        color: #174a7c;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .sm-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .sm-search {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .sm-search input {
+        flex: 1 1 240px;
+        min-width: 0;
+    }
+
+    .sm-page input[type="text"],
+    .sm-page input[type="password"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 12px;
+        margin: 7px 0 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        font: inherit;
+    }
+
+    .sm-page input:focus {
+        outline: 2px solid #93c5fd;
+        border-color: #2563eb;
+    }
+
+    .sm-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        border-radius: 9px;
+        padding: 11px 15px;
+        min-height: 42px;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .sm-primary {
+        background: #174a7c;
+        color: #fff;
+    }
+
+    .sm-primary:hover {
+        background: #10375e;
+    }
+
+    .sm-light {
+        background: #edf2f7;
+        color: #334155;
+    }
+
+    .sm-green {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .sm-red {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .sm-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .sm-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+    }
+
+    .sm-table th,
+    .sm-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .sm-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .sm-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .sm-student-name {
+        font-weight: 700;
+        color: #123b63;
+        margin-bottom: 5px;
+    }
+
+    .sm-muted {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .sm-status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .sm-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .sm-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .sm-actions {
+        min-width: 245px;
+        display: grid;
+        gap: 15px;
+    }
+
+    .sm-action-section {
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        padding: 13px;
+        background: #fbfdff;
+    }
+
+    .sm-action-section h4 {
+        margin: 0 0 8px;
+        color: #334155;
+        font-size: 14px;
+    }
+
+    .sm-action-section label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .sm-action-section form {
+        margin: 0;
+    }
+
+    .sm-action-section input {
+        margin-bottom: 8px;
+    }
+
+    .sm-action-section .sm-btn {
+        width: 100%;
+    }
+
+    .sm-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #64748b;
+    }
+
+    .sm-empty strong {
+        display: block;
+        font-size: 18px;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .sm-note {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: 13px 15px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+        .sm-page {
+            padding: 0 10px 25px;
+            margin-top: 15px;
+        }
+
+        .sm-card {
+            padding: 14px;
+        }
+
+        .sm-search .sm-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="sm-page">
+
+    <div class="sm-header">
+        <div>
+            <h1>Student Management</h1>
+            <p>
+                Manage student accounts, update student details,
+                reset passwords, and control account access.
+            </p>
+        </div>
+
+        <div class="sm-count">
+            {{ students|length }} student{{ '' if students|length == 1 else 's' }}
+        </div>
+    </div>
+
+    <div class="sm-note">
+        <strong>Account safety:</strong>
+        Deactivating an account prevents that student from logging in.
+        Student accounts are not deleted here, so their existing quiz
+        results and records are preserved.
+    </div>
+
+    <div class="sm-card">
+        <form method="GET"
+              action="{{ url_for('manage_students') }}"
+              class="sm-search">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search }}"
+                placeholder="Search by student name or username..."
+                aria-label="Search students"
+            >
+
+            <button type="submit" class="sm-btn sm-primary">
+                Search
+            </button>
+
+            {% if search %}
+                <a href="{{ url_for('manage_students') }}"
+                   class="sm-btn sm-light">
+                    Clear Search
+                </a>
+            {% endif %}
+
+        </form>
+    </div>
+
+    <div class="sm-card">
+
+        {% if students %}
+
+            <div class="sm-table-wrap">
+                <table class="sm-table">
+
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Username</th>
+                            <th>Account Status</th>
+                            <th>Manage Account</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for student in students %}
+
+                            <tr>
+
+                                <td>
+                                    <div class="sm-student-name">
+                                        {{ student.full_name or 'Name not provided' }}
+                                    </div>
+
+                                    <div class="sm-muted">
+                                        Student ID: {{ student.id }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ student.username }}
+                                </td>
+
+                                <td>
+                                    {% if student.is_active %}
+                                        <span class="sm-status sm-active">
+                                            Active
+                                        </span>
+                                    {% else %}
+                                        <span class="sm-status sm-inactive">
+                                            Deactivated
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="sm-actions">
+
+                                        <!-- Update student details -->
+                                        <div class="sm-action-section">
+
+                                            <h4>Edit Student Details</h4>
+
+                                            <form method="POST"
+                                                  action="{{ url_for('manage_students') }}">
+
+                                                <input
+                                                    type="hidden"
+                                                    name="student_id"
+                                                    value="{{ student.id }}"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="update"
+                                                >
+
+                                                <label for="full_name_{{ student.id }}">
+                                                    Full Name
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    id="full_name_{{ student.id }}"
+                                                    name="full_name"
+                                                    value="{{ student.full_name or '' }}"
+                                                    maxlength="150"
+                                                    required
+                                                >
+
+                                                <label for="username_{{ student.id }}">
+                                                    Username
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    id="username_{{ student.id }}"
+                                                    name="username"
+                                                    value="{{ student.username }}"
+                                                    maxlength="100"
+                                                    required
+                                                >
+
+                                                <button type="submit"
+                                                        class="sm-btn sm-primary">
+                                                    Save Changes
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                        <!-- Reset student password -->
+                                        <div class="sm-action-section">
+
+                                            <h4>Reset Password</h4>
+
+                                            <form method="POST"
+                                                  action="{{ url_for('manage_students') }}">
+
+                                                <input
+                                                    type="hidden"
+                                                    name="student_id"
+                                                    value="{{ student.id }}"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="reset_password"
+                                                >
+
+                                                <label for="new_password_{{ student.id }}">
+                                                    New Password
+                                                </label>
+
+                                                <input
+                                                    type="password"
+                                                    id="new_password_{{ student.id }}"
+                                                    name="new_password"
+                                                    minlength="8"
+                                                    autocomplete="new-password"
+                                                    placeholder="At least 8 characters"
+                                                    required
+                                                >
+
+                                                <button type="submit"
+                                                        class="sm-btn sm-light"
+                                                        onclick="return confirm('Reset this student password?');">
+                                                    Reset Password
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                        <!-- Activate or deactivate account -->
+                                        <div class="sm-action-section">
+
+                                            <h4>Account Access</h4>
+
+                                            <form method="POST"
+                                                  action="{{ url_for('manage_students') }}">
+
+                                                <input
+                                                    type="hidden"
+                                                    name="student_id"
+                                                    value="{{ student.id }}"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="toggle_status"
+                                                >
+
+                                                {% if student.is_active %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="sm-btn sm-red"
+                                                        onclick="return confirm('Deactivate this student account?');"
+                                                    >
+                                                        Deactivate Account
+                                                    </button>
+
+                                                {% else %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="sm-btn sm-green"
+                                                        onclick="return confirm('Reactivate this student account?');"
+                                                    >
+                                                        Reactivate Account
+                                                    </button>
+
+                                                {% endif %}
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="sm-empty">
+                <strong>No students found</strong>
+
+                {% if search %}
+                    Try a different name or username, or clear your search.
+                {% else %}
+                    Registered student accounts will appear here.
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

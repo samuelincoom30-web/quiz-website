@@ -2,77 +2,67 @@
 
 {% block content %}
 
+{% set safe_total = total|int %}
+{% set safe_score = score|int %}
+{% set percentage = ((safe_score * 100 / safe_total)|round(0, 'floor')|int) if safe_total > 0 else 0 %}
+{% set percentage = [0, [percentage, 100]|min]|max %}
+
 <style>
     .result-page {
-        max-width: 900px;
-        margin: 35px auto;
+        max-width: 1050px;
+        margin: 30px auto;
         padding: 20px;
-        font-family: Arial, sans-serif;
         color: #1e293b;
     }
 
     .result-hero {
-        background: linear-gradient(135deg, #123c69, #2563eb);
-        color: white;
-        padding: 38px 25px;
-        border-radius: 22px;
         text-align: center;
-        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.18);
-    }
-
-    .result-icon {
-        width: 76px;
-        height: 76px;
-        margin: 0 auto 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.16);
-        border: 2px solid rgba(255, 255, 255, 0.35);
-        border-radius: 50%;
-        font-size: 38px;
+        padding: 35px 20px;
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+        border: 1px solid #dbeafe;
+        border-radius: 22px;
     }
 
     .result-hero h1 {
-        margin: 0 0 12px;
-        font-size: 32px;
-        font-weight: 800;
+        font-size: clamp(26px, 4vw, 36px);
+        margin: 0 0 10px;
+        color: #0f172a;
     }
 
     .result-hero p {
         margin: 0;
-        font-size: 16px;
-        line-height: 1.6;
-        opacity: 0.92;
+        color: #64748b;
+        line-height: 1.7;
     }
 
     .result-card {
-        background: white;
+        background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 20px;
-        padding: 30px;
-        margin-top: 24px;
-        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+        padding: 28px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
     }
 
     .score-layout {
         display: grid;
-        grid-template-columns: 220px 1fr;
-        gap: 35px;
+        grid-template-columns: 190px 1fr;
         align-items: center;
+        gap: 30px;
     }
 
     .score-circle {
-        width: 190px;
-        height: 190px;
+        width: 165px;
+        height: 165px;
         border-radius: 50%;
-        margin: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin: auto;
         background: conic-gradient(
-            #2563eb {{ percentage }}%,
+            #16a34a {{ percentage }}%,
             #e2e8f0 {{ percentage }}%
         );
         position: relative;
@@ -81,33 +71,30 @@
     .score-circle::before {
         content: "";
         position: absolute;
-        width: 154px;
-        height: 154px;
-        background: white;
+        width: 132px;
+        height: 132px;
         border-radius: 50%;
+        background: white;
     }
 
-    .score-number,
-    .score-label {
+    .score-circle strong,
+    .score-circle span {
         position: relative;
         z-index: 1;
     }
 
-    .score-number {
-        font-size: 39px;
-        font-weight: 800;
-        color: #123c69;
+    .score-circle strong {
+        font-size: 35px;
+        color: #166534;
     }
 
-    .score-label {
-        margin-top: 3px;
-        color: #64748b;
+    .score-circle span {
         font-size: 13px;
-        font-weight: 600;
+        color: #64748b;
     }
 
     .score-details h2 {
-        margin: 0 0 12px;
+        margin-top: 0;
         font-size: 25px;
         color: #0f172a;
     }
@@ -115,81 +102,177 @@
     .score-details p {
         color: #64748b;
         line-height: 1.7;
-        margin-bottom: 18px;
     }
 
     .score-stats {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
     }
 
     .stat-box {
+        padding: 17px 12px;
+        border-radius: 13px;
+        text-align: center;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 13px;
-        padding: 18px;
     }
 
-    .stat-label {
+    .stat-box strong {
         display: block;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .stat-box span {
+        font-size: 12px;
         color: #64748b;
-        font-size: 13px;
-        margin-bottom: 8px;
     }
 
-    .stat-value {
+    .stat-correct strong {
+        color: #15803d;
+    }
+
+    .stat-wrong strong {
+        color: #dc2626;
+    }
+
+    .review-heading {
+        margin: 35px 0 20px;
+    }
+
+    .review-heading h2 {
+        font-size: 27px;
         color: #0f172a;
-        font-size: 25px;
-        font-weight: 800;
+        margin: 0 0 8px;
     }
 
-    .result-message {
-        margin-top: 22px;
-        padding: 18px 20px;
-        border-radius: 13px;
-        line-height: 1.6;
+    .review-heading p {
+        color: #64748b;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .answer-review-item {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #94a3b8;
+        border-radius: 15px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        overflow-wrap: anywhere;
+    }
+
+    .answer-review-item.answer-correct {
+        border-left-color: #16a34a;
+    }
+
+    .answer-review-item.answer-incorrect {
+        border-left-color: #dc2626;
+    }
+
+    .answer-review-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+
+    .answer-review-top h3 {
+        margin: 0;
+        font-size: 17px;
+        color: #334155;
+    }
+
+    .answer-status {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .answer-correct .answer-status {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .answer-incorrect .answer-status {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .review-question {
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.8;
+        color: #0f172a;
+        margin: 0 0 18px;
+    }
+
+    .review-answer,
+    .review-correct-answer {
+        padding: 13px 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+        line-height: 1.7;
+    }
+
+    .review-answer {
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .answer-correct .review-answer {
+        background: #f0fdf4;
+    }
+
+    .answer-incorrect .review-answer {
+        background: #fef2f2;
+    }
+
+    .review-correct-answer {
         background: #eff6ff;
-        border-left: 5px solid #2563eb;
-        color: #1e40af;
+        color: #1d4ed8;
+    }
+
+    .answer-correct .review-correct-answer {
+        background: #f0fdf4;
+        color: #166534;
+    }
+
+    .review-answer strong,
+    .review-correct-answer strong {
+        display: block;
+        margin-bottom: 4px;
     }
 
     .result-actions {
         display: flex;
-        flex-wrap: wrap;
         justify-content: center;
+        flex-wrap: wrap;
         gap: 12px;
-        margin-top: 25px;
+        margin: 30px 0;
     }
 
     .result-button {
         display: inline-block;
-        text-decoration: none;
-        text-align: center;
         padding: 13px 22px;
-        border-radius: 11px;
-        font-weight: 700;
-        transition: 0.2s ease;
-    }
-
-    .primary-button {
-        color: white;
+        border-radius: 10px;
         background: #2563eb;
+        color: white !important;
+        text-decoration: none !important;
+        font-weight: 600;
+        text-align: center;
+        transition: background 0.2s ease;
     }
 
-    .primary-button:hover {
+    .result-button:hover {
         background: #1d4ed8;
-        transform: translateY(-2px);
-    }
-
-    .secondary-button {
-        color: #1e40af;
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-    }
-
-    .secondary-button:hover {
-        background: #dbeafe;
     }
 
     .result-footer {
@@ -197,48 +280,34 @@
         color: #94a3b8;
         font-size: 13px;
         margin-top: 25px;
+        padding-bottom: 20px;
     }
 
     @media (max-width: 650px) {
         .result-page {
-            margin: 15px auto;
             padding: 12px;
-        }
-
-        .result-hero {
-            padding: 28px 18px;
-        }
-
-        .result-hero h1 {
-            font-size: 26px;
+            margin: 15px auto;
         }
 
         .result-card {
-            padding: 22px 16px;
+            padding: 20px 15px;
         }
 
         .score-layout {
             grid-template-columns: 1fr;
-            gap: 25px;
-            text-align: center;
-        }
-
-        .score-circle {
-            width: 170px;
-            height: 170px;
-        }
-
-        .score-circle::before {
-            width: 138px;
-            height: 138px;
-        }
-
-        .score-number {
-            font-size: 34px;
+            gap: 20px;
         }
 
         .score-stats {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
+        }
+
+        .answer-review-item {
+            padding: 17px 13px;
+        }
+
+        .review-heading h2 {
+            font-size: 23px;
         }
 
         .result-button {
@@ -248,97 +317,142 @@
     }
 </style>
 
-{% set safe_total = total|int %}
-{% set safe_score = score|int %}
-{% set percentage = ((safe_score * 100 / safe_total)|round(0, 'floor')|int) if safe_total > 0 else 0 %}
-{% set percentage = [0, [percentage, 100]|min]|max %}
-
 <div class="result-page">
 
+    <!-- Results heading -->
+    <section class="result-hero">
+        <h1>Quiz Completed!</h1>
+        <p>
+            {% if percentage >= 80 %}
+                Excellent work! Keep up the good effort.
+            {% elif percentage >= 50 %}
+                Good effort! Review your answers to strengthen your understanding.
+            {% else %}
+                Keep practising. Reviewing your answers is a good way to improve.
+            {% endif %}
+        </p>
+    </section>
 
-<section class="result-hero">
-    <div class="result-icon">
-        {% if percentage >= 80 %}
-            🏆
-        {% elif percentage >= 50 %}
-            🎉
-        {% else %}
-            📘
-        {% endif %}
-    </div>
+    <!-- Score summary -->
+    <section class="result-card">
+        <div class="score-layout">
 
-    <h1>Quiz Completed!</h1>
+            <div class="score-circle">
+                <strong>{{ percentage }}%</strong>
+                <span>Your score</span>
+            </div>
 
-    <p>
-        You have successfully submitted
-        <strong>{{ quiz.title }}</strong>.
-        Here is your performance summary.
-    </p>
-</section>
+            <div class="score-details">
+                <h2>{{ quiz["title"] }}</h2>
 
-<section class="result-card">
+                <p>
+                    You scored <strong>{{ safe_score }}</strong>
+                    out of <strong>{{ safe_total }}</strong> questions.
+                    Review the answers below to see what you got right
+                    and where you can improve.
+                </p>
 
-    <div class="score-layout">
+                <div class="score-stats">
+                    <div class="stat-box stat-correct">
+                        <strong>{{ safe_score }}</strong>
+                        <span>Correct answers</span>
+                    </div>
 
-        <div class="score-circle">
-            <div class="score-number">{{ percentage }}%</div>
-            <div class="score-label">YOUR SCORE</div>
-        </div>
+                    <div class="stat-box stat-wrong">
+                        <strong>{{ safe_total - safe_score }}</strong>
+                        <span>Incorrect or unanswered</span>
+                    </div>
 
-        <div class="score-details">
-            <h2>
-                {% if percentage >= 80 %}
-                    Excellent Work!
-                {% elif percentage >= 50 %}
-                    Good Effort!
-                                    {% else %}
-                        Keep Practising!
-                {% endif %}
-            </h2>
-
-            <p>
-                {% if percentage >= 80 %}
-                    Outstanding performance. Keep up the excellent work!
-                {% elif percentage >= 50 %}
-                    Well done. Review the topics you found difficult and keep improving.
-                {% else %}
-                    Every attempt is an opportunity to learn. Review your lessons and try again when permitted.
-                {% endif %}
-            </p>
-
-            <div class="score-stats">
-                <div class="stat-box">
-                    <span class="stat-label">Correct answers</span>
-                    <span class="stat-value">{{ safe_score }}</span>
-                </div>
-
-                <div class="stat-box">
-                    <span class="stat-label">Total questions</span>
-                    <span class="stat-value">{{ safe_total }}</span>
+                    <div class="stat-box">
+                        <strong>{{ safe_total }}</strong>
+                        <span>Total questions</span>
+                    </div>
                 </div>
             </div>
+
+        </div>
+    </section>
+
+    <!-- Detailed answer review -->
+    <section class="answer-review">
+
+        <div class="review-heading">
+            <h2>Review Your Answers</h2>
+            <p>
+                Read each question, check your response, and compare it
+                with the correct answer.
+            </p>
         </div>
 
-    </div>
+        {% if answer_records %}
 
-    <div class="result-message">
-        <strong>Keep learning!</strong><br>
-        Your result has been recorded. Continue practising to strengthen your knowledge.
-    </div>
+            {% for answer in answer_records %}
 
+                <article class="answer-review-item
+                    {% if answer[4] %}answer-correct{% else %}answer-incorrect{% endif %}">
+
+                    <div class="answer-review-top">
+                        <h3>Question {{ loop.index }}</h3>
+
+                        <span class="answer-status">
+                            {% if answer[4] %}
+                                ✓ Correct
+                            {% else %}
+                                ✗ Incorrect
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <p class="review-question">
+                        {{ answer[1] }}
+                    </p>
+
+                    <div class="review-answer">
+                        <strong>Your answer</strong>
+
+                        {% if answer[2] %}
+                            {{ answer[2] }}.
+                            {{ answer[5] if answer|length > 5 and answer[5] else "Option text unavailable" }}
+                        {% else %}
+                            Not answered
+                        {% endif %}
+                    </div>
+
+                    <div class="review-correct-answer">
+                        <strong>Correct answer</strong>
+
+                        {{ answer[3] }}.
+                        {{ answer[6] if answer|length > 6 and answer[6] else "Option text unavailable" }}
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="answer-review-item">
+                <h3>Answer review unavailable</h3>
+                <p>
+                    The score is available, but detailed answers were
+                    not supplied to this page.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <!-- Navigation; no student download option -->
     <div class="result-actions">
-        <a href="{{ url_for('student_dashboard') }}"
-           class="result-button primary-button">
-            Return to Dashboard →
+        <a href="{{ url_for('student_dashboard') }}" class="result-button">
+            Return to Dashboard
         </a>
     </div>
 
-</section>
-
-<div class="result-footer">
-    Online Quiz System · Keep learning, keep improving.
-</div>
-
+    <div class="result-footer">
+        Online Quiz System · Keep learning, keep improving.
+    </div>
 
 </div>
 

@@ -303,7 +303,11 @@ def init_db():
             ADD COLUMN IF NOT EXISTS is_admin
             BOOLEAN DEFAULT FALSE
         """)
-
+        conn.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS is_active
+            BOOLEAN DEFAULT TRUE
+        """)
 
         conn.commit()
 
@@ -439,15 +443,16 @@ def login():
         try:
 
             user = conn.execute("""
-                                SELECT
-                    id,
-                    username,
-                    password,
-                    role,
-                    is_admin
-                FROM users
-                WHERE username = %s
-            """, (
+                                    SELECT
+                        id,
+                        username,
+                        password,
+                        role,
+                        is_admin,
+                        is_active
+                    FROM users
+                    WHERE username = %s
+                """, (
                 username,
             )).fetchone()
 
@@ -477,7 +482,9 @@ def login():
                 url_for("login")
             )
 
-
+        if user["role"] == "student" and not user["is_active"]:
+            flash("Your account has been deactivated. Please contact the administrator.")
+            return redirect(url_for("login"))
         session["user_id"] = user["id"]
 
         session["username"] = user["username"]
@@ -581,6 +588,132 @@ def manage_teachers():
         teachers=teachers
     )
 # ============================================================
+# ADMINISTRATOR: MANAGE STUDENTS
+# ============================================================
+
+@app.route("/admin/students", methods=["GET", "POST"])
+@admin_required
+def manage_students():
+
+    conn = get_db()
+
+    try:
+        if request.method == "POST":
+
+            student_id = request.form.get("student_id", "").strip()
+            action = request.form.get("action", "").strip()
+
+            if not student_id.isdigit():
+                flash("Invalid student account.")
+                return redirect(url_for("manage_students"))
+
+            student_id = int(student_id)
+
+            student = conn.execute("""
+                SELECT id, username
+                FROM users
+                WHERE id = %s AND role = 'student'
+            """, (student_id,)).fetchone()
+
+            if not student:
+                flash("Student account not found.")
+                return redirect(url_for("manage_students"))
+
+            if action == "update":
+
+                full_name = request.form.get(
+                    "full_name", ""
+                ).strip()
+
+                username = request.form.get(
+                    "username", ""
+                ).strip()
+
+                if not full_name or not username:
+                    flash("Full name and username are required.")
+                    return redirect(url_for("manage_students"))
+
+                existing = conn.execute("""
+                    SELECT id
+                    FROM users
+                    WHERE username = %s AND id <> %s
+                """, (username, student_id)).fetchone()
+
+                if existing:
+                    flash("That username is already in use.")
+                    return redirect(url_for("manage_students"))
+
+                conn.execute("""
+                    UPDATE users
+                    SET full_name = %s,
+                        username = %s
+                    WHERE id = %s AND role = 'student'
+                """, (full_name, username, student_id))
+
+                conn.commit()
+                flash("Student details updated successfully.")
+
+            elif action == "toggle_status":
+
+                conn.execute("""
+                    UPDATE users
+                    SET is_active = NOT is_active
+                    WHERE id = %s AND role = 'student'
+                """, (student_id,))
+
+                conn.commit()
+                flash("Student account status updated.")
+
+            elif action == "reset_password":
+
+                new_password = request.form.get(
+                    "new_password", ""
+                )
+
+                if not new_password.strip():
+                    flash("Enter a new password.")
+                    return redirect(url_for("manage_students"))
+
+                conn.execute("""
+                    UPDATE users
+                    SET password = %s
+                    WHERE id = %s AND role = 'student'
+                """, (new_password, student_id))
+
+                conn.commit()
+                flash("Student password reset successfully.")
+
+            else:
+                flash("Invalid management action.")
+
+            return redirect(url_for("manage_students"))
+
+        search = request.args.get("q", "").strip()
+
+        students = conn.execute("""
+            SELECT
+                id,
+                full_name,
+                username,
+                is_active
+            FROM users
+            WHERE role = 'student'
+              AND (
+                  full_name ILIKE %s
+                  OR username ILIKE %s
+              )
+            ORDER BY full_name, username
+        """, (f"%{search}%", f"%{search}%")).fetchall()
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "manage_students.html",
+        students=students,
+        search=search
+    )
+# ============================================================
 # STUDENT REGISTRATION
 # ============================================================
 @app.route(
@@ -651,13 +784,37 @@ def teacher_dashboard():
                     quizzes.max_attempts,
                     COUNT(questions.id) AS question_count
                 FROM quizzes
-
                 LEFT JOIN questions
                     ON quizzes.id = questions.quiz_id
-
                 GROUP BY quizzes.id
-
                 ORDER BY quizzes.id DESC
+            """).fetchall()
+
+            student_leaderboard = conn.execute("""
+                SELECT
+                    users.id,
+                    users.full_name,
+                    users.username,
+                    COUNT(attempts.id) AS quizzes_completed,
+                    ROUND(
+                        AVG(
+                            attempts.score * 100.0
+                            / NULLIF(attempts.total, 0)
+                        ),
+                        1
+                    ) AS average_score
+                FROM users
+                LEFT JOIN attempts
+                    ON attempts.student_id = users.id
+                WHERE users.role = 'student'
+                GROUP BY
+                    users.id,
+                    users.full_name,
+                    users.username
+                ORDER BY
+                    average_score DESC NULLS LAST,
+                    quizzes_completed DESC,
+                    users.full_name ASC
             """).fetchall()
 
         else:
@@ -672,19 +829,48 @@ def teacher_dashboard():
                     quizzes.max_attempts,
                     COUNT(questions.id) AS question_count
                 FROM quizzes
-
                 LEFT JOIN questions
                     ON quizzes.id = questions.quiz_id
-
                 WHERE quizzes.teacher_id = %s
-
                 GROUP BY quizzes.id
-
                 ORDER BY quizzes.id DESC
             """, (
                 session["user_id"],
             )).fetchall()
 
+            student_leaderboard = conn.execute("""
+                SELECT
+                    users.id,
+                    users.full_name,
+                    users.username,
+                    COUNT(attempts.id) AS quizzes_completed,
+                    ROUND(
+                        AVG(
+                            attempts.score * 100.0
+                            / NULLIF(attempts.total, 0)
+                        ),
+                        1
+                    ) AS average_score
+                FROM users
+                LEFT JOIN attempts
+                    ON attempts.student_id = users.id
+                    AND attempts.quiz_id IN (
+                        SELECT id
+                        FROM quizzes
+                        WHERE teacher_id = %s
+                    )
+                WHERE users.role = 'student'
+                GROUP BY
+                    users.id,
+                    users.full_name,
+                    users.username
+                ORDER BY
+                    average_score DESC NULLS LAST,
+                    quizzes_completed DESC,
+                    users.full_name ASC
+            """, (
+                session["user_id"],
+            )).fetchall()
 
         students = conn.execute("""
             SELECT COUNT(*) AS count
@@ -692,19 +878,15 @@ def teacher_dashboard():
             WHERE role = 'student'
         """).fetchone()["count"]
 
-
     finally:
-
         conn.close()
-
 
     return render_template(
         "teacher_dashboard.html",
         quizzes=quizzes,
-
-        # Keep both names so your existing template works.
         students=students,
-        student_count=students
+        student_count=students,
+        student_leaderboard=student_leaderboard
     )
 
 
@@ -762,7 +944,7 @@ def create_quiz():
         show_result_immediately = (
             request.form.get(
                 "show_result_immediately"
-            ) == "on"
+            ) in ("on", "1")
         )
 
 
@@ -940,7 +1122,7 @@ def edit_quiz(quiz_id):
             show_result_immediately = (
                 request.form.get(
                     "show_result_immediately"
-                ) == "on"
+                ) in ("on", "1")
             )
 
 
@@ -1778,7 +1960,116 @@ def student_dashboard():
         quizzes=quizzes,
         results=results
     )
+# ============================================================
+# STUDENT LEADERBOARD
+# ============================================================
 
+@app.route("/student/leaderboard")
+@student_required
+def student_leaderboard():
+
+    conn = get_db()
+
+    try:
+        leaderboard = conn.execute("""
+            WITH student_scores AS (
+                SELECT
+                    users.id AS student_id,
+                    users.full_name,
+                    users.username,
+                    AVG(
+                        attempts.score * 100.0
+                        / NULLIF(attempts.total, 0)
+                    ) AS average_percentage,
+                    COUNT(attempts.id) AS attempts_count
+                FROM users
+                JOIN attempts
+                    ON attempts.student_id = users.id
+                WHERE users.role = 'student'
+                  AND attempts.total > 0
+                GROUP BY
+                    users.id,
+                    users.full_name,
+                    users.username
+            ),
+            ranked_students AS (
+                SELECT
+                    student_id,
+                    full_name,
+                    username,
+                    average_percentage,
+                    attempts_count,
+                    ROW_NUMBER() OVER (
+                        ORDER BY
+                            average_percentage DESC,
+                            attempts_count DESC,
+                            full_name ASC,
+                            student_id ASC
+                    ) AS rank_position
+                FROM student_scores
+            )
+            SELECT
+                student_id,
+                full_name,
+                username,
+                average_percentage,
+                attempts_count,
+                rank_position
+            FROM ranked_students
+            ORDER BY rank_position
+            LIMIT 10
+        """).fetchall()
+
+        my_rank = conn.execute("""
+            WITH student_scores AS (
+                SELECT
+                    users.id AS student_id,
+                    users.full_name,
+                    AVG(
+                        attempts.score * 100.0
+                        / NULLIF(attempts.total, 0)
+                    ) AS average_percentage,
+                    COUNT(attempts.id) AS attempts_count
+                FROM users
+                JOIN attempts
+                    ON attempts.student_id = users.id
+                WHERE users.role = 'student'
+                  AND attempts.total > 0
+                GROUP BY
+                    users.id,
+                    users.full_name
+            ),
+            ranked_students AS (
+                SELECT
+                    student_id,
+                    full_name,
+                    average_percentage,
+                    attempts_count,
+                    ROW_NUMBER() OVER (
+                        ORDER BY
+                            average_percentage DESC,
+                            attempts_count DESC,
+                            full_name ASC,
+                            student_id ASC
+                    ) AS rank_position
+                FROM student_scores
+            )
+            SELECT
+                rank_position,
+                average_percentage,
+                attempts_count
+            FROM ranked_students
+            WHERE student_id = %s
+        """, (session["user_id"],)).fetchone()
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "student_leaderboard.html",
+        leaderboard=leaderboard,
+        my_rank=my_rank
+    )
 # ============================================================
 # STUDENT QUIZZES PAGE
 # ============================================================
@@ -1956,12 +2247,26 @@ def take_quiz(quiz_id):
                 if is_correct:
                     score += 1
 
+                selected_option_text = (
+                    question[f"option_{selected_answer.lower()}"]
+                    if selected_answer in ("A", "B", "C", "D")
+                    else None
+                )
+
+                correct_option_text = (
+                    question[f"option_{correct_answer.lower()}"]
+                    if correct_answer in ("A", "B", "C", "D")
+                    else None
+                )
+
                 answer_records.append((
                     question["id"],
                     question["question"],
                     selected_answer,
                     correct_answer,
-                    is_correct
+                    is_correct,
+                    selected_option_text,
+                    correct_option_text
                 ))
 
             attempt = conn.execute("""
@@ -2011,15 +2316,12 @@ def take_quiz(quiz_id):
                     "quiz_result.html",
                     quiz=quiz,
                     score=score,
-                    total=total
+                    total=total,
+                    answer_records=answer_records
                 )
 
             flash("Quiz submitted successfully.")
             return redirect(url_for("student_dashboard"))
-
-
-
-
 
     finally:
 
@@ -2076,7 +2378,6 @@ def student_results():
         results=results
     )
 
-
 # ============================================================
 # TEACHER RESULTS
 # ============================================================
@@ -2085,85 +2386,105 @@ def student_results():
 @teacher_required
 def teacher_results():
 
-    quiz_id = request.args.get(
-        "quiz_id",
-        type=int
-    )
-
+    quiz_id = request.args.get("quiz_id", type=int)
 
     conn = get_db()
 
     try:
 
-        if quiz_id:
+        if session.get("is_admin"):
 
-            results = conn.execute("""
-                                SELECT
-                    attempts.id,
-                    quizzes.title,
-                    users.full_name,
-                    users.username,
-                    attempts.score,
-                    attempts.total,
-                    attempts.submitted_at
+            if quiz_id:
+                results = conn.execute("""
+                    SELECT
+                        attempts.id,
+                        quizzes.title,
+                        users.full_name,
+                        users.username,
+                        attempts.score,
+                        attempts.total,
+                        attempts.submitted_at
+                    FROM attempts
+                    JOIN quizzes
+                        ON attempts.quiz_id = quizzes.id
+                    JOIN users
+                        ON attempts.student_id = users.id
+                    WHERE quizzes.id = %s
+                    ORDER BY attempts.submitted_at DESC
+                """, (quiz_id,)).fetchall()
 
-                FROM attempts
-
-                JOIN quizzes
-                    ON attempts.quiz_id = quizzes.id
-
-                JOIN users
-                    ON attempts.student_id = users.id
-
-                WHERE quizzes.teacher_id = %s
-                AND quizzes.id = %s
-
-                ORDER BY attempts.submitted_at DESC
-            """, (
-                session["user_id"],
-                quiz_id
-            )).fetchall()
-
+            else:
+                results = conn.execute("""
+                    SELECT
+                        attempts.id,
+                        quizzes.title,
+                        users.full_name,
+                        users.username,
+                        attempts.score,
+                        attempts.total,
+                        attempts.submitted_at
+                    FROM attempts
+                    JOIN quizzes
+                        ON attempts.quiz_id = quizzes.id
+                    JOIN users
+                        ON attempts.student_id = users.id
+                    ORDER BY attempts.submitted_at DESC
+                """).fetchall()
 
         else:
 
-            results = conn.execute("""
-                SELECT
-                    attempts.id,
-                    quizzes.title,
-                    users.full_name,
-                    users.username,
-                    attempts.score,
-                    attempts.total,
-                    attempts.submitted_at
+            if quiz_id:
+                results = conn.execute("""
+                    SELECT
+                        attempts.id,
+                        quizzes.title,
+                        users.full_name,
+                        users.username,
+                        attempts.score,
+                        attempts.total,
+                        attempts.submitted_at
+                    FROM attempts
+                    JOIN quizzes
+                        ON attempts.quiz_id = quizzes.id
+                    JOIN users
+                        ON attempts.student_id = users.id
+                    WHERE quizzes.teacher_id = %s
+                      AND quizzes.id = %s
+                    ORDER BY attempts.submitted_at DESC
+                """, (
+                    session["user_id"],
+                    quiz_id
+                )).fetchall()
 
-                FROM attempts
-
-                JOIN quizzes
-                    ON attempts.quiz_id = quizzes.id
-
-                JOIN users
-                    ON attempts.student_id = users.id
-
-                WHERE quizzes.teacher_id = %s
-
-                ORDER BY attempts.submitted_at DESC
-            """, (
-                session["user_id"],
-            )).fetchall()
-
+            else:
+                results = conn.execute("""
+                    SELECT
+                        attempts.id,
+                        quizzes.title,
+                        users.full_name,
+                        users.username,
+                        attempts.score,
+                        attempts.total,
+                        attempts.submitted_at
+                    FROM attempts
+                    JOIN quizzes
+                        ON attempts.quiz_id = quizzes.id
+                    JOIN users
+                        ON attempts.student_id = users.id
+                    WHERE quizzes.teacher_id = %s
+                    ORDER BY attempts.submitted_at DESC
+                """, (
+                    session["user_id"],
+                )).fetchall()
 
     finally:
-
         conn.close()
-
 
     return render_template(
         "teacher_results.html",
         results=results,
         quiz_id=quiz_id
     )
-
 # ============================================================
 # DOWNLOAD STUDENT QUIZ REPORT AS PDF
 # ============================================================
