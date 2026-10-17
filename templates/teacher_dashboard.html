@@ -1,833 +1,942 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#12315a">
 
-```
-<title>Teacher Dashboard | Online Quiz System</title>
-
-<style>
-    :root {
-        --navy: #12315a;
-        --navy-dark: #0b2040;
-        --blue: #2864dc;
-        --blue-light: #edf3ff;
-        --green: #15805d;
-        --green-light: #e8f7ef;
-        --amber: #a96809;
-        --amber-light: #fff5df;
-        --red: #c03945;
-        --red-light: #fff0f0;
-        --purple: #7652c8;
-        --purple-light: #f1ecff;
-        --ink: #18243a;
-        --muted: #718096;
-        --line: #e7ecf3;
-        --surface: #ffffff;
-        --background: #f4f7fc;
-        --radius: 16px;
-        --shadow: 0 8px 28px rgba(22, 43, 77, 0.06);
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: Inter, "Segoe UI", Arial, sans-serif;
-        background: var(--background);
-        color: var(--ink);
-        line-height: 1.6;
-    }
-
-    a {
-        color: inherit;
-    }
-
-    button,
-    input {
-        font: inherit;
-    }
-
-    .topbar {
-        background: linear-gradient(120deg, var(--navy-dark), var(--navy));
-        color: white;
-        padding: 20px 4%;
-        box-shadow: 0 5px 22px rgba(11, 32, 64, 0.16);
-    }
-
-    .topbar-inner {
-        max-width: 1500px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-    }
-
-    .brand-mark {
-        width: 49px;
-        height: 49px;
-        border-radius: 14px;
-        display: grid;
-        place-items: center;
-        background: rgba(255, 255, 255, 0.13);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        font-size: 25px;
-    }
-
-    .brand h1 {
-        font-size: clamp(19px, 2vw, 26px);
-        line-height: 1.3;
-        letter-spacing: -0.5px;
-    }
-
-    .brand p {
-        font-size: 13px;
-        color: #d4e2f7;
-        margin-top: 3px;
-    }
-
-    .topbar-actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .top-link {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 7px;
-        min-height: 42px;
-        padding: 9px 14px;
-        border-radius: 10px;
-        color: white;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 650;
-        border: 1px solid rgba(255, 255, 255, 0.24);
-        background: rgba(255, 255, 255, 0.08);
-        transition: background 0.2s, transform 0.2s;
-    }
-
-    .top-link:hover {
-        background: rgba(255, 255, 255, 0.17);
-        transform: translateY(-1px);
-    }
-
-    .top-link.logout {
-        background: #c83d4b;
-        border-color: #c83d4b;
-    }
-
-    .top-link.logout:hover {
-        background: #a92d3a;
-    }
-
-    .page {
-        width: min(1500px, 92%);
-        margin: 30px auto;
-    }
-
-    .welcome-panel {
-        position: relative;
-        overflow: hidden;
-        padding: clamp(24px, 4vw, 39px);
-        border-radius: 22px;
-        background:
-            radial-gradient(circle at 90% 20%, rgba(94, 143, 255, 0.26), transparent 28%),
-            linear-gradient(120deg, #ffffff, #edf4ff);
-        border: 1px solid #e0eaff;
-        box-shadow: var(--shadow);
-        margin-bottom: 26px;
-    }
-
-    .welcome-panel::after {
-        content: "✦";
-        position: absolute;
-        right: 7%;
-        top: 12%;
-        color: rgba(40, 100, 220, 0.14);
-        font-size: 100px;
-        line-height: 1;
-        pointer-events: none;
-    }
-
-    .eyebrow {
-        color: var(--blue);
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1.6px;
-        margin-bottom: 8px;
-    }
-
-    .welcome-panel h2 {
-        color: var(--navy);
-        font-size: clamp(25px, 3vw, 35px);
-        letter-spacing: -0.8px;
-        line-height: 1.25;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .welcome-panel p {
-        max-width: 730px;
-        color: #61718a;
-        font-size: 14px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .welcome-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 9px;
-        margin-top: 19px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .welcome-badge {
-        background: white;
-        border: 1px solid #dfe8fa;
-        color: #36537d;
-        border-radius: 30px;
-        padding: 6px 11px;
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .flash-messages {
-        margin-bottom: 22px;
-    }
-
-    .flash-message {
-        padding: 13px 16px;
-        border: 1px solid #bde9d2;
-        border-radius: 11px;
-        background: var(--green-light);
-        color: #126746;
-        margin-bottom: 8px;
-        font-size: 13px;
-    }
-
-    .section-heading {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 17px;
-    }
-
-    .section-heading h2 {
-        color: var(--navy);
-        font-size: 20px;
-        letter-spacing: -0.3px;
-    }
-
-    .section-description {
-        color: var(--muted);
-        font-size: 12px;
-        margin-top: 3px;
-    }
-
-    .section-label {
-        padding: 6px 11px;
-        background: var(--blue-light);
-        color: var(--navy);
-        border-radius: 30px;
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-    /* STATISTICS */
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 17px;
-        margin-bottom: 32px;
-    }
-
-    .stat-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 22px;
-        box-shadow: var(--shadow);
-        min-width: 0;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 32px rgba(22, 43, 77, 0.09);
-    }
-
-    .stat-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 17px;
-    }
-
-    .stat-icon {
-        width: 45px;
-        height: 45px;
-        display: grid;
-        place-items: center;
-        border-radius: 13px;
-        font-size: 22px;
-    }
-
-    .icon-blue {
-        background: var(--blue-light);
-    }
-
-    .icon-green {
-        background: var(--green-light);
-    }
-
-    .icon-amber {
-        background: var(--amber-light);
-    }
-
-    .icon-purple {
-        background: var(--purple-light);
-    }
-
-    .stat-caption {
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 650;
-    }
-
-    .stat-number {
-        font-size: clamp(27px, 3vw, 34px);
-        font-weight: 800;
-        color: var(--navy);
-        line-height: 1.2;
-        overflow-wrap: anywhere;
-    }
-
-    .stat-footnote {
-        color: #8994a7;
-        font-size: 11px;
-        margin-top: 8px;
-    }
-
-    /* QUICK ACTIONS */
-
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 17px;
-        margin-bottom: 32px;
-    }
-
-    .action-card {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        background: white;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 22px;
-        text-decoration: none;
-        box-shadow: var(--shadow);
-        min-width: 0;
-        transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .action-card:hover {
-        transform: translateY(-4px);
-        border-color: #c6d7fa;
-        box-shadow: 0 14px 30px rgba(22, 43, 77, 0.09);
-    }
-
-    .action-icon {
-        width: 49px;
-        height: 49px;
-        display: grid;
-        place-items: center;
-        border-radius: 14px;
-        background: var(--blue-light);
-        font-size: 24px;
-        margin-bottom: 16px;
-    }
-
-    .action-card h3 {
-        color: var(--navy);
-        font-size: 16px;
-        margin-bottom: 6px;
-    }
-
-    .action-card p {
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.7;
-        flex-grow: 1;
-    }
-
-    .action-arrow {
-        color: var(--blue);
-        font-size: 12px;
-        font-weight: 800;
-        margin-top: 15px;
-    }
-
-    .admin-card {
-        border-color: #dcd4fa;
-        background: linear-gradient(145deg, #ffffff, #f8f5ff);
-    }
-
-    .admin-card .action-icon {
-        background: var(--purple-light);
-    }
-
-    .admin-card .action-arrow {
-        color: var(--purple);
-    }
-
-    /* SHARED PANELS */
-
-    .panel {
-        background: white;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: clamp(18px, 2.5vw, 27px);
-        margin-bottom: 28px;
-        min-width: 0;
-    }
-
-    .panel-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 17px;
-    }
-
-    .panel-header h2 {
-        color: var(--navy);
-        font-size: 20px;
-    }
-
-    .panel-header p {
-        color: var(--muted);
-        font-size: 12px;
-        margin-top: 4px;
-    }
-
-    /* LEADERBOARD */
-
-    .leaderboard-list {
-        display: grid;
-        gap: 10px;
-    }
-
-    .leader-row {
-        display: grid;
-        grid-template-columns: 45px minmax(0, 1fr) auto;
-        align-items: center;
-        gap: 13px;
-        padding: 13px 15px;
-        border: 1px solid #edf0f5;
-        border-radius: 13px;
-        background: #fcfdff;
-    }
-
-    .leader-rank {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        display: grid;
-        place-items: center;
-        font-size: 14px;
-        font-weight: 850;
-        color: #51617a;
-        background: #eef2f8;
-    }
-
-    .rank-one {
-        background: #fff0c2;
-        color: #946200;
-    }
-
-    .rank-two {
-        background: #e7ebf0;
-        color: #4d5b6c;
-    }
-
-    .rank-three {
-        background: #f8e3d1;
-        color: #8c4d24;
-    }
-
-    .leader-name {
-        font-size: 13px;
-        font-weight: 800;
-        color: var(--ink);
-        overflow-wrap: anywhere;
-    }
-
-    .leader-username {
-        font-size: 11px;
-        color: var(--muted);
-        overflow-wrap: anywhere;
-    }
-
-    .leader-score {
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .leader-score strong {
-        display: block;
-        font-size: 17px;
-        color: var(--navy);
-    }
-
-    .leader-score span {
-        display: block;
-        color: var(--muted);
-        font-size: 10px;
-    }
-
-    .leaderboard-note {
-        margin-top: 14px;
-        padding: 11px 13px;
-        background: #f5f8ff;
-        border-radius: 10px;
-        color: #62728b;
-        font-size: 11px;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 35px 18px;
-        border: 1px dashed #dce3ee;
-        border-radius: 13px;
-        background: #fbfcff;
-    }
-
-    .empty-icon {
-        font-size: 34px;
-        margin-bottom: 8px;
-    }
-
-    .empty-state h3 {
-        color: var(--navy);
-        font-size: 15px;
-        margin-bottom: 5px;
-    }
-
-    .empty-state p {
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    /* TABLE */
-
-    .table-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 13px;
-    }
-
-    .table-toolbar p {
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .search-box {
-        width: min(100%, 310px);
-        min-height: 42px;
-        padding: 9px 13px;
-        border: 1px solid #dfe5ef;
-        border-radius: 10px;
-        outline: none;
-        background: #fff;
-        color: var(--ink);
-        font-size: 12px;
-    }
-
-    .search-box:focus {
-        border-color: #8caef5;
-        box-shadow: 0 0 0 3px rgba(40, 100, 220, 0.1);
-    }
-
-    .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 880px;
-    }
-
-    th {
-        background: #f3f6fb;
-        color: #5b6b84;
-        padding: 14px 13px;
-        text-align: left;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        white-space: nowrap;
-    }
-
-    td {
-        padding: 15px 13px;
-        border-top: 1px solid #edf0f5;
-        font-size: 12px;
-        vertical-align: middle;
-    }
-
-    tbody tr:hover {
-        background: #fafcff;
-    }
-
-    .quiz-title {
-        font-weight: 800;
-        color: var(--navy);
-    }
-
-    .quiz-description {
-        color: var(--muted);
-        max-width: 250px;
-    }
-
-    .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 9px;
-        border-radius: 30px;
-        font-size: 10px;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .status::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: currentColor;
-    }
-
-    .published {
-        color: #126b4d;
-        background: #e2f7ed;
-    }
-
-    .draft {
-        color: #92600b;
-        background: #fff3d8;
-    }
-
-    .button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-height: 34px;
-        padding: 7px 10px;
-        border: 0;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: 800;
-        cursor: pointer;
-        white-space: nowrap;
-        margin: 2px;
-        transition: filter 0.2s, transform 0.2s;
-    }
-
-    .button:hover {
-        filter: brightness(0.92);
-        transform: translateY(-1px);
-    }
-
-    .edit-btn {
-        background: var(--navy);
-    }
-
-    .results-btn {
-        background: var(--green);
-    }
-
-    .publish-btn {
-        background: var(--blue);
-    }
-
-    .delete-btn {
-        background: var(--red);
-    }
-
-    .actions-cell {
-        min-width: 235px;
-    }
-
-    .inline-form {
-        display: inline-block;
-        margin: 2px;
-    }
-
-    /* FEATURES */
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 11px;
-    }
-
-    .feature {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        background: #f8faff;
-        border: 1px solid #e9eef7;
-        border-radius: 11px;
-        padding: 13px;
-        color: #4e607c;
-        font-size: 11px;
-        min-width: 0;
-    }
-
-    .feature span {
-        font-size: 17px;
-        flex-shrink: 0;
-    }
-
-    .footer {
-        text-align: center;
-        padding: 22px 15px 30px;
-        color: #8a96a9;
-        font-size: 11px;
-    }
-
-    @media (max-width: 1150px) {
-        .stats-grid,
-        .actions-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+    <title>Teacher Dashboard | Online Quiz System</title>
+
+    <style>
+        :root {
+            --navy: #12315a;
+            --navy-dark: #0b2040;
+            --blue: #2864dc;
+            --blue-light: #edf3ff;
+            --green: #15805d;
+            --green-light: #e8f7ef;
+            --amber: #a96809;
+            --amber-light: #fff5df;
+            --red: #c03945;
+            --purple: #7652c8;
+            --purple-light: #f1ecff;
+            --ink: #18243a;
+            --muted: #718096;
+            --line: #e7ecf3;
+            --background: #f4f7fc;
+            --radius: 16px;
+            --shadow: 0 8px 28px rgba(22, 43, 77, 0.06);
         }
 
-        .features-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-    }
 
-    @media (max-width: 650px) {
+        [hidden] {
+            display: none !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--ink);
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible {
+            outline: 3px solid #8caef5;
+            outline-offset: 3px;
+        }
+
+        /* TOP BAR */
+
         .topbar {
-            padding: 17px 4%;
+            background: linear-gradient(120deg, var(--navy-dark), var(--navy));
+            color: white;
+            padding: 20px 4%;
+            box-shadow: 0 5px 22px rgba(11, 32, 64, 0.16);
         }
 
         .topbar-inner {
-            align-items: flex-start;
+            max-width: 1500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-width: 0;
         }
 
         .brand-mark {
-            width: 42px;
-            height: 42px;
+            width: 49px;
+            height: 49px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 25px;
+        }
+
+        .brand h1 {
+            font-size: clamp(19px, 2vw, 26px);
+            line-height: 1.3;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 13px;
+            color: #d4e2f7;
+            margin-top: 3px;
         }
 
         .topbar-actions {
-            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .top-link {
-            flex: 1;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            min-height: 44px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.08);
+            transition: background 0.2s;
         }
 
+        .top-link:hover {
+            background: rgba(255, 255, 255, 0.17);
+        }
+
+        .top-link.logout {
+            background: #c83d4b;
+            border-color: #c83d4b;
+        }
+
+        .top-link.logout:hover {
+            background: #a92d3a;
+        }
+
+        /* PAGE AND WELCOME */
+
         .page {
-            width: 94%;
-            margin-top: 18px;
+            width: min(1500px, 92%);
+            margin: 30px auto;
         }
 
         .welcome-panel {
-            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            padding: clamp(24px, 4vw, 39px);
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at 90% 20%, rgba(94, 143, 255, 0.26), transparent 28%),
+                linear-gradient(120deg, #ffffff, #edf4ff);
+            border: 1px solid #e0eaff;
+            box-shadow: var(--shadow);
+            margin-bottom: 26px;
         }
 
-        .stats-grid,
-        .actions-grid,
-        .features-grid {
-            grid-template-columns: 1fr;
+        .eyebrow {
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            margin-bottom: 8px;
         }
 
-        .stat-card {
-            padding: 18px;
-        }
-
-        .stat-top {
+        .welcome-panel h2 {
+            color: var(--navy);
+            font-size: clamp(25px, 3vw, 35px);
+            letter-spacing: -0.8px;
+            line-height: 1.25;
             margin-bottom: 10px;
+            overflow-wrap: anywhere;
         }
 
-        .panel {
-            padding: 16px;
-        }
-
-        .leader-row {
-            grid-template-columns: 38px minmax(0, 1fr) auto;
-            gap: 9px;
-            padding: 11px 9px;
-        }
-
-        .leader-rank {
-            width: 34px;
-            height: 34px;
-        }
-
-        .leader-score strong {
+        .welcome-panel p {
+            max-width: 730px;
+            color: #61718a;
             font-size: 14px;
         }
 
+        .welcome-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 19px;
+        }
+
+        .welcome-badge {
+            background: white;
+            border: 1px solid #dfe8fa;
+            color: #36537d;
+            border-radius: 30px;
+            padding: 6px 11px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash-messages {
+            margin-bottom: 22px;
+        }
+
+        .flash-message {
+            padding: 13px 16px;
+            border: 1px solid #bde9d2;
+            border-radius: 11px;
+            background: var(--green-light);
+            color: #126746;
+            margin-bottom: 8px;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        /* SECTION HEADINGS */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .section-heading h2 {
+            color: var(--navy);
+            font-size: 20px;
+            letter-spacing: -0.3px;
+        }
+
+        .section-description {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .section-label {
+            padding: 6px 11px;
+            background: var(--blue-light);
+            color: var(--navy);
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* STATISTICS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 17px;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            font-size: 22px;
+        }
+
+        .icon-blue { background: var(--blue-light); }
+        .icon-green { background: var(--green-light); }
+        .icon-amber { background: var(--amber-light); }
+        .icon-purple { background: var(--purple-light); }
+
+        .stat-caption {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .stat-number {
+            font-size: clamp(27px, 3vw, 34px);
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-footnote {
+            color: #8994a7;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        /* QUICK ACTIONS */
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 22px;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            min-width: 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: #c6d7fa;
+            box-shadow: 0 14px 30px rgba(22, 43, 77, 0.09);
+        }
+
+        .action-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: var(--blue-light);
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .action-card h3 {
+            color: var(--navy);
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .action-card p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+            flex-grow: 1;
+        }
+
+        .action-arrow {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 800;
+            margin-top: 15px;
+        }
+
+        .admin-card {
+            border-color: #dcd4fa;
+            background: linear-gradient(145deg, #ffffff, #f8f5ff);
+        }
+
+        .admin-card .action-icon {
+            background: var(--purple-light);
+        }
+
+        .admin-card .action-arrow {
+            color: var(--purple);
+        }
+
+        /* GENERAL BUTTONS */
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 40px;
+            padding: 9px 13px;
+            border: 0;
+            border-radius: 9px;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            transition: filter 0.2s;
+        }
+
+        .button:hover {
+            filter: brightness(0.93);
+        }
+
+        .primary-btn {
+            background: var(--blue);
+        }
+
+        .secondary-btn {
+            background: var(--navy);
+        }
+
+        .edit-btn {
+            background: var(--navy);
+        }
+
+        .results-btn {
+            background: var(--green);
+        }
+
+        .publish-btn {
+            background: var(--blue);
+        }
+
+        .delete-btn {
+            background: var(--red);
+        }
+
+        /* SHARED PANELS */
+
+        .panel {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: clamp(18px, 2.5vw, 27px);
+            margin-bottom: 28px;
+            min-width: 0;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .panel-header h2 {
+            color: var(--navy);
+            font-size: 20px;
+            overflow-wrap: anywhere;
+        }
+
+        .panel-header p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* LEADERBOARD TOGGLE */
+
+        .leaderboard-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .leaderboard-control h2 {
+            color: var(--navy);
+            font-size: 19px;
+        }
+
+        .leaderboard-control p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .leaderboard-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 46px;
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 11px;
+            background: var(--navy);
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 5px 16px rgba(18, 49, 90, 0.16);
+        }
+
+        .leaderboard-toggle:hover {
+            background: #1c477c;
+        }
+
+        .leaderboard-panel {
+            border-top: 4px solid #f1c75b;
+            animation: panelIn 0.22s ease-out;
+        }
+
+        @keyframes panelIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .leaderboard-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .leader-row {
+            display: grid;
+            grid-template-columns: 45px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            border: 1px solid #edf0f5;
+            border-radius: 13px;
+            background: #fcfdff;
+        }
+
+        .leader-rank {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            font-weight: 850;
+            color: #51617a;
+            background: #eef2f8;
+        }
+
+        .rank-one {
+            background: #fff0c2;
+            color: #946200;
+        }
+
+        .rank-two {
+            background: #e7ebf0;
+            color: #4d5b6c;
+        }
+
+        .rank-three {
+            background: #f8e3d1;
+            color: #8c4d24;
+        }
+
+        .leader-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--ink);
+            overflow-wrap: anywhere;
+        }
+
+        .leader-username {
+            font-size: 11px;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .leader-score {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .leader-score strong {
+            display: block;
+            font-size: 17px;
+            color: var(--navy);
+        }
+
+        .leader-score span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .leaderboard-note {
+            margin-top: 14px;
+            padding: 11px 13px;
+            background: #f5f8ff;
+            border-radius: 10px;
+            color: #62728b;
+            font-size: 11px;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            text-align: center;
+            padding: 35px 18px;
+            border: 1px dashed #dce3ee;
+            border-radius: 13px;
+            background: #fbfcff;
+        }
+
+        .empty-icon {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state h3 {
+            color: var(--navy);
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* QUIZ SEARCH AND TABLE */
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 13px;
+        }
+
+        .table-toolbar p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
         .search-box {
+            width: min(100%, 310px);
+            min-height: 44px;
+            padding: 10px 13px;
+            border: 1px solid #dfe5ef;
+            border-radius: 10px;
+            outline: none;
+            background: white;
+            color: var(--ink);
+            font-size: 13px;
+        }
+
+        .search-box:focus {
+            border-color: #8caef5;
+            box-shadow: 0 0 0 3px rgba(40, 100, 220, 0.1);
+        }
+
+        .table-wrapper {
             width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            -webkit-overflow-scrolling: touch;
         }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-            scroll-behavior: auto !important;
-            transition-duration: 0.01ms !important;
-            animation-duration: 0.01ms !important;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 880px;
         }
-    }
-</style>
-```
 
+        th {
+            background: #f3f6fb;
+            color: #5b6b84;
+            padding: 14px 13px;
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 13px;
+            border-top: 1px solid #edf0f5;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #fafcff;
+        }
+
+        .quiz-title {
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .quiz-description {
+            color: var(--muted);
+            max-width: 250px;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 9px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .published {
+            color: #126b4d;
+            background: #e2f7ed;
+        }
+
+        .draft {
+            color: #92600b;
+            background: #fff3d8;
+        }
+
+        .actions-cell {
+            min-width: 235px;
+        }
+
+        .inline-form {
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .inline-form .button {
+            font-size: 10px;
+            min-height: 35px;
+            padding: 7px 10px;
+        }
+
+        /* FEATURES */
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 11px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: #f8faff;
+            border: 1px solid #e9eef7;
+            border-radius: 11px;
+            padding: 13px;
+            color: #4e607c;
+            font-size: 11px;
+            min-width: 0;
+        }
+
+        .feature span {
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 22px 15px 30px;
+            color: #8a96a9;
+            font-size: 11px;
+        }
+
+        /* RESPONSIVE LAYOUT */
+
+        @media (max-width: 1150px) {
+            .stats-grid,
+            .actions-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .topbar {
+                padding: 17px 4%;
+            }
+
+            .topbar-inner {
+                align-items: flex-start;
+            }
+
+            .brand-mark {
+                width: 42px;
+                height: 42px;
+            }
+
+            .brand p {
+                font-size: 12px;
+            }
+
+            .topbar-actions {
+                width: 100%;
+            }
+
+            .top-link {
+                flex: 1;
+            }
+
+            .page {
+                width: 94%;
+                margin-top: 18px;
+            }
+
+            .welcome-panel {
+                border-radius: 16px;
+            }
+
+            .stats-grid,
+            .actions-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 18px;
+            }
+
+            .stat-top {
+                margin-bottom: 10px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .leaderboard-control {
+                align-items: stretch;
+            }
+
+            .leaderboard-toggle {
+                width: 100%;
+            }
+
+            .leader-row {
+                grid-template-columns: 36px minmax(0, 1fr) auto;
+                gap: 8px;
+                padding: 11px 9px;
+            }
+
+            .leader-rank {
+                width: 33px;
+                height: 33px;
+            }
+
+            .leader-score strong {
+                font-size: 14px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .page {
+                width: 95%;
+            }
+
+            .welcome-panel {
+                padding: 19px;
+            }
+
+            .leader-row {
+                grid-template-columns: 31px minmax(0, 1fr);
+            }
+
+            .leader-rank {
+                width: 29px;
+                height: 29px;
+            }
+
+            .leader-score {
+                grid-column: 2;
+                text-align: left;
+            }
+
+            .leader-score strong,
+            .leader-score span {
+                display: inline;
+                margin-right: 5px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -842,437 +951,463 @@
             </div>
         </div>
 
-```
-    <nav class="topbar-actions" aria-label="Account navigation">
-        <a href="{{ url_for('teacher_messages') }}" class="top-link">
-            💬 Messages
-        </a>
+        <nav class="topbar-actions" aria-label="Account navigation">
+            <a href="{{ url_for('teacher_messages') }}" class="top-link">
+                💬 Messages
+            </a>
 
-        <a href="{{ url_for('logout') }}" class="top-link logout">
-            ↪ Logout
-        </a>
-    </nav>
-</div>
-```
-
+            <a href="{{ url_for('logout') }}" class="top-link logout">
+                ↪ Logout
+            </a>
+        </nav>
+    </div>
 </header>
 
 <main class="page">
 
-```
-<section class="welcome-panel">
-    <div class="eyebrow">Teaching &amp; Learning Portal</div>
+    <!-- WELCOME -->
 
-    <h2>
-        Welcome,
-        {{ session.get('full_name', session.get('username', 'Teacher')) }}!
-    </h2>
+    <section class="welcome-panel">
+        <div class="eyebrow">Teaching &amp; Learning Portal</div>
 
-    <p>
-        Manage assessments, monitor student performance, review quiz
-        results and communicate with learners from one central workspace.
-    </p>
+        <h2>
+            Welcome,
+            {{ session.get('full_name', session.get('username', 'Teacher')) }}!
+        </h2>
 
-    <div class="welcome-badges">
-        <span class="welcome-badge">📚 Quiz Management</span>
-        <span class="welcome-badge">📊 Performance Tracking</span>
-        <span class="welcome-badge">💬 Student Communication</span>
-    </div>
-</section>
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class="flash-messages" role="status" aria-live="polite">
-            {% for message in messages %}
-                <div class="flash-message">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
-
-<!-- DASHBOARD STATISTICS -->
-
-<section aria-labelledby="overview-heading">
-    <div class="section-heading">
-        <div>
-            <h2 id="overview-heading">Dashboard Overview</h2>
-            <p class="section-description">
-                A quick view of your assessment activities.
-            </p>
-        </div>
-    </div>
-
-    <div class="stats-grid">
-        <article class="stat-card">
-            <div class="stat-top">
-                <span class="stat-caption">Total Quizzes</span>
-                <span class="stat-icon icon-blue" aria-hidden="true">📚</span>
-            </div>
-            <div class="stat-number">{{ quizzes|length }}</div>
-            <p class="stat-footnote">All quizzes in your dashboard</p>
-        </article>
-
-        <article class="stat-card">
-            <div class="stat-top">
-                <span class="stat-caption">Published Quizzes</span>
-                <span class="stat-icon icon-green" aria-hidden="true">🚀</span>
-            </div>
-            <div class="stat-number">
-                {{ quizzes|selectattr('published')|list|length }}
-            </div>
-            <p class="stat-footnote">Available to students</p>
-        </article>
-
-        <article class="stat-card">
-            <div class="stat-top">
-                <span class="stat-caption">Draft Quizzes</span>
-                <span class="stat-icon icon-amber" aria-hidden="true">📝</span>
-            </div>
-            <div class="stat-number">
-                {{ quizzes|rejectattr('published')|list|length }}
-            </div>
-            <p class="stat-footnote">Not yet published</p>
-        </article>
-
-        <article class="stat-card">
-            <div class="stat-top">
-                <span class="stat-caption">Students</span>
-                <span class="stat-icon icon-purple" aria-hidden="true">👨‍🎓</span>
-            </div>
-            <div class="stat-number">{{ student_count|default(0) }}</div>
-            <p class="stat-footnote">Registered student accounts</p>
-        </article>
-    </div>
-</section>
-
-<!-- QUICK ACTIONS -->
-
-<section aria-labelledby="quick-actions-heading">
-    <div class="section-heading">
-        <div>
-            <h2 id="quick-actions-heading">Quick Actions</h2>
-            <p class="section-description">
-                Open the tools you use most often.
-            </p>
-        </div>
-    </div>
-
-    <div class="actions-grid">
-
-        <a href="{{ url_for('create_quiz') }}" class="action-card">
-            <div class="action-icon" aria-hidden="true">📄</div>
-            <h3>Upload Questions</h3>
-            <p>
-                Start creating an assessment using the question-upload
-                features available in your system.
-            </p>
-            <span class="action-arrow">Open quiz creation →</span>
-        </a>
-
-        <a href="{{ url_for('create_quiz') }}" class="action-card">
-            <div class="action-icon" aria-hidden="true">✏️</div>
-            <h3>Create a Quiz</h3>
-            <p>
-                Create a quiz and prepare questions, answer options
-                and correct answers.
-            </p>
-            <span class="action-arrow">Create quiz →</span>
-        </a>
-
-        <a href="{{ url_for('teacher_results') }}" class="action-card">
-            <div class="action-icon" aria-hidden="true">📊</div>
-            <h3>Student Results</h3>
-            <p>
-                Review quiz attempts, scores and student performance.
-            </p>
-            <span class="action-arrow">View results →</span>
-        </a>
-
-        <a href="{{ url_for('teacher_messages') }}" class="action-card">
-            <div class="action-icon" aria-hidden="true">💬</div>
-            <h3>Student Messages</h3>
-            <p>
-                View messages and communicate with students.
-            </p>
-            <span class="action-arrow">Open messages →</span>
-        </a>
-
-        {% if session.get('role') == 'teacher' and session.get('is_admin') %}
-
-            <a href="{{ url_for('manage_students') }}"
-               class="action-card admin-card">
-                <div class="action-icon" aria-hidden="true">👨‍🎓</div>
-                <h3>Manage Students</h3>
-                <p>
-                    Find student accounts, update student details,
-                    reset passwords and activate or deactivate accounts.
-                </p>
-                <span class="action-arrow">Manage student accounts →</span>
-            </a>
-
-            <a href="{{ url_for('manage_teachers') }}"
-               class="action-card admin-card">
-                <div class="action-icon" aria-hidden="true">👩‍🏫</div>
-                <h3>Manage Teachers</h3>
-                <p>
-                    Open the existing teacher management page to
-                    manage teacher accounts.
-                </p>
-                <span class="action-arrow">Manage teacher accounts →</span>
-            </a>
-
-        {% endif %}
-
-    </div>
-</section>
-
-<!-- STUDENT LEADERBOARD -->
-
-<section class="panel" aria-labelledby="leaderboard-heading">
-    <div class="panel-header">
-        <div>
-            <h2 id="leaderboard-heading">🏆 Student Leaderboard</h2>
-            <p>
-                Recognise students' performance based on recorded quiz results.
-            </p>
-        </div>
-        <span class="section-label">TOP PERFORMERS</span>
-    </div>
-
-    {% if student_leaderboard|default([]) %}
-
-        <div class="leaderboard-list">
-            {% for student in student_leaderboard %}
-                <article class="leader-row">
-                    <div class="leader-rank
-                        {% if loop.index == 1 %}rank-one
-                        {% elif loop.index == 2 %}rank-two
-                        {% elif loop.index == 3 %}rank-three
-                        {% endif %}">
-                        {% if loop.index == 1 %}
-                            🥇
-                        {% elif loop.index == 2 %}
-                            🥈
-                        {% elif loop.index == 3 %}
-                            🥉
-                        {% else %}
-                            {{ loop.index }}
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <div class="leader-name">
-                            {{ student.full_name or student.username or 'Student' }}
-                        </div>
-                        <div class="leader-username">
-                            {{ student.username or '' }}
-                            {% if student.quizzes_completed is defined %}
-                                · {{ student.quizzes_completed }} quiz attempt(s)
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="leader-score">
-                        <strong>
-                            {% if student.average_score is defined and student.average_score is not none %}
-                                {{ "%.1f"|format(student.average_score|float) }}%
-                            {% elif student.total_score is defined and student.total_score is not none %}
-                                {{ "%.1f"|format(student.total_score|float) }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </strong>
-                        <span>
-                            {% if student.average_score is defined and student.average_score is not none %}
-                                Average score
-                            {% else %}
-                                Score
-                            {% endif %}
-                        </span>
-                    </div>
-                </article>
-            {% endfor %}
-        </div>
-
-        <p class="leaderboard-note">
-            Rankings depend on the results supplied by the application.
-            Only recorded results should be used to determine student positions.
+        <p>
+            Manage assessments, monitor student performance, review quiz
+            results and communicate with learners from one central workspace.
         </p>
 
-    {% else %}
+        <div class="welcome-badges">
+            <span class="welcome-badge">📚 Quiz Management</span>
+            <span class="welcome-badge">📊 Performance Tracking</span>
+            <span class="welcome-badge">💬 Student Communication</span>
+        </div>
+    </section>
 
-        <div class="empty-state">
-            <div class="empty-icon" aria-hidden="true">🏆</div>
-            <h3>Leaderboard data is not available yet</h3>
-            <p>
-                The dashboard layout is ready, but the Flask route must
-                calculate the rankings from actual student results and pass
-                them to this template as <strong>student_leaderboard</strong>.
-            </p>
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages" role="status" aria-live="polite">
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- DASHBOARD STATISTICS -->
+
+    <section aria-labelledby="overview-heading">
+        <div class="section-heading">
+            <div>
+                <h2 id="overview-heading">Dashboard Overview</h2>
+                <p class="section-description">
+                    A quick view of your assessment activities.
+                </p>
+            </div>
         </div>
 
-    {% endif %}
-</section>
+        <div class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-caption">Total Quizzes</span>
+                    <span class="stat-icon icon-blue" aria-hidden="true">📚</span>
+                </div>
+                <div class="stat-number">{{ quizzes|length }}</div>
+                <p class="stat-footnote">All quizzes in your dashboard</p>
+            </article>
 
-<!-- QUIZ MANAGEMENT -->
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-caption">Published Quizzes</span>
+                    <span class="stat-icon icon-green" aria-hidden="true">🚀</span>
+                </div>
+                <div class="stat-number">
+                    {{ quizzes|selectattr('published')|list|length }}
+                </div>
+                <p class="stat-footnote">Available to students</p>
+            </article>
 
-<section class="panel" aria-labelledby="quiz-list-heading">
-    <div class="panel-header">
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-caption">Draft Quizzes</span>
+                    <span class="stat-icon icon-amber" aria-hidden="true">📝</span>
+                </div>
+                <div class="stat-number">
+                    {{ quizzes|rejectattr('published')|list|length }}
+                </div>
+                <p class="stat-footnote">Not yet published</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-caption">Students</span>
+                    <span class="stat-icon icon-purple" aria-hidden="true">👨‍🎓</span>
+                </div>
+                <div class="stat-number">{{ student_count|default(0) }}</div>
+                <p class="stat-footnote">Registered student accounts</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- QUICK ACTIONS -->
+
+    <section aria-labelledby="quick-actions-heading">
+        <div class="section-heading">
+            <div>
+                <h2 id="quick-actions-heading">Quick Actions</h2>
+                <p class="section-description">
+                    Open the tools you use most often.
+                </p>
+            </div>
+        </div>
+
+        <div class="actions-grid">
+
+            <a href="{{ url_for('create_quiz') }}" class="action-card">
+                <div class="action-icon" aria-hidden="true">📄</div>
+                <h3>Upload Questions</h3>
+                <p>
+                    Start creating an assessment using the question-upload
+                    features available in your system.
+                </p>
+                <span class="action-arrow">Open quiz creation →</span>
+            </a>
+
+            <a href="{{ url_for('create_quiz') }}" class="action-card">
+                <div class="action-icon" aria-hidden="true">✏️</div>
+                <h3>Create a Quiz</h3>
+                <p>
+                    Create a quiz and prepare questions, answer options
+                    and correct answers.
+                </p>
+                <span class="action-arrow">Create quiz →</span>
+            </a>
+
+            <a href="{{ url_for('teacher_results') }}" class="action-card">
+                <div class="action-icon" aria-hidden="true">📊</div>
+                <h3>Student Results</h3>
+                <p>
+                    Review quiz attempts, scores and student performance.
+                </p>
+                <span class="action-arrow">View results →</span>
+            </a>
+
+            <a href="{{ url_for('teacher_messages') }}" class="action-card">
+                <div class="action-icon" aria-hidden="true">💬</div>
+                <h3>Student Messages</h3>
+                <p>
+                    View messages and communicate with students.
+                </p>
+                <span class="action-arrow">Open messages →</span>
+            </a>
+
+            {% if session.get('role') == 'teacher' and session.get('is_admin') %}
+
+                <a href="{{ url_for('manage_students') }}"
+                   class="action-card admin-card">
+                    <div class="action-icon" aria-hidden="true">👨‍🎓</div>
+                    <h3>Manage Students</h3>
+                    <p>
+                        Find student accounts, update student details,
+                        reset passwords and manage student accounts.
+                    </p>
+                    <span class="action-arrow">Manage student accounts →</span>
+                </a>
+
+                <a href="{{ url_for('manage_teachers') }}"
+                   class="action-card admin-card">
+                    <div class="action-icon" aria-hidden="true">👩‍🏫</div>
+                    <h3>Manage Teachers</h3>
+                    <p>
+                        Open the existing teacher management page to
+                        manage teacher accounts.
+                    </p>
+                    <span class="action-arrow">Manage teacher accounts →</span>
+                </a>
+
+            {% endif %}
+
+        </div>
+    </section>
+
+    <!-- LEADERBOARD BUTTON: VISIBLE BY DEFAULT -->
+
+    <section class="leaderboard-control" aria-label="Student leaderboard controls">
         <div>
-            <h2 id="quiz-list-heading">My Quizzes</h2>
-            <p>
-                Manage, publish and review the assessments in your system.
+            <h2>🏆 Student Leaderboard</h2>
+            <p>Click the button to view the current student rankings.</p>
+        </div>
+
+        <button
+            type="button"
+            id="leaderboardToggle"
+            class="leaderboard-toggle"
+            aria-expanded="false"
+            aria-controls="leaderboardPanel"
+        >
+            🏆 Show Student Leaderboard
+        </button>
+    </section>
+
+    <!-- LEADERBOARD PANEL: HIDDEN UNTIL BUTTON IS CLICKED -->
+
+    <section
+        id="leaderboardPanel"
+        class="panel leaderboard-panel"
+        aria-labelledby="leaderboard-heading"
+        hidden
+    >
+        <div class="panel-header">
+            <div>
+                <h2 id="leaderboard-heading">🏆 Student Leaderboard</h2>
+                <p>
+                    Recognise students' performance based on recorded quiz results.
+                </p>
+            </div>
+            <span class="section-label">TOP PERFORMERS</span>
+        </div>
+
+        {% if student_leaderboard|default([]) %}
+
+            <div class="leaderboard-list">
+                {% for student in student_leaderboard %}
+                    <article class="leader-row">
+                        <div class="leader-rank
+                            {% if loop.index == 1 %}rank-one
+                            {% elif loop.index == 2 %}rank-two
+                            {% elif loop.index == 3 %}rank-three
+                            {% endif %}">
+
+                            {% if loop.index == 1 %}
+                                🥇
+                            {% elif loop.index == 2 %}
+                                🥈
+                            {% elif loop.index == 3 %}
+                                🥉
+                            {% else %}
+                                {{ loop.index }}
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <div class="leader-name">
+                                {{ student.full_name or student.username or 'Student' }}
+                            </div>
+
+                            <div class="leader-username">
+                                {{ student.username or '' }}
+
+                                {% if student.quizzes_completed is defined %}
+                                    · {{ student.quizzes_completed }} quiz attempt(s)
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="leader-score">
+                            <strong>
+                                {% if student.average_score is defined and student.average_score is not none %}
+                                    {{ "%.1f"|format(student.average_score|float) }}%
+                                {% elif student.total_score is defined and student.total_score is not none %}
+                                    {{ "%.1f"|format(student.total_score|float) }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+
+                            <span>
+                                {% if student.average_score is defined and student.average_score is not none %}
+                                    Average score
+                                {% else %}
+                                    Score
+                                {% endif %}
+                            </span>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <p class="leaderboard-note">
+                Rankings depend on the results supplied by the application.
+                Only recorded results should be used to determine student positions.
             </p>
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-icon" aria-hidden="true">🏆</div>
+                <h3>Leaderboard data is not available yet</h3>
+                <p>
+                    No leaderboard entries were provided by the application.
+                    Once student results are available, the rankings can appear here.
+                </p>
+            </div>
+
+        {% endif %}
+    </section>
+
+    <!-- QUIZ MANAGEMENT -->
+
+    <section class="panel" aria-labelledby="quiz-list-heading">
+        <div class="panel-header">
+            <div>
+                <h2 id="quiz-list-heading">My Quizzes</h2>
+                <p>
+                    Manage, publish and review the assessments in your system.
+                </p>
+            </div>
+
+            <span class="section-label">
+                {{ quizzes|length }} quiz(es)
+            </span>
         </div>
-        <span class="section-label">
-            {{ quizzes|length }} quiz(es)
-        </span>
-    </div>
 
-    {% if quizzes %}
+        {% if quizzes %}
 
-        <div class="table-toolbar">
-            <p>Search the quiz list by title, description, status or ID.</p>
-            <input
-                type="search"
-                id="quizSearch"
-                class="search-box"
-                placeholder="Search quizzes..."
-                aria-label="Search quizzes"
-            >
-        </div>
+            <div class="table-toolbar">
+                <p>Search the quiz list by title, description, status or ID.</p>
 
-        <div class="table-wrapper">
-            <table id="quizTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Quiz Title</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Duration</th>
-                        <th>Max Attempts</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+                <input
+                    type="search"
+                    id="quizSearch"
+                    class="search-box"
+                    placeholder="Search quizzes..."
+                    aria-label="Search quizzes"
+                >
+            </div>
 
-                <tbody>
-                    {% for quiz in quizzes %}
+            <div class="table-wrapper">
+                <table id="quizTable">
+                    <thead>
                         <tr>
-                            <td>{{ quiz.id }}</td>
+                            <th>ID</th>
+                            <th>Quiz Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Max Attempts</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
-                            <td>
-                                <span class="quiz-title">{{ quiz.title }}</span>
-                            </td>
+                    <tbody>
+                        {% for quiz in quizzes %}
+                            <tr>
+                                <td>{{ quiz.id }}</td>
 
-                            <td>
-                                <span class="quiz-description">
-                                    {{ quiz.description or 'No description' }}
-                                </span>
-                            </td>
+                                <td>
+                                    <span class="quiz-title">{{ quiz.title }}</span>
+                                </td>
 
-                            <td>
-                                {% if quiz.published %}
-                                    <span class="status published">Published</span>
-                                {% else %}
-                                    <span class="status draft">Draft</span>
-                                {% endif %}
-                            </td>
+                                <td>
+                                    <span class="quiz-description">
+                                        {{ quiz.description or 'No description' }}
+                                    </span>
+                                </td>
 
-                            <td>
-                                {% if quiz.duration_minutes %}
-                                    {{ quiz.duration_minutes }} min
-                                {% else %}
-                                    No limit
-                                {% endif %}
-                            </td>
+                                <td>
+                                    {% if quiz.published %}
+                                        <span class="status published">Published</span>
+                                    {% else %}
+                                        <span class="status draft">Draft</span>
+                                    {% endif %}
+                                </td>
 
-                            <td>{{ quiz.max_attempts or 1 }}</td>
+                                <td>
+                                    {% if quiz.duration_minutes %}
+                                        {{ quiz.duration_minutes }} min
+                                    {% else %}
+                                        No limit
+                                    {% endif %}
+                                </td>
 
-                            <td class="actions-cell">
-                                <a
-                                    href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
-                                    class="button edit-btn"
-                                >✏️ Edit</a>
+                                <td>{{ quiz.max_attempts or 1 }}</td>
 
-                                <a
-                                    href="{{ url_for('teacher_results', quiz_id=quiz.id) }}"
-                                    class="button results-btn"
-                                >📊 Results</a>
+                                <td class="actions-cell">
+                                    <a
+                                        href="{{ url_for('edit_quiz', quiz_id=quiz.id) }}"
+                                        class="button edit-btn"
+                                    >✏️ Edit</a>
 
-                                {% if not quiz.published %}
+                                    <a
+                                        href="{{ url_for('teacher_results', quiz_id=quiz.id) }}"
+                                        class="button results-btn"
+                                    >📊 Results</a>
+
+                                    {% if not quiz.published %}
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
+                                            class="inline-form"
+                                        >
+                                            <button type="submit" class="button publish-btn">
+                                                🚀 Publish
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
                                     <form
                                         method="POST"
-                                        action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
+                                        action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}"
                                         class="inline-form"
+                                        onsubmit="return confirmDeleteQuiz(this);"
                                     >
-                                        <button type="submit" class="button publish-btn">
-                                            🚀 Publish
+                                        <button type="submit" class="button delete-btn">
+                                            🗑️ Delete
                                         </button>
                                     </form>
-                                {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-                                <form
-                                    method="POST"
-                                    action="{{ url_for('delete_quiz', quiz_id=quiz.id) }}"
-                                    class="inline-form"
-                                    onsubmit="return confirmDeleteQuiz(this);"
-                                >
-                                    <button type="submit" class="button delete-btn">
-                                        🗑️ Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div id="noSearchResults" class="empty-state" hidden>
+                <h3>No matching quizzes</h3>
+                <p>Try a different search term.</p>
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-icon" aria-hidden="true">📚</div>
+                <h3>No quizzes available</h3>
+                <p>Create your first quiz to get started.</p>
+            </div>
+
+        {% endif %}
+    </section>
+
+    <!-- SYSTEM FEATURES -->
+
+    <section class="panel" aria-labelledby="features-heading">
+        <div class="panel-header">
+            <div>
+                <h2 id="features-heading">System Features</h2>
+                <p>Tools available in your quiz management system.</p>
+            </div>
         </div>
 
-        <div id="noSearchResults" class="empty-state" hidden>
-            <h3>No matching quizzes</h3>
-            <p>Try a different search term.</p>
+        <div class="features-grid">
+            <div class="feature"><span>📄</span> Question upload</div>
+            <div class="feature"><span>✏️</span> Quiz editing</div>
+            <div class="feature"><span>✅</span> Automatic marking</div>
+            <div class="feature"><span>🚀</span> Quiz publishing</div>
+            <div class="feature"><span>👨‍🎓</span> Student accounts</div>
+            <div class="feature"><span>📝</span> Quiz attempts</div>
+            <div class="feature"><span>📊</span> Results and reports</div>
+            <div class="feature"><span>⏱️</span> Timed examinations</div>
+            <div class="feature"><span>🔀</span> Randomised questions</div>
+            <div class="feature"><span>📋</span> Attempt limits</div>
+            <div class="feature"><span>💬</span> Teacher-student messaging</div>
+            <div class="feature"><span>🏆</span> Student leaderboard</div>
         </div>
-
-    {% else %}
-
-        <div class="empty-state">
-            <div class="empty-icon" aria-hidden="true">📚</div>
-            <h3>No quizzes available</h3>
-            <p>
-                Create your first quiz to get started.
-            </p>
-        </div>
-
-    {% endif %}
-</section>
-
-<!-- SYSTEM FEATURES -->
-
-<section class="panel" aria-labelledby="features-heading">
-    <div class="panel-header">
-        <div>
-            <h2 id="features-heading">System Features</h2>
-            <p>Tools available in your quiz management system.</p>
-        </div>
-    </div>
-
-    <div class="features-grid">
-        <div class="feature"><span>📄</span> Question upload</div>
-        <div class="feature"><span>✏️</span> Quiz editing</div>
-        <div class="feature"><span>✅</span> Automatic marking</div>
-        <div class="feature"><span>🚀</span> Quiz publishing</div>
-        <div class="feature"><span>👨‍🎓</span> Student accounts</div>
-        <div class="feature"><span>📝</span> Quiz attempts</div>
-        <div class="feature"><span>📊</span> Results and reports</div>
-        <div class="feature"><span>⏱️</span> Timed examinations</div>
-        <div class="feature"><span>🔀</span> Randomised questions</div>
-        <div class="feature"><span>📋</span> Attempt limits</div>
-        <div class="feature"><span>💬</span> Teacher-student messaging</div>
-        <div class="feature"><span>🏆</span> Student leaderboard</div>
-    </div>
-</section>
-```
+    </section>
 
 </main>
 
@@ -1281,6 +1416,35 @@
 </footer>
 
 <script>
+    /* SHOW OR HIDE THE STUDENT LEADERBOARD */
+
+    const leaderboardToggle = document.getElementById("leaderboardToggle");
+    const leaderboardPanel = document.getElementById("leaderboardPanel");
+
+    if (leaderboardToggle && leaderboardPanel) {
+        leaderboardToggle.addEventListener("click", function () {
+            const isCurrentlyHidden = leaderboardPanel.hidden;
+
+            leaderboardPanel.hidden = !isCurrentlyHidden;
+            leaderboardToggle.setAttribute("aria-expanded", String(isCurrentlyHidden));
+
+            leaderboardToggle.innerHTML = isCurrentlyHidden
+                ? "✖ Hide Student Leaderboard"
+                : "🏆 Show Student Leaderboard";
+
+            if (isCurrentlyHidden) {
+                leaderboardPanel.scrollIntoView({
+                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                        ? "auto"
+                        : "smooth",
+                    block: "start"
+                });
+            }
+        });
+    }
+
+    /* SEARCH QUIZZES */
+
     const searchInput = document.getElementById("quizSearch");
     const quizTable = document.getElementById("quizTable");
     const noSearchResults = document.getElementById("noSearchResults");
@@ -1305,6 +1469,8 @@
             }
         });
     }
+
+    /* CONFIRM QUIZ DELETION */
 
     function confirmDeleteQuiz(form) {
         const titleCell = form.closest("tr")?.querySelector(".quiz-title");
