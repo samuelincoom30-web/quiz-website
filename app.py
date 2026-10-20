@@ -1422,18 +1422,12 @@ def unpublish_quiz(quiz_id):
 # DELETE QUIZ
 # ============================================================
 
-
-@app.route(
-    "/teacher/quiz/<int:quiz_id>/delete",
-    methods=["POST"]
-)
+@app.route("/teacher/quiz/<int:quiz_id>/delete", methods=["POST"])
 @teacher_required
 def delete_quiz(quiz_id):
-
     conn = get_db()
 
     try:
-        # Find the quiz and check who owns it
         quiz = conn.execute("""
             SELECT id, teacher_id
             FROM quizzes
@@ -1444,8 +1438,6 @@ def delete_quiz(quiz_id):
             flash("Quiz not found.")
             return redirect(url_for("teacher_dashboard"))
 
-        # Allow administrators to delete any quiz.
-        # Ordinary teachers can delete only their own quizzes.
         is_admin = bool(session.get("is_admin"))
         teacher_id = quiz["teacher_id"]
 
@@ -1453,35 +1445,54 @@ def delete_quiz(quiz_id):
             flash("You are not allowed to delete this quiz.")
             return redirect(url_for("teacher_dashboard"))
 
-        # Delete student attempts for this quiz first.
-        # Their individual answers are linked to these attempts.
+        # Keep historical student results intact.
+        result_count = conn.execute("""
+            SELECT COUNT(*) AS count
+            FROM results
+            WHERE quiz_id = %s
+        """, (quiz_id,)).fetchone()["count"]
+
+        if result_count > 0:
+            flash(
+                "This quiz has student results and cannot be "
+                "permanently deleted. Unpublish it instead to "
+                "preserve the students' records."
+            )
+            return redirect(url_for("teacher_dashboard"))
+
+        # Remove saved answers before deleting their attempts.
+        conn.execute("""
+            DELETE FROM attempt_answers
+            WHERE attempt_id IN (
+                SELECT id
+                FROM attempts
+                WHERE quiz_id = %s
+            )
+        """, (quiz_id,))
+
+        # Remove attempts and questions before deleting the quiz.
         conn.execute("""
             DELETE FROM attempts
             WHERE quiz_id = %s
         """, (quiz_id,))
 
-        # Delete the questions belonging to this quiz.
         conn.execute("""
             DELETE FROM questions
             WHERE quiz_id = %s
         """, (quiz_id,))
 
-        # Delete the quiz itself.
         conn.execute("""
             DELETE FROM quizzes
             WHERE id = %s
         """, (quiz_id,))
 
         conn.commit()
-
-        flash("Quiz and its related records deleted successfully.")
+        flash("Quiz deleted successfully.")
 
     finally:
         conn.close()
 
     return redirect(url_for("teacher_dashboard"))
-
-
 
 
 # ============================================================
@@ -2199,6 +2210,7 @@ def take_quiz(quiz_id):
         # ----------------------------------------------------
 
         timer_key = f"quiz_start_{quiz_id}"
+        attempt_key = f"quiz_attempt_count_{quiz_id}"
 
         duration_seconds = max(
             60,
@@ -2206,13 +2218,31 @@ def take_quiz(quiz_id):
         )
 
         if request.method == "GET":
-            if timer_key not in session:
-                session[timer_key] = datetime.now().timestamp()
 
-        elif timer_key not in session:
+            # Start a fresh timer when there is no timer for
+            # this quiz or the completed-attempt count changed.
+            if (
+                timer_key not in session
+                or session.get(attempt_key) != attempt_count
+            ):
+                session[timer_key] = (
+                    datetime.now().timestamp()
+                )
+
+                session[attempt_key] = attempt_count
+
+        elif (
+            timer_key not in session
+            or session.get(attempt_key) != attempt_count
+        ):
+
+            # A POST without a valid active timer is treated
+            # as expired by the countdown calculation.
             session[timer_key] = (
                 datetime.now().timestamp() - duration_seconds
             )
+
+            session[attempt_key] = attempt_count
 
         start_time = float(session[timer_key])
 
@@ -2310,6 +2340,9 @@ def take_quiz(quiz_id):
                 ))
 
             conn.commit()
+            # Clear the completed attempt's timer.
+            session.pop(timer_key, None)
+            session.pop(attempt_key, None)
 
             if quiz["show_result_immediately"]:
                 return render_template(
