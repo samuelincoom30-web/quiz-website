@@ -1,215 +1,189 @@
-
 {% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
 
 <style>
-.student-dashboard {
-    --sd-primary: #173b65;
-    --sd-accent: #2563eb;
+/* =========================================
+   STUDENT DASHBOARD
+========================================= */
+
+.student_dashboard {
+    --sd-primary: #2563eb;
+    --sd-primary-dark: #1d4ed8;
+    --sd-text: #172033;
     --sd-muted: #64748b;
-    --sd-border: #e5eaf2;
-    width: 100%;
-    min-width: 0;
-    color: #1e293b;
-    overflow-wrap: anywhere;
+    --sd-border: #e2e8f0;
+    --sd-surface: #ffffff;
+
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 18px 12px 35px;
+    color: var(--sd-text);
 }
 
-.student-dashboard *,
-.student-dashboard *::before,
-.student-dashboard *::after {
+.student_dashboard * {
     box-sizing: border-box;
 }
 
-.student-dashboard a {
-    -webkit-tap-highlight-color: transparent;
-}
-
-.sd-hero {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(24px, 4vw, 44px);
-    margin-bottom: 25px;
-    border-radius: 22px;
-    color: #fff;
-    background: linear-gradient(125deg, #102b4b, #174a80 55%, #3478e5);
-    box-shadow: 0 12px 30px rgba(23, 59, 101, .15);
-}
-
-.sd-hero::before,
-.sd-hero::after {
-    content: "";
-    position: absolute;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.sd-hero::before {
-    width: 280px;
-    height: 280px;
-    right: -65px;
-    top: -125px;
-}
-
-.sd-hero::after {
-    width: 190px;
-    height: 190px;
-    right: 10px;
-    bottom: -125px;
-}
-
-.sd-hero-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
-    align-items: center;
-    gap: 24px;
-}
-
-.sd-hero-content {
-    position: relative;
-    z-index: 1;
-    min-width: 0;
-    max-width: 650px;
-}
-
-.sd-hero-art {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 370px;
-    justify-self: end;
-}
-
-.sd-hero-art svg {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.sd-art-caption {
-    margin-top: 5px;
-    text-align: center;
-    color: #e2eaf7;
-    font-size: 12px;
-    letter-spacing: .3px;
-}
-
-.sd-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    margin-bottom: 16px;
-    border: 1px solid rgba(255,255,255,.22);
-    border-radius: 30px;
-    background: rgba(255,255,255,.1);
-    color: #e4efff;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-}
-
-.sd-hero h1 {
-    margin: 0 0 13px;
-    color: #fff;
-    font-size: clamp(27px, 3.4vw, 39px);
-    line-height: 1.2;
-    letter-spacing: -.7px;
-    overflow-wrap: anywhere;
-}
-
-.sd-hero p {
-    max-width: 570px;
-    margin: 0 0 23px;
-    color: #e2eaf7;
-    font-size: 15px;
-    line-height: 1.8;
-}
-
-.sd-hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.student-dashboard .sd-hero .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    margin: 0;
-    padding: 11px 16px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: #fff;
-    color: #173b65;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
+.student_dashboard a {
     text-decoration: none;
-    transition: background .2s, transform .2s;
-}
-
-.student-dashboard .sd-hero .btn.sd-secondary {
-    border-color: rgba(255,255,255,.35);
-    background: rgba(255,255,255,.1);
-    color: #fff;
 }
 
 .sd-section {
-    margin-bottom: 30px;
+    margin-top: 30px;
 }
 
 .sd-section-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
+    flex-wrap: wrap;
     margin-bottom: 16px;
 }
 
 .sd-section-heading h2 {
     margin: 0;
-    color: #173b65;
-    font-size: 21px;
-    line-height: 1.35;
-    letter-spacing: -.3px;
+    font-size: 1.35rem;
+    font-weight: 750;
+    color: var(--sd-text);
 }
 
 .sd-section-heading p {
     margin: 5px 0 0;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.6;
+    color: var(--sd-muted);
+    font-size: 0.9rem;
 }
 
-.sd-link {
+/* =========================================
+   WELCOME SECTION
+========================================= */
+
+.sd-welcome {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 20px;
+    background: linear-gradient(125deg, #1d4ed8, #2563eb 60%, #4f46e5);
+    color: #ffffff;
+}
+
+.sd-welcome::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -75px;
+    top: -100px;
+    border: 30px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.sd-welcome-content {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.sd-welcome-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 30px;
+    background: rgba(255,255,255,0.12);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.sd-welcome h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+.sd-welcome p {
+    max-width: 650px;
+    margin: 12px 0 0;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.65;
+}
+
+.sd-welcome-illustration {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 115px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 115px;
+    height: 115px;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.14);
+    font-size: 4.2rem;
+}
+
+/* =========================================
+   QUICK LINKS
+========================================= */
+
+.sd-quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.student_dashboard .sd-quick-links .btn {
     display: inline-flex;
     align-items: center;
-    min-height: 40px;
-    color: #2563eb;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
+    justify-content: center;
+    width: auto;
+    min-height: 38px;
+    padding: 8px 13px;
+    border: 1px solid var(--sd-border);
+    border-radius: 9px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 650;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background 0.18s ease, transform 0.18s ease;
 }
 
-.sd-stats {
+.student_dashboard .sd-quick-links .btn:hover {
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   STATISTICS
+========================================= */
+
+.sd-stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
 }
 
-.sd-stat {
+.sd-stat-card {
     min-width: 0;
-    padding: 20px;
-    border: 1px solid #e5eaf2;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(15,23,42,.035);
+    padding: 18px;
+    border: 1px solid var(--sd-border);
+    border-radius: 15px;
+    background: var(--sd-surface);
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
 }
 
 .sd-stat-top {
@@ -217,55 +191,263 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-bottom: 14px;
 }
 
 .sd-stat-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #64748b;
-    font-size: 12px;
+    color: var(--sd-muted);
+    font-size: 0.86rem;
     font-weight: 600;
-    line-height: 1.5;
 }
 
 .sd-stat-icon {
-    display: grid;
-    place-items: center;
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 20px;
-}
-
-.sd-icon-blue {
-    background: #eaf1ff;
-}
-
-.sd-icon-green {
-    background: #e7f8ee;
-}
-
-.sd-icon-purple {
-    background: #f1eaff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: #eff6ff;
+    font-size: 1.2rem;
 }
 
 .sd-stat-value {
-    display: block;
-    color: #173b65;
-    font-size: clamp(24px, 3vw, 34px);
+    margin-top: 13px;
+    color: var(--sd-text);
+    font-size: 1.9rem;
+    line-height: 1.15;
     font-weight: 800;
-    line-height: 1.25;
     overflow-wrap: anywhere;
 }
 
-.sd-stat-caption {
-    margin-top: 7px;
-    color: #94a3b8;
-    font-size: 11px;
-    line-height: 1.5;
+.sd-stat-note {
+    margin-top: 6px;
+    color: var(--sd-muted);
+    font-size: 0.8rem;
 }
+
+/* =========================================
+   QUIZ CARDS
+========================================= */
+
+/*
+   Three columns on desktop.
+   Two columns on tablets.
+   One column on small phones.
+*/
+
+.sd-quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.sd-quiz-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid var(--sd-border);
+    border-radius: 15px;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.sd-quiz-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.sd-quiz-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.sd-quiz-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #eff6ff;
+    font-size: 1.35rem;
+}
+
+.sd-quiz-title-area {
+    min-width: 0;
+    flex: 1;
+}
+
+.sd-quiz-title {
+    margin: 2px 0 0;
+    color: var(--sd-text);
+    font-size: 1rem;
+    font-weight: 750;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.sd-quiz-description {
+    margin: 11px 0 0;
+    color: var(--sd-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.sd-quiz-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 13px;
+}
+
+.sd-quiz-meta span {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 7px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Compact Start Quiz button */
+
+.student_dashboard .sd-quiz-card .sd-start-quiz {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    width: auto;
+    max-width: 100%;
+    min-height: 34px;
+    margin-top: auto;
+    padding: 7px 11px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--sd-primary);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.student_dashboard .sd-quiz-card .sd-start-quiz:hover {
+    background: var(--sd-primary-dark);
+    color: #ffffff;
+}
+
+.sd-quiz-action {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+}
+
+/* =========================================
+   RECENT RESULTS
+========================================= */
+
+.sd-results-card {
+    overflow: hidden;
+    border: 1px solid var(--sd-border);
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.sd-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.sd-results-table {
+    width: 100%;
+    min-width: 560px;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.sd-results-table th,
+.sd-results-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #edf2f7;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 0.87rem;
+}
+
+.sd-results-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+}
+
+.sd-results-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.sd-results-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.sd-score-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 30px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.8rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+/* =========================================
+   EMPTY STATES
+========================================= */
+
+.sd-empty-state {
+    padding: 30px 18px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.sd-empty-icon {
+    margin-bottom: 9px;
+    font-size: 2.3rem;
+}
+
+.sd-empty-state h3 {
+    margin: 0;
+    color: var(--sd-text);
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.sd-empty-state p {
+    margin: 8px 0 0;
+    color: var(--sd-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* =========================================
+   LEARNING SECTION
+========================================= */
 
 .sd-learning-grid {
     display: grid;
@@ -274,684 +456,404 @@
 }
 
 .sd-learning-card {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
-    padding: 22px;
-    border: 1px solid #e5eaf2;
-    border-radius: 17px;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(15,23,42,.035);
+    padding: 18px;
+    border: 1px solid var(--sd-border);
+    border-radius: 14px;
+    background: #ffffff;
 }
 
-.sd-card-icon {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    margin-bottom: 16px;
-    border-radius: 14px;
-    font-size: 23px;
+.sd-learning-card-icon {
+    margin-bottom: 10px;
+    font-size: 1.8rem;
 }
 
 .sd-learning-card h3 {
-    margin: 0 0 9px;
-    color: #173b65;
-    font-size: 17px;
-    line-height: 1.4;
+    margin: 0;
+    color: var(--sd-text);
+    font-size: 1rem;
+    font-weight: 750;
 }
 
 .sd-learning-card p {
-    flex-grow: 1;
-    margin: 0 0 18px;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.75;
+    margin: 8px 0 0;
+    color: var(--sd-muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
 }
 
-.student-dashboard .sd-learning-card .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 44px;
-    margin-top: auto;
-    padding: 11px 13px;
-    border-radius: 9px;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    text-decoration: none;
-}
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
 
-.sd-results-panel {
-    overflow: hidden;
-    border: 1px solid #e5eaf2;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(15,23,42,.035);
-}
-
-.sd-table-wrap {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.student-dashboard .sd-results-panel table {
-    width: 100%;
-    min-width: 500px;
-    border-collapse: collapse;
-}
-
-.student-dashboard .sd-results-panel th {
-    padding: 14px 16px;
-    background: #f5f8fd;
-    color: #64748b;
-    font-size: 10px;
-    letter-spacing: .6px;
-    text-align: left;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.student-dashboard .sd-results-panel td {
-    padding: 15px 16px;
-    border-top: 1px solid #edf1f7;
-    color: #334155;
-    font-size: 12px;
-    vertical-align: middle;
-}
-
-.sd-score {
-    display: inline-block;
-    padding: 6px 9px;
-    border-radius: 7px;
-    background: #eaf1ff;
-    color: #1d4ed8;
-    font-size: 12px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.sd-empty {
-    padding: 30px 20px;
-    text-align: center;
-    color: #64748b;
-}
-
-.sd-empty-icon {
-    margin-bottom: 10px;
-    font-size: 34px;
-}
-
-.sd-empty h3 {
-    margin: 0 0 7px;
-    color: #173b65;
-    font-size: 17px;
-}
-
-.sd-empty p {
-    margin: 0 0 17px;
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-.sd-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: 13px;
-    padding: 19px;
-    border: 1px solid #dbeafe;
-    border-radius: 15px;
-    background: linear-gradient(110deg, #eff6ff, #f8fbff);
-}
-
-.sd-tip-icon {
-    display: grid;
-    place-items: center;
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
-    background: #dbeafe;
-    font-size: 21px;
-}
-
-.sd-tip h3 {
-    margin: 0 0 5px;
-    color: #173b65;
-    font-size: 15px;
-    line-height: 1.5;
-}
-
-.sd-tip p {
-    margin: 0;
-    color: #475569;
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-/* Tablet */
-@media (max-width: 850px) {
-    .sd-hero-layout {
-        grid-template-columns: minmax(0, 1fr) minmax(0, .65fr);
-        gap: 15px;
+@media (max-width: 1000px) {
+    .sd-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .sd-hero-art {
-        max-width: 300px;
-    }
-
-    .sd-stats {
-        gap: 11px;
-    }
-
-    .sd-stat {
-        padding: 17px;
-    }
-
+    .sd-quiz-grid,
     .sd-learning-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* Mobile phones */
 @media (max-width: 600px) {
-    .sd-hero {
-        padding: 22px 16px;
-        margin-bottom: 20px;
+    .student_dashboard {
+        padding: 10px 4px 25px;
+    }
+
+    .sd-welcome {
+        padding: 21px 18px;
+        border-radius: 15px;
+    }
+
+    .sd-welcome-illustration {
+        flex-basis: 65px;
+        width: 65px;
+        height: 65px;
         border-radius: 16px;
+        font-size: 2.5rem;
     }
 
-    .sd-hero-layout {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 15px;
+    .sd-welcome p {
+        font-size: 0.9rem;
     }
 
-    .sd-eyebrow {
-        margin-bottom: 12px;
-        padding: 6px 10px;
-        font-size: 10px;
-        letter-spacing: .8px;
-    }
-
-    .sd-hero h1 {
-        font-size: clamp(25px, 7vw, 32px);
-        line-height: 1.25;
-    }
-
-    .sd-hero p {
-        margin-bottom: 18px;
-        font-size: 14px;
-        line-height: 1.7;
-    }
-
-    .sd-hero-actions {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 9px;
-    }
-
-    .student-dashboard .sd-hero .btn {
-        width: 100%;
-        min-height: 46px;
-        padding: 12px;
-    }
-
-    .sd-hero-art {
-        width: 100%;
-        max-width: 235px;
-        justify-self: center;
-        margin: 0 auto;
-    }
-
-    .sd-art-caption {
-        font-size: 11px;
-    }
-
-    /* Two compact cards per row */
-    .sd-stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .sd-stats-grid {
         gap: 10px;
-        margin-bottom: 25px;
     }
 
-    .sd-stat {
-        padding: 14px 12px;
-        border-radius: 13px;
-    }
-
-    .sd-stat-top {
-        align-items: flex-start;
-        margin-bottom: 11px;
-    }
-
-    .sd-stat-label {
-        font-size: 11px;
-        line-height: 1.45;
-    }
-
-    .sd-stat-icon {
-        flex-basis: 32px;
-        width: 32px;
-        height: 32px;
-        border-radius: 9px;
-        font-size: 17px;
+    .sd-stat-card {
+        padding: 13px;
     }
 
     .sd-stat-value {
-        font-size: clamp(22px, 6vw, 28px);
+        font-size: 1.55rem;
     }
 
-    .sd-stat-caption {
-        font-size: 10px;
+    .sd-quiz-grid,
+    .sd-learning-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .sd-quiz-card {
+        padding: 15px;
+    }
+
+    .student_dashboard .sd-quiz-card .sd-start-quiz {
+        min-height: 38px;
+        padding: 9px 13px;
     }
 
     .sd-section {
-        margin-bottom: 24px;
+        margin-top: 24px;
     }
 
-    .sd-section-heading {
-        align-items: flex-start;
+    .sd-section-heading h2 {
+        font-size: 1.2rem;
+    }
+
+    .sd-quick-links {
         gap: 8px;
     }
 
-    .sd-section-heading h2 {
-        font-size: 19px;
-    }
-
-    .sd-section-heading p {
-        font-size: 12px;
-    }
-
-    .sd-link {
-        min-height: 36px;
-        white-space: nowrap;
-    }
-
-    .sd-learning-grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 11px;
-    }
-
-    .sd-learning-card {
-        padding: 18px;
-        border-radius: 14px;
-    }
-
-    .sd-card-icon {
-        width: 43px;
-        height: 43px;
-        margin-bottom: 13px;
-        font-size: 21px;
-    }
-
-    .sd-learning-card p {
-        margin-bottom: 15px;
-    }
-
-    .sd-results-panel {
-        border-radius: 13px;
-    }
-
-    .student-dashboard .sd-results-panel th {
-        padding: 12px;
-        font-size: 10px;
-    }
-
-    .student-dashboard .sd-results-panel td {
-        padding: 13px 12px;
-        font-size: 12px;
-    }
-
-    .sd-empty {
-        padding: 24px 15px;
-    }
-
-    .sd-tip {
-        gap: 10px;
-        padding: 15px;
-        border-radius: 13px;
-    }
-
-    .sd-tip-icon {
-        flex-basis: 35px;
-        width: 35px;
-        height: 35px;
-        font-size: 18px;
-    }
-
-    .sd-tip h3 {
-        font-size: 14px;
-    }
-
-    .sd-tip p {
-        font-size: 12px;
-        line-height: 1.7;
-    }
-}
-
-/* Very small phones */
-@media (max-width: 360px) {
-    .sd-stats {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .sd-stat {
-        padding: 15px;
-    }
-
-    .sd-hero {
-        padding: 19px 13px;
-    }
-
-    .sd-hero-art {
-        max-width: 210px;
-    }
-
-    .sd-section-heading h2 {
-        font-size: 18px;
+    .student_dashboard .sd-quick-links .btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .student-dashboard *,
-    .student-dashboard *::before,
-    .student-dashboard *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
+    .sd-quiz-card,
+    .sd-quick-links .btn {
+        transition: none;
     }
 }
 </style>
 
-<div class="student-dashboard">
+<div class="student_dashboard">
 
-    {% set score_stats = namespace(total_percent=0, count=0) %}
+    <!-- WELCOME -->
+    <section class="sd-welcome">
+        <div class="sd-welcome-content">
+            <span class="sd-welcome-label">STUDENT LEARNING CENTRE</span>
 
-    {% for result in results %}
-        {% if result.total and result.total|int > 0 %}
-            {% set score_stats.total_percent = score_stats.total_percent + (result.score|float / result.total|float * 100) %}
-            {% set score_stats.count = score_stats.count + 1 %}
-        {% endif %}
-    {% endfor %}
+            <h1>Welcome to Your Dashboard</h1>
 
-    <section class="sd-hero">
-        <div class="sd-hero-layout">
+            <p>
+                Choose a quiz, practise what you have learned, and track your
+                progress. Keep learning, keep improving, and do your best.
+            </p>
+        </div>
 
-            <div class="sd-hero-content">
-                <div class="sd-eyebrow">
-                    <span aria-hidden="true">✦</span>
-                    STUDENT LEARNING CENTRE
+        <div class="sd-welcome-illustration" aria-hidden="true">
+            📚
+        </div>
+    </section>
+
+    <!-- QUICK LINKS -->
+    <nav class="sd-quick-links" aria-label="Student dashboard shortcuts">
+
+        <a class="btn" href="{{ url_for('student_quizzes') }}">
+            📝 Available Quizzes
+        </a>
+
+        <a class="btn" href="{{ url_for('student_results') }}">
+            📊 My Results
+        </a>
+
+        <a class="btn" href="{{ url_for('student_leaderboard') }}">
+            🏆 Leaderboard
+        </a>
+
+        <a class="btn" href="{{ url_for('messages') }}">
+            💬 Messages
+        </a>
+
+    </nav>
+
+    <!-- STATISTICS -->
+    {% set completed_count = results|length if results else 0 %}
+
+    {% set score_stats = namespace(total_score=0, total_possible=0) %}
+
+    {% if results %}
+        {% for result in results %}
+            {% if result.total and result.total > 0 %}
+                {% set score_stats.total_score =
+                    score_stats.total_score + (result.score|float) %}
+                {% set score_stats.total_possible =
+                    score_stats.total_possible + (result.total|float) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set average_percentage = (
+        (score_stats.total_score / score_stats.total_possible * 100)
+        if score_stats.total_possible > 0 else 0
+    ) %}
+
+    <section class="sd-section" aria-label="Learning statistics">
+
+        <div class="sd-stats-grid">
+
+            <article class="sd-stat-card">
+                <div class="sd-stat-top">
+                    <span class="sd-stat-label">Available Quizzes</span>
+                    <span class="sd-stat-icon" aria-hidden="true">📝</span>
                 </div>
 
-                <h1>Welcome back, {{ session.get("username", "Student") }}!</h1>
-
-                <p>
-                    Welcome to STOCKWELL MONTESSORI SCHOOL's Online Examination
-                    Portal. Continue learning, challenge yourself with an examination,
-                    and follow your progress as you work towards your goals.
-                </p>
-
-                <div class="sd-hero-actions">
-                    <a class="btn" href="{{ url_for('student_quizzes') }}">
-                        📝 &nbsp; Explore Examinations
-                    </a>
-
-                    <a class="btn sd-secondary" href="{{ url_for('student_results') }}">
-                        📊 &nbsp; My Performance
-                    </a>
-
-                    <a class="btn sd-secondary" href="{{ url_for('student_leaderboard') }}">
-                        🏆 &nbsp; View Leaderboard
-                    </a>
+                <div class="sd-stat-value">
+                    {{ quizzes|length if quizzes else 0 }}
                 </div>
-            </div>
 
-            <div class="sd-hero-art">
-                <svg viewBox="0 0 420 330" role="img"
-                     aria-labelledby="sd-learning-title sd-learning-desc"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <title id="sd-learning-title">Digital learning illustration</title>
-                    <desc id="sd-learning-desc">
-                        A student studies with a laptop, books, a quiz checklist,
-                        and educational symbols.
-                    </desc>
+                <div class="sd-stat-note">
+                    Quizzes ready for you
+                </div>
+            </article>
 
-                    <defs>
-                        <linearGradient id="sd-screen" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stop-color="#f8fbff"/>
-                            <stop offset="100%" stop-color="#dceaff"/>
-                        </linearGradient>
-                        <linearGradient id="sd-shirt" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stop-color="#f8c84e"/>
-                            <stop offset="100%" stop-color="#f5a623"/>
-                        </linearGradient>
-                    </defs>
+            <article class="sd-stat-card">
+                <div class="sd-stat-top">
+                    <span class="sd-stat-label">Attempts Completed</span>
+                    <span class="sd-stat-icon" aria-hidden="true">✅</span>
+                </div>
 
-                    <ellipse cx="211" cy="294" rx="165" ry="18" fill="#092544" opacity=".24"/>
+                <div class="sd-stat-value">
+                    {{ completed_count }}
+                </div>
 
-                    <g transform="translate(28 38)">
-                        <rect width="74" height="67" rx="16" fill="#fff"/>
-                        <path d="M17 18 Q29 13 37 21 Q45 13 57 18 L57 48 Q45 43 37 50 Q29 43 17 48 Z"
-                              fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-                        <path d="M37 21 V49 M22 26 L31 28 M22 34 L31 36 M44 28 L52 26 M44 36 L52 34"
-                              fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
-                    </g>
+                <div class="sd-stat-note">
+                    Submitted quiz attempts
+                </div>
+            </article>
 
-                    <g transform="translate(310 24)">
-                        <rect width="82" height="91" rx="15" fill="#fff"/>
-                        <rect x="13" y="13" width="56" height="12" rx="5" fill="#dbeafe"/>
-                        <circle cx="21" cy="39" r="5" fill="#22c55e"/>
-                        <path d="M18 39 L20 41 L24 36" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-                        <rect x="31" y="36" width="31" height="6" rx="3" fill="#93a9c5"/>
-                        <circle cx="21" cy="56" r="5" fill="#22c55e"/>
-                        <path d="M18 56 L20 58 L24 53" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-                        <rect x="31" y="53" width="26" height="6" rx="3" fill="#93a9c5"/>
-                        <circle cx="21" cy="73" r="5" fill="#eab308"/>
-                        <rect x="31" y="70" width="31" height="6" rx="3" fill="#cbd5e1"/>
-                    </g>
+            <article class="sd-stat-card">
+                <div class="sd-stat-top">
+                    <span class="sd-stat-label">Average Score</span>
+                    <span class="sd-stat-icon" aria-hidden="true">📈</span>
+                </div>
 
-                    <g transform="translate(337 147)">
-                        <circle cx="23" cy="23" r="23" fill="#facc15"/>
-                        <path d="M23 8 L27 19 L39 19 L29 26 L33 38 L23 31 L13 38 L17 26 L7 19 L19 19 Z" fill="#fff"/>
-                    </g>
+                <div class="sd-stat-value">
+                    {{ "%.1f"|format(average_percentage) }}%
+                </div>
 
-                    <g transform="translate(42 147)">
-                        <circle cx="23" cy="23" r="23" fill="#b7f0d0"/>
-                        <path d="M13 25 L20 32 L34 16" fill="none" stroke="#176b4d" stroke-width="4"
-                              stroke-linecap="round" stroke-linejoin="round"/>
-                    </g>
+                <div class="sd-stat-note">
+                    Based on your recorded results
+                </div>
+            </article>
 
-                    <path d="M40 253 Q210 229 380 253 L365 280 Q210 297 55 280 Z" fill="#f7c65b"/>
-                    <path d="M55 278 L64 308 M365 278 L356 308" stroke="#f4c15a" stroke-width="10" stroke-linecap="round"/>
+            <article class="sd-stat-card">
+                <div class="sd-stat-top">
+                    <span class="sd-stat-label">Keep Improving</span>
+                    <span class="sd-stat-icon" aria-hidden="true">🎯</span>
+                </div>
 
-                    <g transform="translate(43 225)">
-                        <rect x="0" y="22" width="78" height="14" rx="4" fill="#ef4444"/>
-                        <rect x="6" y="7" width="73" height="16" rx="4" fill="#fff"/>
-                        <path d="M17 9 V21" stroke="#cbd5e1" stroke-width="3"/>
-                        <rect x="12" y="-7" width="69" height="15" rx="4" fill="#60a5fa"/>
-                        <path d="M24 -5 V6" stroke="#dbeafe" stroke-width="3"/>
-                    </g>
+                <div class="sd-stat-value">
+                    {% if average_percentage >= 80 %}
+                        🌟
+                    {% elif average_percentage >= 50 %}
+                        👍
+                    {% else %}
+                        💪
+                    {% endif %}
+                </div>
 
-                    <path d="M149 127 Q137 83 166 62 Q199 39 225 66 Q244 86 229 127 Z" fill="#302b36"/>
-                    <ellipse cx="191" cy="104" rx="38" ry="43" fill="#8b5639"/>
-                    <path d="M153 99 Q151 62 182 57 Q210 52 229 78 L230 94 Q210 86 198 72 Q183 94 153 99 Z" fill="#302b36"/>
-                    <path d="M154 109 Q144 105 148 120 Q152 132 160 127" fill="#8b5639"/>
-                    <path d="M224 109 Q235 105 231 120 Q227 132 220 127" fill="#8b5639"/>
-                    <path d="M174 105 Q180 101 185 105 M199 105 Q205 101 210 105"
-                          fill="none" stroke="#302b36" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M187 122 Q195 128 203 121" fill="none" stroke="#6b3829" stroke-width="2.5" stroke-linecap="round"/>
-
-                    <path d="M157 144 Q190 130 222 145 Q244 165 255 226 L132 226 Q139 170 157 144 Z"
-                          fill="url(#sd-shirt)"/>
-                    <path d="M171 144 L190 166 L208 144" fill="none" stroke="#fff" stroke-width="4" opacity=".8"/>
-                    <path d="M151 164 Q133 174 121 202" fill="none" stroke="#8b5639" stroke-width="17" stroke-linecap="round"/>
-                    <path d="M225 164 Q241 178 250 203" fill="none" stroke="#8b5639" stroke-width="17" stroke-linecap="round"/>
-
-                    <g transform="translate(140 187)">
-                        <path d="M17 0 H114 Q121 0 121 8 V68 H10 V8 Q10 0 17 0 Z" fill="#173b65"/>
-                        <rect x="17" y="7" width="97" height="53" rx="3" fill="url(#sd-screen)"/>
-                        <rect x="27" y="15" width="49" height="7" rx="3" fill="#93c5fd"/>
-                        <rect x="27" y="28" width="74" height="5" rx="2" fill="#cbd5e1"/>
-                        <rect x="27" y="38" width="56" height="5" rx="2" fill="#cbd5e1"/>
-                        <circle cx="34" cy="51" r="4" fill="#22c55e"/>
-                        <path d="M32 51 L34 53 L37 49" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
-                        <rect x="43" y="49" width="51" height="4" rx="2" fill="#93a9c5"/>
-                        <path d="M0 68 H131 L119 78 H12 Z" fill="#dbeafe"/>
-                        <path d="M52 70 H79" stroke="#93a9c5" stroke-width="3" stroke-linecap="round"/>
-                    </g>
-
-                    <g transform="translate(285 236) rotate(-12)">
-                        <rect width="60" height="33" rx="4" fill="#fff"/>
-                        <path d="M11 0 V33" stroke="#60a5fa" stroke-width="3"/>
-                        <path d="M19 9 H51 M19 16 H48 M19 23 H43" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-                    </g>
-
-                    <g transform="translate(318 213) rotate(24)">
-                        <rect width="7" height="43" rx="3" fill="#ef4444"/>
-                        <path d="M0 4 H7" stroke="#fca5a5" stroke-width="2"/>
-                        <path d="M0 43 L3.5 50 L7 43 Z" fill="#f5d0a9"/>
-                    </g>
-
-                    <circle cx="122" cy="72" r="4" fill="#facc15"/>
-                    <circle cx="292" cy="130" r="5" fill="#93c5fd"/>
-                    <circle cx="100" cy="188" r="3" fill="#fff" opacity=".85"/>
-                    <circle cx="294" cy="171" r="4" fill="#b7f0d0"/>
-                </svg>
-
-                <div class="sd-art-caption">Learn • Practise • Achieve</div>
-            </div>
+                <div class="sd-stat-note">
+                    Every attempt is a chance to learn
+                </div>
+            </article>
 
         </div>
     </section>
 
-    <section class="sd-stats" aria-label="Your learning statistics">
-
-        <article class="sd-stat">
-            <div class="sd-stat-top">
-                <span class="sd-stat-label">Available Examinations</span>
-                <span class="sd-stat-icon sd-icon-blue" aria-hidden="true">📚</span>
-            </div>
-            <span class="sd-stat-value">{{ quizzes|length }}</span>
-            <div class="sd-stat-caption">Published quizzes to explore</div>
-        </article>
-
-        <article class="sd-stat">
-            <div class="sd-stat-top">
-                <span class="sd-stat-label">Completed Attempts</span>
-                <span class="sd-stat-icon sd-icon-green" aria-hidden="true">✓</span>
-            </div>
-            <span class="sd-stat-value">{{ results|length }}</span>
-            <div class="sd-stat-caption">Recorded examination attempts</div>
-        </article>
-
-        <article class="sd-stat">
-            <div class="sd-stat-top">
-                <span class="sd-stat-label">Average Score</span>
-                <span class="sd-stat-icon sd-icon-purple" aria-hidden="true">📈</span>
-            </div>
-
-            <span class="sd-stat-value">
-                {% if score_stats.count > 0 %}
-                    {{ "%.1f"|format(score_stats.total_percent / score_stats.count) }}%
-                {% else %}
-                    —
-                {% endif %}
-            </span>
-
-            <div class="sd-stat-caption">Across attempts with recorded scores</div>
-        </article>
-
-    </section>
-
+    <!-- AVAILABLE QUIZZES -->
     <section class="sd-section">
+
         <div class="sd-section-heading">
             <div>
-                <h2>Your Learning Centre</h2>
-                <p>Everything you need to continue your learning journey.</p>
-            </div>
-        </div>
-
-        <div class="sd-learning-grid">
-
-            <article class="sd-learning-card">
-                <div class="sd-card-icon sd-icon-blue" aria-hidden="true">📝</div>
-                <h3>Available Quizzes</h3>
-                <p>
-                    Explore published examinations, read the details,
-                    and choose a quiz when you are ready.
-                </p>
-                <a class="btn" href="{{ url_for('student_quizzes') }}">
-                    Browse Quizzes &rarr;
-                </a>
-            </article>
-
-            <article class="sd-learning-card">
-                <div class="sd-card-icon sd-icon-green" aria-hidden="true">🏆</div>
-                <h3>My Results</h3>
-                <p>
-                    Review your marks and previous attempts.
-                    Use your results to identify where you can improve.
-                </p>
-                <a class="btn" href="{{ url_for('student_results') }}">
-                    View Results &rarr;
-                </a>
-            </article>
-
-            <article class="sd-learning-card">
-                <div class="sd-card-icon sd-icon-purple" aria-hidden="true">💬</div>
-                <h3>Messages</h3>
-                <p>
-                    Communicate with your teacher, ask questions,
-                    and check for responses to your messages.
-                </p>
-                <a class="btn" href="{{ url_for('messages') }}">
-                    Open Messages &rarr;
-                </a>
-            </article>
-
-        </div>
-    </section>
-
-    <section class="sd-section">
-        <div class="sd-section-heading">
-            <div>
-                <h2>Recent Examination Results</h2>
-                <p>Your latest recorded performance.</p>
+                <h2>Available Quizzes</h2>
+                <p>Select a quiz to begin your assessment.</p>
             </div>
 
-            <a class="sd-link" href="{{ url_for('student_results') }}">
-                All results &rarr;
+            <a class="btn btn-outline-primary btn-sm"
+               href="{{ url_for('student_quizzes') }}">
+                View All Quizzes
             </a>
         </div>
 
-        <div class="sd-results-panel">
+        {% if quizzes %}
 
-            {% if results %}
+            <div class="sd-quiz-grid">
 
+                {% for quiz in quizzes %}
+
+                    <article class="sd-quiz-card">
+
+                        <div class="sd-quiz-card-top">
+
+                            <div class="sd-quiz-icon" aria-hidden="true">
+                                📝
+                            </div>
+
+                            <div class="sd-quiz-title-area">
+                                <h3 class="sd-quiz-title">
+                                    {{ quiz.title }}
+                                </h3>
+                            </div>
+
+                        </div>
+
+                        <p class="sd-quiz-description">
+                            {% if quiz.description %}
+                                {{ quiz.description }}
+                            {% else %}
+                                Test your knowledge and see how much you have learned.
+                            {% endif %}
+                        </p>
+
+                        <div class="sd-quiz-meta">
+
+                            {% if quiz.question_count is defined %}
+                                <span>
+                                    ❓ {{ quiz.question_count }} questions
+                                </span>
+                            {% endif %}
+
+                            {% if quiz.duration_minutes %}
+                                <span>
+                                    ⏱️ {{ quiz.duration_minutes }} min
+                                </span>
+                            {% endif %}
+
+                            {% if quiz.max_attempts %}
+                                <span>
+                                    🔁 {{ quiz.max_attempts }} attempts
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="sd-quiz-action">
+                            <a class="sd-start-quiz"
+                               href="{{ url_for('take_quiz', quiz_id=quiz.id) }}">
+                                ▶ Start Quiz
+                            </a>
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="sd-empty-state">
+                <div class="sd-empty-icon" aria-hidden="true">📚</div>
+                <h3>No quizzes available right now</h3>
+                <p>
+                    Your teacher has not published any quizzes yet.
+                    Please check again later.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+    <!-- RECENT RESULTS -->
+    <section class="sd-section">
+
+        <div class="sd-section-heading">
+            <div>
+                <h2>Recent Results</h2>
+                <p>Review your recent quiz performance.</p>
+            </div>
+
+            <a class="btn btn-outline-primary btn-sm"
+               href="{{ url_for('student_results') }}">
+                View All Results
+            </a>
+        </div>
+
+        {% if results %}
+
+            <div class="sd-results-card">
                 <div class="sd-table-wrap">
-                    <table>
+
+                    <table class="sd-results-table">
                         <thead>
                             <tr>
-                                <th>Examination</th>
+                                <th>Quiz</th>
                                 <th>Score</th>
+                                <th>Percentage</th>
                                 <th>Date Submitted</th>
                             </tr>
                         </thead>
 
                         <tbody>
+
                             {% for result in results[:5] %}
+
+                                {% set percentage = (
+                                    result.score|float / result.total|float * 100
+                                    if result.total and result.total|float > 0
+                                    else 0
+                                ) %}
+
                                 <tr>
-                                    <td><strong>{{ result.title }}</strong></td>
+                                    <td>
+                                        <strong>{{ result.title }}</strong>
+                                    </td>
 
                                     <td>
-                                        <span class="sd-score">
-                                            {{ result.score }}/{{ result.total }}
-                                            {% if result.total and result.total|int > 0 %}
-                                                · {{ "%.1f"|format(result.score|float / result.total|float * 100) }}%
-                                            {% endif %}
+                                        {{ result.score }} / {{ result.total }}
+                                    </td>
+
+                                    <td>
+                                        <span class="sd-score-pill">
+                                            {{ "%.1f"|format(percentage) }}%
                                         </span>
                                     </td>
 
@@ -959,47 +861,88 @@
                                         {% if result.submitted_at %}
                                             {{ result.submitted_at }}
                                         {% else %}
-                                            Not available
+                                            —
                                         {% endif %}
                                     </td>
                                 </tr>
+
                             {% endfor %}
+
                         </tbody>
                     </table>
+
                 </div>
+            </div>
 
-            {% else %}
+        {% else %}
 
-                <div class="sd-empty">
-                    <div class="sd-empty-icon" aria-hidden="true">📘</div>
-                    <h3>Your learning journey starts here</h3>
-                    <p>
-                        You have no recorded examination attempts yet.
-                        Choose an available quiz to get started.
-                    </p>
-                    <a class="btn" href="{{ url_for('student_quizzes') }}">
-                        Find Your First Quiz &rarr;
-                    </a>
-                </div>
+            <div class="sd-empty-state">
+                <div class="sd-empty-icon" aria-hidden="true">📊</div>
+                <h3>Your results will appear here</h3>
+                <p>
+                    Complete your first quiz to begin tracking your progress.
+                </p>
+            </div>
 
-            {% endif %}
+        {% endif %}
 
-        </div>
     </section>
 
-    <section class="sd-tip">
-        <div class="sd-tip-icon" aria-hidden="true">💡</div>
-        <div>
-            <h3>A little learning every day goes a long way</h3>
-            <p>
-                Read every question carefully, manage your examination time,
-                and review your results after each attempt. Consistent practice
-                can help you build confidence and improve your understanding.
-            </p>
+    <!-- LEARNING TIPS -->
+    <section class="sd-section">
+
+        <div class="sd-section-heading">
+            <div>
+                <h2>Learning Corner</h2>
+                <p>Build good habits and make each study session count.</p>
+            </div>
         </div>
+
+        <div class="sd-learning-grid">
+
+            <article class="sd-learning-card">
+                <div class="sd-learning-card-icon" aria-hidden="true">
+                    🎯
+                </div>
+
+                <h3>Practise Regularly</h3>
+
+                <p>
+                    Take available quizzes regularly to strengthen your
+                    understanding and identify topics that need more practice.
+                </p>
+            </article>
+
+            <article class="sd-learning-card">
+                <div class="sd-learning-card-icon" aria-hidden="true">
+                    📖
+                </div>
+
+                <h3>Review Your Results</h3>
+
+                <p>
+                    Check your scores after each attempt and use them to guide
+                    your revision.
+                </p>
+            </article>
+
+            <article class="sd-learning-card">
+                <div class="sd-learning-card-icon" aria-hidden="true">
+                    🚀
+                </div>
+
+                <h3>Keep Improving</h3>
+
+                <p>
+                    Learn from mistakes, practise challenging questions, and
+                    celebrate your progress.
+                </p>
+            </article>
+
+        </div>
+
     </section>
 
 </div>
 
 {% endblock %}
-

@@ -309,6 +309,19 @@ def init_db():
             BOOLEAN DEFAULT TRUE
         """)
 
+        conn.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS class_name
+            VARCHAR(100) DEFAULT 'Unassigned'
+        """)
+
+        conn.execute("""
+            UPDATE users
+            SET class_name = 'Unassigned'
+            WHERE role = 'student'
+              AND (class_name IS NULL OR TRIM(class_name) = '')
+        """)
+
         conn.commit()
 
 
@@ -370,25 +383,39 @@ def student_required(func):
     def wrapper(*args, **kwargs):
 
         if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
+            return redirect(url_for("login"))
 
         if session.get("role") != "student":
+            flash("Student access required.")
+            return redirect(url_for("login"))
 
+        # Recheck the account so deactivation also stops
+        # an already-authenticated student session.
+        conn = get_db()
+        try:
+            user = conn.execute("""
+                SELECT role, is_active
+                FROM users
+                WHERE id = %s
+            """, (session["user_id"],)).fetchone()
+        finally:
+            conn.close()
+
+        if (
+            not user
+            or user["role"] != "student"
+            or not user["is_active"]
+        ):
+            session.clear()
             flash(
-                "Student access required."
+                "Your account is inactive or unavailable. "
+                "Please contact the administrator."
             )
-
-            return redirect(
-                url_for("login")
-            )
+            return redirect(url_for("login"))
 
         return func(*args, **kwargs)
 
     wrapper.__name__ = func.__name__
-
     return wrapper
 
 
@@ -594,14 +621,48 @@ def manage_teachers():
 @app.route("/admin/students", methods=["GET", "POST"])
 @admin_required
 def manage_students():
-
     conn = get_db()
 
     try:
         if request.method == "POST":
-
-            student_id = request.form.get("student_id", "").strip()
             action = request.form.get("action", "").strip()
+
+            # The main teacher creates student accounts.
+            if action == "create":
+                full_name = request.form.get("full_name", "").strip()
+                username = request.form.get("username", "").strip()
+                password = request.form.get("password", "")
+                class_name = request.form.get("class_name", "").strip()
+
+                if not full_name or not username or not password or not class_name:
+                    flash("Complete all student account fields.")
+                    return redirect(url_for("manage_students"))
+
+                if len(password) < 8:
+                    flash("The student password must contain at least 8 characters.")
+                    return redirect(url_for("manage_students"))
+
+                existing = conn.execute("""
+                    SELECT id FROM users WHERE username = %s
+                """, (username,)).fetchone()
+
+                if existing:
+                    flash("That username is already in use.")
+                    return redirect(url_for("manage_students"))
+
+                conn.execute("""
+                    INSERT INTO users
+                        (full_name, username, password, role,
+                         is_admin, is_active, class_name)
+                    VALUES (%s, %s, %s, 'student', FALSE, TRUE, %s)
+                """, (full_name, username, password, class_name))
+
+                conn.commit()
+                flash("Student account created successfully.")
+                return redirect(url_for("manage_students"))
+
+            # All other actions must refer to an existing student.
+            student_id = request.form.get("student_id", "").strip()
 
             if not student_id.isdigit():
                 flash("Invalid student account.")
@@ -620,17 +681,12 @@ def manage_students():
                 return redirect(url_for("manage_students"))
 
             if action == "update":
+                full_name = request.form.get("full_name", "").strip()
+                username = request.form.get("username", "").strip()
+                class_name = request.form.get("class_name", "").strip()
 
-                full_name = request.form.get(
-                    "full_name", ""
-                ).strip()
-
-                username = request.form.get(
-                    "username", ""
-                ).strip()
-
-                if not full_name or not username:
-                    flash("Full name and username are required.")
+                if not full_name or not username or not class_name:
+                    flash("Full name, username and class are required.")
                     return redirect(url_for("manage_students"))
 
                 existing = conn.execute("""
@@ -646,15 +702,15 @@ def manage_students():
                 conn.execute("""
                     UPDATE users
                     SET full_name = %s,
-                        username = %s
+                        username = %s,
+                        class_name = %s
                     WHERE id = %s AND role = 'student'
-                """, (full_name, username, student_id))
+                """, (full_name, username, class_name, student_id))
 
                 conn.commit()
-                flash("Student details updated successfully.")
+                flash("Student details and class updated successfully.")
 
             elif action == "toggle_status":
-
                 conn.execute("""
                     UPDATE users
                     SET is_active = NOT is_active
@@ -665,13 +721,10 @@ def manage_students():
                 flash("Student account status updated.")
 
             elif action == "reset_password":
+                new_password = request.form.get("new_password", "")
 
-                new_password = request.form.get(
-                    "new_password", ""
-                )
-
-                if not new_password.strip():
-                    flash("Enter a new password.")
+                if len(new_password) < 8:
+                    flash("The new password must contain at least 8 characters.")
                     return redirect(url_for("manage_students"))
 
                 conn.execute("""
@@ -695,15 +748,24 @@ def manage_students():
                 id,
                 full_name,
                 username,
-                is_active
+                is_active,
+                COALESCE(NULLIF(TRIM(class_name), ''), 'Unassigned') AS class_name
             FROM users
             WHERE role = 'student'
               AND (
                   full_name ILIKE %s
                   OR username ILIKE %s
+                  OR class_name ILIKE %s
               )
-            ORDER BY full_name, username
-        """, (f"%{search}%", f"%{search}%")).fetchall()
+            ORDER BY
+                COALESCE(NULLIF(TRIM(class_name), ''), 'Unassigned'),
+                full_name,
+                username
+        """, (
+            f"%{search}%",
+            f"%{search}%",
+            f"%{search}%"
+        )).fetchall()
 
     finally:
         conn.close()
@@ -721,44 +783,9 @@ def manage_students():
 methods=["GET", "POST"]
 )
 def register():
-    if request.method == "POST":
-        full_name = request.form.get("full_name", "").strip()
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
+    flash("Student self-registration is disabled. Please contact the main teacher for an account.")
+    return redirect(url_for("login"))
 
-        if not full_name or not username or not password:
-            flash("Full name, username and password are required.")
-            return redirect(url_for("register"))
-
-        conn = get_db()
-
-        try:
-            existing = conn.execute("""
-                SELECT id
-                FROM users
-                WHERE username = %s
-            """, (username,)).fetchone()
-
-            if existing:
-                flash("Username already exists.")
-                return redirect(url_for("register"))
-
-            conn.execute("""
-                INSERT INTO users
-                    (full_name, username, password, role)
-                VALUES (%s, %s, %s, 'student')
-            """, (full_name, username, password))
-
-            conn.commit()
-
-        finally:
-            conn.close()
-
-        flash("Registration successful. You can now log in.")
-        return redirect(url_for("login"))
-
-    return render_template("register.html")
-    
 
 # ============================================================
 # TEACHER DASHBOARD
@@ -1445,16 +1472,16 @@ def delete_quiz(quiz_id):
             flash("You are not allowed to delete this quiz.")
             return redirect(url_for("teacher_dashboard"))
 
-        # Keep historical student results intact.
-        result_count = conn.execute("""
+        # Preserve quizzes that have student attempts or results.
+        attempt_count = conn.execute("""
             SELECT COUNT(*) AS count
-            FROM results
+            FROM attempts
             WHERE quiz_id = %s
         """, (quiz_id,)).fetchone()["count"]
 
-        if result_count > 0:
+        if attempt_count > 0:
             flash(
-                "This quiz has student results and cannot be "
+                "This quiz has student attempts and cannot be "
                 "permanently deleted. Unpublish it instead to "
                 "preserve the students' records."
             )
@@ -2217,27 +2244,25 @@ def take_quiz(quiz_id):
             int(quiz["duration_minutes"] or 30) * 60
         )
 
+        timer_was_valid = (
+            timer_key in session
+            and session.get(attempt_key) == attempt_count
+        )
+
         if request.method == "GET":
 
             # Start a fresh timer when there is no timer for
             # this quiz or the completed-attempt count changed.
-            if (
-                timer_key not in session
-                or session.get(attempt_key) != attempt_count
-            ):
+            if not timer_was_valid:
                 session[timer_key] = (
                     datetime.now().timestamp()
                 )
 
                 session[attempt_key] = attempt_count
 
-        elif (
-            timer_key not in session
-            or session.get(attempt_key) != attempt_count
-        ):
+        elif not timer_was_valid:
 
-            # A POST without a valid active timer is treated
-            # as expired by the countdown calculation.
+            # A POST without an active timer is expired.
             session[timer_key] = (
                 datetime.now().timestamp() - duration_seconds
             )
@@ -2246,7 +2271,8 @@ def take_quiz(quiz_id):
 
         start_time = float(session[timer_key])
 
-        elapsed_seconds = (
+        elapsed_seconds = max(
+            0,
             datetime.now().timestamp() - start_time
         )
 
@@ -2256,9 +2282,51 @@ def take_quiz(quiz_id):
         )
 
         # ----------------------------------------------------
-        # SUBMIT QUIZ
+        # ENFORCE THE SERVER-SIDE DEADLINE
         # ----------------------------------------------------
 
+        # Allow a short grace period for automatic browser
+        # submission and network delay.
+        submission_expired = (
+            request.method == "POST"
+            and (
+                not timer_was_valid
+                or elapsed_seconds > duration_seconds + 10
+            )
+        )
+
+        if submission_expired:
+            # Record the expired attempt with zero marks so
+            # it cannot be repeatedly retried to bypass the
+            # configured attempt limit.
+            conn.execute("""
+                INSERT INTO attempts
+                (
+                    quiz_id,
+                    student_id,
+                    score,
+                    total
+                )
+                VALUES (%s, %s, %s, %s)
+            """, (
+                quiz_id,
+                session["user_id"],
+                0,
+                len(questions)
+            ))
+
+            conn.commit()
+            session.pop(timer_key, None)
+            session.pop(attempt_key, None)
+
+            flash(
+                "Time expired. This attempt was recorded with a score of zero."
+            )
+            return redirect(url_for("student_dashboard"))
+
+        # ----------------------------------------------------
+        # SUBMIT QUIZ
+        # ----------------------------------------------------
 
         if request.method == "POST":
 

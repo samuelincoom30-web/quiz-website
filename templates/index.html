@@ -176,6 +176,28 @@
             box-sizing: border-box;
         }
     }
+
+    /* Black, silver and gold portal accents */
+    .btn,
+    a.btn {
+        border-color: #d4af37;
+    }
+
+    .btn.success {
+        background: #d4af37;
+        color: #111111;
+    }
+
+    .btn.success:hover {
+        background: #f0d56e;
+        color: #111111;
+    }
+
+    .btn.btn-light {
+        background: #d4d4d8;
+        color: #18181b;
+    }
+
 </style>
 
 <section class="landing-hero">
@@ -197,10 +219,6 @@
     <div class="hero-actions">
         <a class="btn btn-light" href="{{ url_for('login') }}">
             Sign In &rarr;
-        </a>
-
-        <a class="btn success" href="{{ url_for('register') }}">
-            Student Registration
         </a>
 
         <a class="btn btn-light" href="{{ url_for('login') }}">

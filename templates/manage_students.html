@@ -251,6 +251,149 @@
             width: 100%;
         }
     }
+
+    /* Black, silver and gold school-management theme */
+    .sm-page {
+        color: #e4e4e7;
+    }
+
+    .sm-header h1,
+    .sm-student-name {
+        color: #d4af37;
+    }
+
+    .sm-header p,
+    .sm-muted {
+        color: #c4c4cc;
+    }
+
+    .sm-count {
+        background: #d4af37;
+        color: #111111;
+    }
+
+    .sm-card {
+        background: #18181b;
+        border-color: #52525b;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .sm-page input[type="text"],
+    .sm-page input[type="password"] {
+        background: #09090b;
+        color: #f4f4f5;
+        border-color: #71717a;
+    }
+
+    .sm-page input:focus {
+        outline: 2px solid #d4af37;
+        border-color: #d4af37;
+    }
+
+    .sm-primary,
+    .sm-green {
+        background: #d4af37;
+        color: #111111;
+    }
+
+    .sm-primary:hover {
+        background: #f0d56e;
+        color: #111111;
+    }
+
+    .sm-light {
+        background: #d4d4d8;
+        color: #18181b;
+    }
+
+    .sm-table th {
+        background: #27272a;
+        color: #e5c76b;
+    }
+
+    .sm-table td {
+        color: #e4e4e7;
+        border-bottom-color: #3f3f46;
+    }
+
+    .sm-table tbody tr:hover {
+        background: #27272a;
+    }
+
+    .sm-action-section {
+        background: #202024;
+        border-color: #52525b;
+    }
+
+    .sm-action-section h4,
+    .sm-action-section label {
+        color: #e4e4e7;
+    }
+
+    .sm-note {
+        background: #292211;
+        color: #f2df9b;
+        border-color: #92752b;
+    }
+
+    .sm-class-heading td {
+        background: #302711;
+        color: #f0d56e;
+        font-weight: 800;
+        border-top: 2px solid #92752b;
+    }
+
+    .sm-class-count {
+        float: right;
+        color: #d4d4d8;
+        font-weight: 600;
+    }
+
+    .sm-class-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border: 1px solid #92752b;
+        border-radius: 999px;
+        background: #292211;
+        color: #f0d56e;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .sm-create-form {
+        margin-top: 18px;
+    }
+
+    .sm-create-form label {
+        display: block;
+        color: #e4e4e7;
+        font-weight: 700;
+    }
+
+    .sm-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 18px;
+        margin-bottom: 12px;
+    }
+
+    .sm-empty,
+    .sm-empty strong {
+        color: #d4d4d8;
+    }
+
+    @media (max-width: 650px) {
+        .sm-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sm-class-count {
+            float: none;
+            display: block;
+            margin-top: 4px;
+        }
+    }
+
 </style>
 
 <div class="sm-page">
@@ -274,6 +417,47 @@
         Deactivating an account prevents that student from logging in.
         Student accounts are not deleted here, so their existing quiz
         results and records are preserved.
+    </div>
+
+    <div class="sm-card sm-create-card">
+        <h2>Create Student Account</h2>
+        <p class="sm-muted">
+            The main teacher creates accounts and gives each student their login details.
+        </p>
+
+        <form method="POST" action="{{ url_for('manage_students') }}" class="sm-create-form">
+            <input type="hidden" name="action" value="create">
+
+            <div class="sm-form-grid">
+                <div>
+                    <label for="create_full_name">Student's Full Name</label>
+                    <input type="text" id="create_full_name" name="full_name"
+                           maxlength="150" autocomplete="name" required>
+                </div>
+
+                <div>
+                    <label for="create_username">Student Username / ID</label>
+                    <input type="text" id="create_username" name="username"
+                           maxlength="100" autocomplete="off" required>
+                </div>
+
+                <div>
+                    <label for="create_class_name">Class</label>
+                    <input type="text" id="create_class_name" name="class_name"
+                           maxlength="100" placeholder="e.g. JHS 1, Grade 5" required>
+                </div>
+
+                <div>
+                    <label for="create_password">Temporary Password</label>
+                    <input type="password" id="create_password" name="password"
+                           minlength="8" autocomplete="new-password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="sm-btn sm-primary">
+                Create Student Account
+            </button>
+        </form>
     </div>
 
     <div class="sm-card">
@@ -314,6 +498,7 @@
                         <tr>
                             <th>Student</th>
                             <th>Username</th>
+                            <th>Class</th>
                             <th>Account Status</th>
                             <th>Manage Account</th>
                         </tr>
@@ -321,8 +506,18 @@
 
                     <tbody>
 
-                        {% for student in students %}
+                        {% for class_group in students|groupby('class_name') %}
+                            <tr class="sm-class-heading">
+                                <td colspan="5">
+                                    {{ class_group.grouper or 'Unassigned' }}
+                                    <span class="sm-class-count">
+                                        {{ class_group.list|length }}
+                                        student{{ '' if class_group.list|length == 1 else 's' }}
+                                    </span>
+                                </td>
+                            </tr>
 
+                            {% for student in class_group.list %}
                             <tr>
 
                                 <td>
@@ -337,6 +532,12 @@
 
                                 <td>
                                     {{ student.username }}
+                                </td>
+
+                                <td>
+                                    <span class="sm-class-badge">
+                                        {{ student.class_name or 'Unassigned' }}
+                                    </span>
                                 </td>
 
                                 <td>
@@ -396,6 +597,19 @@
                                                     id="username_{{ student.id }}"
                                                     name="username"
                                                     value="{{ student.username }}"
+                                                    maxlength="100"
+                                                    required
+                                                >
+
+                                                <label for="class_name_{{ student.id }}">
+                                                    Class
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    id="class_name_{{ student.id }}"
+                                                    name="class_name"
+                                                    value="{{ student.class_name or 'Unassigned' }}"
                                                     maxlength="100"
                                                     required
                                                 >
@@ -504,6 +718,7 @@
 
                             </tr>
 
+                            {% endfor %}
                         {% endfor %}
 
                     </tbody>
