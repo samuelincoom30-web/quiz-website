@@ -298,6 +298,20 @@ def init_db():
             BOOLEAN DEFAULT TRUE
         """)
 
+        # Ensure older production databases have the full_name column.
+        conn.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS full_name
+            VARCHAR(150)
+        """)
+
+        # Preserve existing names; use the username only when a name is empty.
+        conn.execute("""
+            UPDATE users
+            SET full_name = username
+            WHERE full_name IS NULL OR TRIM(full_name) = ''
+        """)
+
         conn.execute("""
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS is_admin
@@ -1958,6 +1972,21 @@ def student_dashboard():
     conn = get_db()
 
     try:
+        # Load the name of the currently logged-in student.
+        student = conn.execute("""
+            SELECT full_name, username
+            FROM users
+            WHERE id = %s AND role = 'student'
+        """, (session["user_id"],)).fetchone()
+
+        # Use the username if the student's full name is empty.
+        student_name = ""
+        if student:
+            student_name = (
+                (student["full_name"] or "").strip()
+                or (student["username"] or "").strip()
+            )
+
         quizzes = conn.execute("""
             SELECT
                 quizzes.id,
@@ -1995,6 +2024,7 @@ def student_dashboard():
 
     return render_template(
         "student_dashboard.html",
+        student_name=student_name,
         quizzes=quizzes,
         results=results
     )
