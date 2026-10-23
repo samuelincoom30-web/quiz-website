@@ -2,132 +2,751 @@
 
 {% block content %}
 
-<div class="card">
+<style>
+    /* All styling is scoped to the quiz page. */
+    .quiz-page {
+        --quiz-navy: #172554;
+        --quiz-blue: #1d4ed8;
+        --quiz-teal: #0f766e;
+        --quiz-teal-light: #ccfbf1;
+        --quiz-ink: #1e293b;
+        --quiz-muted: #64748b;
+        --quiz-border: #dbe4f0;
+        --quiz-surface: #ffffff;
+        --quiz-background: #f3f7fc;
 
-    <h1>{{ quiz["title"] }}</h1>
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 12px 0 40px;
+        color: var(--quiz-ink);
+    }
 
-    <p>
-        {{ quiz["description"] }}
-    </p>
+    .quiz-page,
+    .quiz-page * {
+        box-sizing: border-box;
+    }
 
-</div>
+    .quiz-page .quiz-intro {
+        position: relative;
+        overflow: hidden;
+        padding: 30px;
+        margin-bottom: 24px;
+        border-radius: 22px;
+        color: #ffffff;
+        background: linear-gradient(130deg, #172554 0%, #1d4ed8 60%, #0f766e 100%);
+        box-shadow: 0 12px 30px rgba(23, 37, 84, 0.16);
+    }
 
+    .quiz-page .quiz-intro::after {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        right: -65px;
+        top: -85px;
+        border: 30px solid rgba(255, 255, 255, 0.09);
+        border-radius: 50%;
+        pointer-events: none;
+    }
 
-<div class="card" style="text-align: center;">
-    <h2>Time Remaining</h2>
-    <h1 id="countdown" style="color: red;">Loading...</h1>
-</div>
+    .quiz-page .quiz-eyebrow {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 6px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #e0f2fe;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+    }
 
-<form method="POST" id="quiz-form">
+    .quiz-page .quiz-intro h1 {
+        position: relative;
+        z-index: 1;
+        margin: 0 0 12px;
+        color: #ffffff;
+        font-size: clamp(1.65rem, 4vw, 2.35rem);
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+    }
 
-    {% for question in questions %}
+    .quiz-page .quiz-intro p {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+        margin: 0;
+        color: #e2e8f0;
+        line-height: 1.75;
+        overflow-wrap: anywhere;
+    }
 
-    <div class="card question">
+    /* The timer remains visible while the student scrolls. */
+    .quiz-page .timer-sticky {
+        position: sticky;
+        top: 12px;
+        z-index: 100;
+        margin: 0 0 26px;
+        padding: 0;
+    }
 
-        <h3>
-            {{ loop.index }}. {{ question["question"] }}
-        </h3>
+    .quiz-page .timer-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 15px 20px;
+        border: 1px solid rgba(204, 251, 241, 0.9);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.13);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
 
-        <div class="option">
+    .quiz-page .timer-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--quiz-muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
 
-            <label>
+    .quiz-page .timer-help {
+        display: block;
+        color: var(--quiz-muted);
+        font-size: 0.86rem;
+    }
 
-                <input type="radio"
-                       name="question_{{ question['id'] }}"
-                       value="A"
-                       required>
+    .quiz-page .timer-value {
+        flex: 0 0 auto;
+        min-width: 112px;
+        padding: 10px 15px;
+        border-radius: 13px;
+        background: var(--quiz-teal-light);
+        color: var(--quiz-teal);
+        font-size: clamp(1.4rem, 4vw, 1.9rem);
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.04em;
+        line-height: 1.2;
+        text-align: center;
+    }
 
-                A. {{ question["option_a"] }}
+    .quiz-page .timer-value.timer-warning {
+        background: #fff7ed;
+        color: #c2410c;
+    }
 
-            </label>
+    .quiz-page .timer-value.timer-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        animation: quiz-timer-pulse 1.2s ease-in-out infinite;
+    }
 
-        </div>
+    @keyframes quiz-timer-pulse {
+        50% {
+            box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.1);
+        }
+    }
 
+    .quiz-page .quiz-instructions {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 0 0 22px;
+        padding: 15px 17px;
+        border: 1px solid #bfdbfe;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: #1e40af;
+        line-height: 1.6;
+    }
 
-        <div class="option">
+    .quiz-page .quiz-instructions strong {
+        display: block;
+        margin-bottom: 2px;
+        color: #1e3a8a;
+    }
 
-            <label>
+    .quiz-page .question-card {
+        margin: 0 0 22px;
+        padding: 24px;
+        border: 1px solid var(--quiz-border);
+        border-radius: 19px;
+        background: var(--quiz-surface);
+        box-shadow: 0 5px 18px rgba(15, 23, 42, 0.055);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        scroll-margin-top: 115px;
+    }
 
-                <input type="radio"
-                       name="question_{{ question['id'] }}"
-                       value="B">
+    .quiz-page .question-card:focus-within {
+        border-color: #93c5fd;
+        box-shadow: 0 8px 25px rgba(29, 78, 216, 0.09);
+    }
 
-                B. {{ question["option_b"] }}
+    .quiz-page .question-heading {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin: 0 0 22px;
+    }
 
-            </label>
+    .quiz-page .question-number {
+        display: inline-flex;
+        flex: 0 0 42px;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, #dbeafe, #ccfbf1);
+        color: var(--quiz-navy);
+        font-size: 1rem;
+        font-weight: 900;
+    }
 
-        </div>
+    .quiz-page .question-heading h2 {
+        flex: 1;
+        min-width: 0;
+        margin: 5px 0 0;
+        color: var(--quiz-navy);
+        font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+        font-weight: 750;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+    }
 
+    .quiz-page .answer-options {
+        display: grid;
+        gap: 11px;
+    }
 
-        <div class="option">
+    .quiz-page .answer-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        min-width: 0;
+        padding: 15px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 13px;
+        background: #ffffff;
+        cursor: pointer;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+        transition:
+            background-color 0.16s ease,
+            border-color 0.16s ease,
+            transform 0.16s ease;
+    }
 
-            <label>
+    .quiz-page .answer-option:hover {
+        border-color: #93c5fd;
+        background: #f8fbff;
+    }
 
-                <input type="radio"
-                       name="question_{{ question['id'] }}"
-                       value="C">
+    .quiz-page .answer-option:has(input:checked) {
+        border-color: var(--quiz-teal);
+        background: #f0fdfa;
+        box-shadow: inset 0 0 0 1px var(--quiz-teal);
+    }
 
-                C. {{ question["option_c"] }}
+    .quiz-page .answer-option input[type="radio"] {
+        flex: 0 0 auto;
+        width: 19px;
+        height: 19px;
+        margin: 4px 0 0;
+        accent-color: var(--quiz-teal);
+        cursor: pointer;
+    }
 
-            </label>
+    .quiz-page .answer-letter {
+        display: inline-flex;
+        flex: 0 0 30px;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        margin-top: -5px;
+        border-radius: 9px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 0.83rem;
+        font-weight: 850;
+    }
 
-        </div>
+    .quiz-page .answer-option:has(input:checked) .answer-letter {
+        background: var(--quiz-teal);
+        color: #ffffff;
+    }
 
+    .quiz-page .answer-text {
+        flex: 1;
+        min-width: 0;
+    }
 
-        <div class="option">
+    .quiz-page .quiz-submit-area {
+        margin-top: 30px;
+        padding: 22px;
+        border: 1px solid var(--quiz-border);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        text-align: center;
+    }
 
-            <label>
+    .quiz-page .quiz-submit-area p {
+        margin: 0 0 15px;
+        color: var(--quiz-muted);
+        line-height: 1.6;
+    }
 
-                <input type="radio"
-                       name="question_{{ question['id'] }}"
-                       value="D">
+    .quiz-page .quiz-submit-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 340px;
+        min-height: 52px;
+        padding: 14px 24px;
+        border: 0;
+        border-radius: 13px;
+        background: linear-gradient(115deg, #1d4ed8, #0f766e);
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 850;
+        cursor: pointer;
+        box-shadow: 0 7px 16px rgba(29, 78, 216, 0.2);
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
 
-                D. {{ question["option_d"] }}
+    .quiz-page .quiz-submit-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(29, 78, 216, 0.26);
+    }
 
-            </label>
+    .quiz-page .quiz-submit-button:focus-visible,
+    .quiz-page .answer-option:focus-within {
+        outline: 3px solid #93c5fd;
+        outline-offset: 3px;
+    }
 
-        </div>
+    .quiz-page .quiz-submit-button:disabled {
+        cursor: wait;
+        opacity: 0.75;
+        transform: none;
+    }
 
+    .quiz-page .quiz-submit-status {
+        margin-top: 12px;
+        color: var(--quiz-muted);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+        .quiz-page {
+            padding: 6px 0 24px;
+        }
+
+        .quiz-page .quiz-intro {
+            padding: 23px 20px;
+            border-radius: 17px;
+        }
+
+        .quiz-page .timer-sticky {
+            top: 6px;
+            margin-bottom: 19px;
+        }
+
+        .quiz-page .timer-panel {
+            gap: 10px;
+            padding: 12px;
+            border-radius: 15px;
+        }
+
+        .quiz-page .timer-value {
+            min-width: 96px;
+            padding: 10px 11px;
+        }
+
+        .quiz-page .timer-help {
+            font-size: 0.78rem;
+        }
+
+        .quiz-page .question-card {
+            padding: 17px 14px;
+            margin-bottom: 16px;
+            border-radius: 15px;
+            scroll-margin-top: 100px;
+        }
+
+        .quiz-page .question-heading {
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .quiz-page .question-number {
+            flex-basis: 36px;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+        }
+
+        .quiz-page .answer-option {
+            gap: 10px;
+            padding: 13px 11px;
+        }
+
+        .quiz-page .quiz-submit-area {
+            padding: 18px 14px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .quiz-page *,
+        .quiz-page *::before,
+        .quiz-page *::after {
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+    /* Gold and charcoal question redesign */
+    .quiz-page .question-card {
+        background: #f5c84c;
+        border: 1px solid #c99a1a;
+        box-shadow: 0 5px 16px rgba(35, 35, 35, 0.12);
+        padding: 20px;
+    }
+
+    .quiz-page .question-card:focus-within {
+        border-color: #292929;
+        box-shadow: 0 0 0 3px rgba(41, 41, 41, 0.16);
+    }
+
+    .quiz-page .question-heading h2 {
+        color: #252525;
+        font-size: clamp(1rem, 2.3vw, 1.12rem);
+        line-height: 1.55;
+    }
+
+    .quiz-page .question-number {
+        background: #292929;
+        color: #ffd966;
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .quiz-page .answer-options {
+        gap: 8px;
+    }
+
+    .quiz-page .answer-option {
+        gap: 10px;
+        padding: 10px 13px;
+        border: 1px solid #b7b7b7;
+        border-radius: 10px;
+        background: #eeeeee;
+        color: #252525;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .quiz-page .answer-option:hover {
+        border-color: #292929;
+        background: #dedede;
+    }
+
+    .quiz-page .answer-option:has(input:checked) {
+        border: 2px solid #292929;
+        background: #292929;
+        color: #ffffff;
+        box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
+    }
+
+    .quiz-page .answer-option input[type="radio"] {
+        width: 17px;
+        height: 17px;
+        margin-top: 3px;
+        accent-color: #d4a514;
+    }
+
+    .quiz-page .answer-letter {
+        flex-basis: 26px;
+        width: 26px;
+        height: 26px;
+        margin-top: -2px;
+        border-radius: 7px;
+        background: #d5d5d5;
+        color: #252525;
+        font-size: 0.78rem;
+    }
+
+    .quiz-page .answer-option:has(input:checked) .answer-letter {
+        background: #ffd966;
+        color: #252525;
+    }
+
+    @media (max-width: 600px) {
+        .quiz-page .question-card {
+            padding: 15px 12px;
+        }
+
+        .quiz-page .answer-option {
+            gap: 8px;
+            padding: 9px 10px;
+            font-size: 0.92rem;
+        }
+    }
+
+</style>
+
+<div class="quiz-page">
+
+    <section class="quiz-intro">
+        <span class="quiz-eyebrow">Assessment in progress</span>
+
+        <h1>{{ quiz["title"] }}</h1>
+
+        {% if quiz["description"] %}
+            <p>{{ quiz["description"] }}</p>
+        {% else %}
+            <p>Read each question carefully and select the answer you believe is correct.</p>
+        {% endif %}
+    </section>
+
+    <div class="timer-sticky">
+        <section class="timer-panel" aria-label="Quiz countdown timer">
+            <div>
+                <span class="timer-label">Time remaining</span>
+                <span class="timer-help" id="timer-help">
+                    Keep an eye on your remaining time.
+                </span>
+            </div>
+
+            <div
+                id="countdown"
+                class="timer-value"
+                role="timer"
+                aria-live="off"
+                aria-atomic="true"
+            >Loading...</div>
+        </section>
     </div>
 
-    {% endfor %}
+    <div class="quiz-instructions">
+        <div aria-hidden="true">ℹ️</div>
+        <div>
+            <strong>Before you begin</strong>
+            Choose one answer for every question. When you are finished, use the
+            Submit Quiz button at the bottom. Your quiz will also submit when the
+            timer reaches zero.
+        </div>
+    </div>
 
+    <form method="POST" id="quiz-form">
+        {% for question in questions %}
 
-    <button type="submit"
-            class="success">
+        <section class="question-card" aria-labelledby="question-title-{{ loop.index }}">
+            <div class="question-heading">
+                <span class="question-number">{{ loop.index }}</span>
 
-        Submit Quiz
+                <h2 id="question-title-{{ loop.index }}">
+                    {{ question["question"] }}
+                </h2>
+            </div>
 
-    </button>
+            <div class="answer-options">
 
-</form>
+                <label class="answer-option">
+                    <input
+                        type="radio"
+                        name="question_{{ question['id'] }}"
+                        value="A"
+                        required
+                    >
+                    <span class="answer-letter">A</span>
+                    <span class="answer-text">{{ question["option_a"] }}</span>
+                </label>
+
+                <label class="answer-option">
+                    <input
+                        type="radio"
+                        name="question_{{ question['id'] }}"
+                        value="B"
+                    >
+                    <span class="answer-letter">B</span>
+                    <span class="answer-text">{{ question["option_b"] }}</span>
+                </label>
+
+                <label class="answer-option">
+                    <input
+                        type="radio"
+                        name="question_{{ question['id'] }}"
+                        value="C"
+                    >
+                    <span class="answer-letter">C</span>
+                    <span class="answer-text">{{ question["option_c"] }}</span>
+                </label>
+
+                <label class="answer-option">
+                    <input
+                        type="radio"
+                        name="question_{{ question['id'] }}"
+                        value="D"
+                    >
+                    <span class="answer-letter">D</span>
+                    <span class="answer-text">{{ question["option_d"] }}</span>
+                </label>
+
+            </div>
+        </section>
+
+        {% endfor %}
+
+        <div class="quiz-submit-area">
+            <p>Finished answering? Review your selections, then submit your quiz.</p>
+
+            <button
+                type="submit"
+                class="quiz-submit-button"
+                id="quiz-submit-button"
+            >
+                Submit Quiz
+            </button>
+
+            <div
+                class="quiz-submit-status"
+                id="quiz-submit-status"
+                role="status"
+                aria-live="polite"
+            ></div>
+        </div>
+    </form>
+</div>
+
 <script>
-    let remainingSeconds = {{ remaining_seconds }};
-    let timerInterval;
-
+(function () {
+    const quizPage = document.querySelector(".quiz-page");
     const countdownDisplay = document.getElementById("countdown");
+    const timerHelp = document.getElementById("timer-help");
     const quizForm = document.getElementById("quiz-form");
+    const submitButton = document.getElementById("quiz-submit-button");
+    const submitStatus = document.getElementById("quiz-submit-status");
+
+    if (!quizPage || !countdownDisplay || !quizForm) {
+        return;
+    }
+
+    let remainingSeconds = Math.max(
+        0,
+        Number({{ remaining_seconds | int }}) || 0
+    );
+
+    let timerInterval = null;
+    let isSubmitting = false;
+
+    function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        return String(minutes).padStart(2, "0") + ":" +
+               String(seconds).padStart(2, "0");
+    }
 
     function updateCountdown() {
-        const minutes = Math.floor(remainingSeconds / 60);
-        const seconds = remainingSeconds % 60;
+        countdownDisplay.textContent = formatTime(remainingSeconds);
 
-        countdownDisplay.textContent =
-            String(minutes).padStart(2, "0") + ":" +
-            String(seconds).padStart(2, "0");
+        countdownDisplay.classList.remove(
+            "timer-warning",
+            "timer-danger"
+        );
+
+        if (remainingSeconds <= 60) {
+            countdownDisplay.classList.add("timer-danger");
+            timerHelp.textContent = "Less than one minute remains!";
+        } else if (remainingSeconds <= 300) {
+            countdownDisplay.classList.add("timer-warning");
+            timerHelp.textContent = "Five minutes or less remaining.";
+        } else {
+            timerHelp.textContent = "Keep an eye on your remaining time.";
+        }
 
         if (remainingSeconds <= 0) {
             clearInterval(timerInterval);
-            countdownDisplay.textContent = "Time is up! Submitting...";
-            quizForm.submit();
+            countdownDisplay.textContent = "00:00";
+            timerHelp.textContent = "Time is up. Submitting your quiz...";
+            submitQuiz(true);
             return;
         }
 
         remainingSeconds--;
     }
 
+    function submitQuiz(automatic) {
+        if (isSubmitting) {
+            return;
+        }
+
+        isSubmitting = true;
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = automatic
+                ? "Time is up — submitting..."
+                : "Submitting...";
+        }
+
+        if (submitStatus) {
+            submitStatus.textContent = automatic
+                ? "Your time has ended. Your answers are being submitted."
+                : "Your answers are being submitted.";
+        }
+
+        /*
+         * Use the native form submit for automatic expiry so the existing
+         * timer behaviour is preserved, including its handling of unanswered
+         * questions.
+         */
+        HTMLFormElement.prototype.submit.call(quizForm);
+    }
+
+    quizForm.addEventListener("submit", function (event) {
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        event.preventDefault();
+
+        const unanswered = quizForm.querySelectorAll(
+            ".question-card:not(:has(input[type='radio']:checked))"
+        ).length;
+
+        if (unanswered > 0) {
+            const proceed = window.confirm(
+                "You have " + unanswered +
+                " unanswered question(s). Submit your quiz anyway?"
+            );
+
+            if (!proceed) {
+                return;
+            }
+        }
+
+        submitQuiz(false);
+    });
+
     updateCountdown();
     timerInterval = setInterval(updateCountdown, 1000);
+})();
 </script>
 
 {% endblock %}
