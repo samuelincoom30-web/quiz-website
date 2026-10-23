@@ -12,92 +12,515 @@
 
     {% if not questions %}
 
-        <!-- ==========================================
-             UPLOAD PDF SECTION
-        =========================================== -->
+        <!-- MANUAL QUESTION BUILDER -->
 
-        <div style="
-            padding: 25px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background: #f9f9f9;
-            margin-bottom: 25px;
-        ">
+<!-- PDF QUESTION UPLOAD OPTION -->
+<section class="upload-pdf-panel" style="
+    margin: 20px 0 28px;
+    padding: 24px;
+    border: 1px solid #dbe5f2;
+    border-radius: 16px;
+    background: #f8fbff;
+">
+    <h2 style="margin: 0 0 8px; color: #173b70;">
+        Upload Questions from a PDF
+    </h2>
+    <p style="margin: 0 0 18px; color: #52627a;">
+        Choose a PDF containing your quiz questions. You can also enter
+        questions manually using the builder below.
+    </p>
 
-            <h3>Upload Question Paper</h3>
+    <form
+        method="POST"
+        action="{{ url_for('upload_questions', quiz_id=quiz['id']) }}"
+        enctype="multipart/form-data"
+    >
+        <label for="questions-pdf"
+               style="display:block; font-weight:600; margin-bottom:8px;">
+            Select questions PDF
+        </label>
 
-            <p>
-                Upload a PDF question paper. The system will extract
-                the questions and multiple-choice options for you to
-                review and edit.
-            </p>
+        <input
+            type="file"
+            id="questions-pdf"
+            name="pdf_file"
+            accept=".pdf,application/pdf"
+            required
+            style="display:block; width:100%; margin-bottom:16px;"
+        >
 
-            <form method="POST"
-                  action="{{ url_for('upload_questions', quiz_id=quiz['id']) }}"
-                  enctype="multipart/form-data">
+        <button
+            type="submit"
+            style="
+                padding: 12px 20px;
+                border: 0;
+                border-radius: 9px;
+                background: #173b70;
+                color: white;
+                font-weight: 700;
+                cursor: pointer;
+            "
+        >
+            Upload Questions PDF
+        </button>
+    </form>
+</section>
+<!-- END PDF QUESTION UPLOAD OPTION -->
 
-                <label for="pdf_file">
-                    <strong>Select PDF Question Paper:</strong>
-                </label>
 
-                <br><br>
+        <style>
+          .manual-builder { color: #172033; }
 
-                <input
-                    type="file"
-                    id="pdf_file"
-                    name="pdf_file"
-                    accept=".pdf,application/pdf"
-                    required
-                    style="
-                        padding: 10px;
-                        width: 100%;
-                    "
-                >
+          .manual-builder .builder-hero {
+            padding: 26px;
+            border-radius: 18px;
+            background: linear-gradient(125deg, #102b55, #2459a6);
+            color: #fff;
+            margin-bottom: 22px;
+          }
 
-                <br><br>
+          .manual-builder .builder-hero h2 {
+            margin: 0 0 8px;
+            font-size: clamp(1.45rem, 3vw, 2rem);
+          }
 
-                <button
-                    type="submit"
-                    style="
-                        padding: 12px 20px;
-                        cursor: pointer;
-                    "
-                >
-                    Upload and Extract Questions
-                </button>
+          .manual-builder .builder-hero p {
+            margin: 0;
+            line-height: 1.6;
+            color: #e8efff;
+          }
 
-            </form>
-
-        </div>
-
-        <!-- ==========================================
-             FUTURE FEATURES INFORMATION
-        =========================================== -->
-
-        <div style="
+          .manual-builder .builder-panel {
+            background: #fff;
+            border: 1px solid #dce4ef;
+            border-radius: 16px;
             padding: 20px;
-            border-left: 4px solid #007bff;
-            background: #f1f7ff;
-            border-radius: 5px;
-        ">
+            margin-bottom: 20px;
+            box-shadow: 0 5px 18px rgba(15, 35, 70, .06);
+          }
 
-            <h3>How It Works</h3>
+          .manual-builder .builder-topline {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+          }
 
-            <ol>
-                <li>Upload your question paper.</li>
-                <li>The system extracts the questions.</li>
-                <li>Review and correct the extracted questions.</li>
-                <li>Select the correct answer for each question.</li>
-                <li>Save the quiz.</li>
-                <li>Edit the quiz if necessary.</li>
-                <li>Publish the quiz when ready.</li>
-                <li>Students log in and take the quiz.</li>
-                <li>Students receive their results.</li>
-                <li>The teacher can view student performance.</li>
-            </ol>
+          .manual-builder .builder-topline h3 {
+            margin: 0 0 5px;
+          }
 
-        </div>
+          .manual-builder .muted {
+            color: #617089;
+            margin: 0;
+            font-size: .94rem;
+          }
 
+          .manual-builder label {
+            display: block;
+            font-weight: 650;
+            font-size: .92rem;
+            margin: 0 0 6px;
+          }
+
+          .manual-builder input[type="text"],
+          .manual-builder textarea,
+          .manual-builder select,
+          .manual-builder input[type="number"] {
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font: inherit;
+            background: #fff;
+            color: #172033;
+          }
+
+          .manual-builder textarea {
+            min-height: 82px;
+            resize: vertical;
+          }
+
+          .manual-builder input:focus,
+          .manual-builder textarea:focus,
+          .manual-builder select:focus {
+            outline: 3px solid rgba(59, 130, 246, .18);
+            border-color: #3976d7;
+          }
+
+          .manual-builder .count-control {
+            width: 130px !important;
+          }
+
+          .manual-builder .question-card {
+            border: 1px solid #dbe3ef;
+            border-radius: 13px;
+            padding: 17px;
+            margin: 0 0 14px;
+            background: #fbfcff;
+          }
+
+          .manual-builder .question-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 12px;
+            color: #173b70;
+            font-size: 1.05rem;
+          }
+
+          .manual-builder .question-number {
+            display: inline-grid;
+            place-items: center;
+            min-width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: #e3edff;
+            color: #174a96;
+            font-weight: 800;
+          }
+
+          .manual-builder .question-text {
+            margin-bottom: 13px;
+          }
+
+          .manual-builder .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 12px;
+          }
+
+          .manual-builder .option-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #334155;
+          }
+
+          .manual-builder .option-letter {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 27px;
+            height: 27px;
+            border-radius: 7px;
+            background: #e8eef8;
+            color: #244a80;
+            font-weight: 800;
+          }
+
+          .manual-builder .answer-row {
+            max-width: 260px;
+            margin-top: 13px;
+          }
+
+          .manual-builder .builder-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 17px;
+          }
+
+          .manual-builder .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font: inherit;
+            font-weight: 750;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .manual-builder .btn-secondary {
+            background: #e9eff8;
+            color: #1c3e70;
+          }
+
+          .manual-builder .btn-save {
+            background: #16804a;
+            color: #fff;
+            padding: 13px 22px;
+          }
+
+          .manual-builder .save-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            border-top: 1px solid #dce4ef;
+            padding-top: 18px;
+            margin-top: 20px;
+          }
+
+          .manual-builder .save-bar p {
+            margin: 0;
+            color: #617089;
+            font-size: .92rem;
+          }
+
+          @media (max-width: 600px) {
+            .manual-builder .builder-panel,
+            .manual-builder .builder-hero {
+              padding: 16px;
+            }
+
+            .manual-builder .options-grid {
+              grid-template-columns: minmax(0, 1fr);
+              gap: 12px;
+            }
+
+            .manual-builder .question-card {
+              padding: 13px;
+            }
+
+            .manual-builder .builder-actions .btn,
+            .manual-builder .save-bar .btn {
+              width: 100%;
+            }
+          }
+        </style>
+
+        <section class="manual-builder">
+          <div class="builder-hero">
+            <h2>Create Your Questions</h2>
+            <p>
+              Enter each question, add options A–D, choose the correct
+              answer, and save. You do not need to upload a PDF.
+            </p>
+          </div>
+
+          <form
+            method="POST"
+            action="{{ url_for('upload_questions', quiz_id=quiz['id']) }}"
+            id="manual-question-form"
+          >
+            <div class="builder-panel">
+              <div class="builder-topline">
+                <div>
+                  <h3>Question Setup</h3>
+                  <p class="muted">
+                    Choose how many questions you want to create.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="question-count">Number of questions</label>
+                  <input
+                    class="count-control"
+                    type="number"
+                    id="question-count"
+                    name="question_count"
+                    min="1"
+                    max="100"
+                    value="10"
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="builder-actions">
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  id="generate-question-fields"
+                >
+                  Generate Question Fields
+                </button>
+              </div>
+
+              <p
+                class="muted"
+                id="question-count-status"
+                aria-live="polite"
+                style="margin-top:10px;"
+              >
+                Preparing 10 question cards…
+              </p>
+            </div>
+
+            <div id="manual-question-list"></div>
+
+            <div class="save-bar">
+              <p>
+                Check every question, all four options, and its correct
+                answer before saving.
+              </p>
+
+              <button class="btn btn-save" type="submit">
+                Save Questions
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <template id="manual-question-template">
+          <article class="question-card">
+            <h3 class="question-heading">
+              <span class="question-number"></span>
+              <span>
+                Question <span class="question-title-number"></span>
+              </span>
+            </h3>
+
+            <div class="question-text">
+              <label class="question-label">Question text</label>
+              <textarea
+                class="question-input"
+                required
+                placeholder="Type the question here…"
+              ></textarea>
+            </div>
+
+            <div class="options-grid">
+              <div>
+                <label class="option-label">
+                  <span class="option-letter">A</span>
+                  <span>Option A</span>
+                </label>
+                <input
+                  class="option-input-a"
+                  type="text"
+                  required
+                  placeholder="Enter option A"
+                >
+              </div>
+
+              <div>
+                <label class="option-label">
+                  <span class="option-letter">B</span>
+                  <span>Option B</span>
+                </label>
+                <input
+                  class="option-input-b"
+                  type="text"
+                  required
+                  placeholder="Enter option B"
+                >
+              </div>
+
+              <div>
+                <label class="option-label">
+                  <span class="option-letter">C</span>
+                  <span>Option C</span>
+                </label>
+                <input
+                  class="option-input-c"
+                  type="text"
+                  required
+                  placeholder="Enter option C"
+                >
+              </div>
+
+              <div>
+                <label class="option-label">
+                  <span class="option-letter">D</span>
+                  <span>Option D</span>
+                </label>
+                <input
+                  class="option-input-d"
+                  type="text"
+                  required
+                  placeholder="Enter option D"
+                >
+              </div>
+            </div>
+
+            <div class="answer-row">
+              <label class="correct-label">Correct answer</label>
+              <select class="correct-input" required>
+                <option value="" selected disabled>
+                  Choose correct option
+                </option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+          </article>
+        </template>
+
+        <script>
+          (function () {
+            const form = document.getElementById('manual-question-form');
+            if (!form || form.dataset.builderReady === '1') return;
+            form.dataset.builderReady = '1';
+
+            const countInput = document.getElementById('question-count');
+            const list = document.getElementById('manual-question-list');
+            const template = document.getElementById('manual-question-template');
+            const status = document.getElementById('question-count-status');
+            const generateButton = document.getElementById('generate-question-fields');
+
+            function generateQuestions() {
+              const count = Number.parseInt(countInput.value, 10);
+
+              if (!Number.isInteger(count) || count < 1 || count > 100) {
+                status.textContent = 'Enter a number from 1 to 100.';
+                countInput.focus();
+                return false;
+              }
+
+              list.replaceChildren();
+
+              for (let i = 0; i < count; i += 1) {
+                const fragment = template.content.cloneNode(true);
+                const card = fragment.querySelector('.question-card');
+
+                card.querySelector('.question-number').textContent = String(i + 1);
+                card.querySelector('.question-title-number').textContent = String(i + 1);
+
+                const fields = [
+                  ['.question-input', 'question_' + i],
+                  ['.option-input-a', 'option_a_' + i],
+                  ['.option-input-b', 'option_b_' + i],
+                  ['.option-input-c', 'option_c_' + i],
+                  ['.option-input-d', 'option_d_' + i],
+                  ['.correct-input', 'correct_answer_' + i]
+                ];
+
+                for (const [selector, name] of fields) {
+                  card.querySelector(selector).name = name;
+                }
+
+                list.appendChild(fragment);
+              }
+
+              status.textContent =
+                count + ' question card' + (count === 1 ? '' : 's') +
+                ' ready. Complete the fields below.';
+
+              return true;
+            }
+
+            generateButton.addEventListener('click', generateQuestions);
+            countInput.addEventListener('change', generateQuestions);
+
+            form.addEventListener('submit', function (event) {
+              if (!list.querySelector('.question-card')) {
+                event.preventDefault();
+                generateQuestions();
+                status.textContent =
+                  'Question fields have been generated. Complete them, then save.';
+                return;
+              }
+
+              if (!form.reportValidity()) {
+                event.preventDefault();
+              }
+            });
+
+            generateQuestions();
+          })();
+        </script>
 
     {% else %}
 

@@ -681,7 +681,7 @@
                         </td>
 
                         <td>
-                            {% if quiz.is_published %}
+                            {% if quiz.published %}
                                 <span class="status-badge status-published">
                                     Published
                                 </span>
@@ -709,7 +709,7 @@
                                     📊 Results
                                 </a>
 
-                                {% if quiz.is_published %}
+                                {% if quiz.published %}
 
                                 <form
                                     method="POST"
@@ -729,8 +729,7 @@
                                     method="POST"
                                     action="{{ url_for('publish_quiz', quiz_id=quiz.id) }}"
                                     onsubmit="return confirm('Publish this quiz?');"
-
-
+                                >
                                     <button type="submit" class="publish-btn">
                                         🚀 Publish
                                     </button>
